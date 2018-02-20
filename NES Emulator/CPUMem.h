@@ -1,11 +1,11 @@
-#ifndef CPUMEM_H
-#define CPUMEM_H
+#pragma once
 
 #ifdef _DEBUG_MODE
 	#include <iostream>
 #endif
 #include <cstdint>
 #include "BitFlag.h"
+#include "MirrorManager.h"
 
 // TODO:
 //		Add error if Read before Write
@@ -23,14 +23,11 @@ private:
 			uint8_t PRGROM[0x2000];
 		};
 	};
+	MirrorManager mm;
+	void SetupMirrors();
 
 public:
 	void Write(uint16_t offset, uint8_t data);
 	uint8_t Read(uint16_t offset);
-
-	#ifdef _DEBUG_MODE
-		CPUMem();
-	#endif
+	CPUMem(bool shouldSetupMirrors);
 };
-
-#endif

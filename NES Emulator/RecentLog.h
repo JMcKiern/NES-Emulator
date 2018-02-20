@@ -1,5 +1,4 @@
-#ifndef RECENTLOG_H
-#define RECENTLOG_H
+#pragma once
 
 #include "Log.h"
 
@@ -48,5 +47,3 @@ RecentLog& operator<<(RecentLog& rlog, T const& data) {
 	cirBuf.add(data);
 	return rlog;
 }
-
-#endif

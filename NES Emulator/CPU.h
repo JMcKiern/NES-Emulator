@@ -1,5 +1,4 @@
-#ifndef CPU_H
-#define CPU_H
+#pragma once
 
 #include <cstdint>
 #include <string>
@@ -9,16 +8,21 @@
 #include "enums.h"
 #include "Log.h"
 
+// TODO:
+//		Check for proper cycle count
+
+class PPU;
+
 class CPU {
 private:
 	// CPU Registers
-	//union {
-	//	const uint64_t RegisterState;
-	//	struct {
+	union {
+		const uint64_t RegisterState;
+		struct {
 			uint16_t PC;
 			uint8_t SP, A, X, Y;
 			union {
-				const uint8_t P = 0x34;
+				const uint8_t P;
 
 				BitFlag<7> N; // Negative Flag
 				BitFlag<6> V; // Overflow Flag
@@ -29,14 +33,17 @@ private:
 				BitFlag<1> Z; // Zero Flag
 				BitFlag<0> C; // Carry Flag
 			};
-	//	};
-	//};
+		};
+	};
 
 	// CPU Memory
 	CPUMem cpuMem;
 	void Write(uint16_t offset, uint8_t data);
 	uint8_t Read(uint16_t offset);
 	uint8_t ReadNoTick(uint16_t offset);
+	
+	// PPU Pointer
+	PPU* PPUPtr;
 
 	// Instructions
 	void ADC(uint16_t offset, AddrMode addrMode);
@@ -96,42 +103,60 @@ private:
 	void TXS(uint16_t offset, AddrMode addrMode);
 	void TYA(uint16_t offset, AddrMode addrMode);
 	
+	// Stack Management
 	void StackPush(uint8_t data);
 	uint8_t StackPop();
+
+	// Processor Status Management
 	void PopToP();
 	void PushP(bool shouldSetBit4);
 	void SetP(uint8_t val, bool shouldSetBit4);
 
+	// Operation Table
 	Operation operationTable[0xFF];
 	void SetupOperationTable();
-
+	
+	// Log file
 	Log log;
 
-	bool _IRQ, _NMI; // pg143 (154) for turning off
-
-	void StartCycle();
-	void RespondToInterrupt(bool isIRQ);
+	// Interrupts // pg143 (154) for turning off
+	int _IRQ;
+	bool _NMI;
+	void RespondToInterrupt(bool isIRQ); // Priority = Start > _NMI > _IRQ
 	void CheckForInterrupt();
+
+	// Timing
+	int cycle = 0;
 	void Tick();
 
+
+
 public:
-	void PowerUp();
-	void EASY6502STARTUP();
-	void TESTSTARTUP();
-	void LOADTEST(uint8_t* arr, unsigned int len);
-	void LOADTESTFROMFILE(std::string filename);
-	void RunNextOpcode();
-	uint16_t GetPC();
+	// Peripherals
+	void SetIRQ(bool stateOn);
+	void SetNMI(bool stateOn);
+
+	// Other Processors
 	//void WritePPURegister(uint8_t data, uint8_t offset);
 	//uint8_t ReadPPURegister(uint8_t offset);
 
+	// Initialization
+	void PowerUp();
+	void EASY6502STARTUP();
+	void FunctionalTestStartup(std::string filename);
+	void LOADTEST(uint8_t* arr, unsigned int len);
+	void LoadFromFile(std::string filename, uint16_t toOffset);
+	void StartCycle();
+
+	// Running
+	void RunNextOpcode();
+	uint16_t GetPC();
+
+	// Logging
 	#ifdef _DEBUG_MODE
 		void PrintDebugInfo();
 	#endif
 
-	CPU::CPU();
-	CPU::CPU(std::string logFile);
-	CPU(uint8_t __P, uint8_t __A, uint8_t __X, uint8_t __Y, uint16_t __PC, uint8_t __SP);
+	// Constructors
+	CPU::CPU(bool shouldSetupMirrors, std::string logFilename);
 };
-
-#endif

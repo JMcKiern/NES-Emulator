@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include "CPU.h"
+#include "MirrorManager.h"
 
 //uint8_t test[] = {0xa9, 0x01, 0x8d, 0x00, 0x02, 0xa9, 0x05, 0x8d ,0x01, 0x02, 0xa9, 0x08, 0x8d, 0x02, 0x02};
 //uint8_t test[] = {0xa9, 0xc0, 0xaa, 0xe8, 0x69, 0xc4, 0x00}; // BRK doesn't really work
@@ -13,12 +14,11 @@ const uint8_t len = 15;
 const std::string logFile = "log.txt";
 
 int main() {
-	CPU cpu(logFile);
+	CPU cpu(true, logFile);
 	//CPU cpu;
 	std::cout << "Loaded CPU\n";
 	//cpu.LOADTEST(test, len);
-	std::string filename = "6502_functional_test.bin";
-	cpu.LOADTESTFROMFILE(filename);
+	cpu.FunctionalTestStartup("6502_functional_test.bin");
 	std::cout << "Loaded test\n";
 
 
@@ -47,6 +47,5 @@ int main() {
 		cpu.PrintDebugInfo();
 	#endif
 
-	
 	std::cin >> x;
 }

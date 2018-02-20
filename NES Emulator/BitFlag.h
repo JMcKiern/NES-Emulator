@@ -1,5 +1,4 @@
-#ifndef BITFLAG_H
-#define BITFLAG_H
+#pragma once
 
 #include <cstdint>
 
@@ -11,5 +10,3 @@ public:
 	operator int() const { return  ((data >> bitNum) & 0x1);}
 	uint8_t GetBitNum() { return bitNum; }
 };
-
-#endif

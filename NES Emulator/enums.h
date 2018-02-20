@@ -1,5 +1,4 @@
-#ifndef ENUMS_H
-#define ENUMS_H
+#pragma once
 
 enum Instr {
 	INSTR_ILLEGAL,
@@ -78,5 +77,3 @@ enum AddrMode {
 	AM_IDXIND,
 	AM_INDIDX
 };
-
-#endif

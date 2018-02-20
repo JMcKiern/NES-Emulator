@@ -1,0 +1,20 @@
+TODOs for a class go in the header file above its declaration ALWAYS
+	You may refer back to a TODO within the definitions (ie in the *.cpp file)
+
+Headers use #define guards
+
+Do not modify other header files not made by me
+
+Width always comes before height
+
+functions: fooBar();
+variables: fooBar;
+Members: fooBar;
+Methods: FooBar();
+Class: FooBar;
+
+in *.cpp gaps after bottom of function only when moving to different catagory
+
+ptr * are on the side of the type (eg int* x; not int *x;)
+
+Methods definitions should be in the same order as their declarations

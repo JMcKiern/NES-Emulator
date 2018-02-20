@@ -1,5 +1,4 @@
-#ifndef LOG_H
-#define LOG_H
+#pragma once
 
 #include <string>
 #include <fstream>
@@ -55,5 +54,3 @@ Log& operator<<(Log& log, T const& data) {
 	}
 	return log;
 }
-
-#endif
