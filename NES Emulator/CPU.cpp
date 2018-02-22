@@ -607,9 +607,11 @@ void CPU::SetupOperationTable() {
 	operationTable[0x98] = Operation(INSTR_TYA, "TYA", AM_IMP, "IMPLIED ( INS )", &CPU::TYA, 1 << 2);
 }
 
+
+
 // Interrupts
 void CPU::RespondToInterrupt(bool isIRQ) {
-	PC += 1;
+	//PC += 1;
 	StackPush((PC >> 8) & 0xFF);					// 3
 	StackPush(PC & 0xFF);							// 4
 	PushP(false); // ??								// 5
@@ -622,9 +624,11 @@ void CPU::RespondToInterrupt(bool isIRQ) {
 	I = 1;
 }
 void CPU::CheckForInterrupt() { // Check interal timings wrt _NMI taking over before _IRQ vectors are selected
-	while ((_IRQ && I == 0) || _NMI) {
-		if (_NMI) {
+	if (!_NMI) hasNMIBeenProcessed = false;
+	while ((_IRQ && I == 0) || (_NMI && !hasNMIBeenProcessed)) {
+		if (_NMI && !hasNMIBeenProcessed) {
 			RespondToInterrupt(false);
+			hasNMIBeenProcessed = true;
 			break;
 		}
 		else if (_IRQ && I == 0) {
@@ -776,6 +780,12 @@ void CPU::RunNextOpcode() {
 		std::cout << cycle;
 		throw - 1;
 	}
+	// Start - Used in 6502_interrupt_test
+	//if ((ReadNoTick(0xbffc) >> 0) & 0x1) SetIRQ(true);
+	//if ((ReadNoTick(0xbffc) >> 1) & 0x1) SetNMI(true);
+	_IRQ = ((ReadNoTick(0xbffc) >> 0) & 0x1);
+	SetNMI((ReadNoTick(0xbffc) >> 1) & 0x1);
+	// End
 	CheckForInterrupt();
 }
 uint16_t CPU::GetPC() {

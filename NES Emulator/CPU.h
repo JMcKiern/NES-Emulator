@@ -120,8 +120,9 @@ private:
 	Log log;
 
 	// Interrupts // pg143 (154) for turning off
-	int _IRQ;
-	bool _NMI;
+	int _IRQ = 0;
+	bool _NMI = false;
+	bool hasNMIBeenProcessed = true; // Potential Error: if _NMI starts low and goes high in first RunOpcode() loop then will miss
 	void RespondToInterrupt(bool isIRQ); // Priority = Start > _NMI > _IRQ
 	void CheckForInterrupt();
 

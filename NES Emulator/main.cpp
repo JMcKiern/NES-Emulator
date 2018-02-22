@@ -19,8 +19,8 @@ int main() {
 	std::cout << "Loaded CPU\n";
 	//cpu.LOADTEST(test, len);
 	//cpu.C64TestStartup("C:\\Users\\Jack\\Downloads\\testsuite - 2.15.tar\\testsuite - 2.15\\bin\\start");
-	cpu.FunctionalTestStartup("Tests/6502_functional_test.bin");
-	//cpu.FunctionalTestStartup("Tests/6502_interrupt_test.bin");
+	//cpu.FunctionalTestStartup("Tests/6502_functional_test.bin");
+	cpu.FunctionalTestStartup("Tests/6502_interrupt_test.bin");
 	std::cout << "Loaded test\n";
 
 
@@ -32,7 +32,8 @@ int main() {
 	int i = 0;
 	while (true) {
  		cpu.RunNextOpcode();
-		if (cpu.GetPC() == 0x336d) break; // Success
+		//if (cpu.GetPC() == 0x336d) break; // Success
+		if (cpu.GetPC() == 0x06f5) break; // Success
 		if (PC == cpu.GetPC()) throw -1;
 		PC = cpu.GetPC();
 		#ifdef _DEBUG_MODE
