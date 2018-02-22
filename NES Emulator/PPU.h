@@ -25,7 +25,7 @@ private:
 
 	
 	// Control Register 1 Variables	
-	uint8_t NN; // NameTable
+	uint16_t NN; // NameTable
 	uint8_t I;  // Address Increment
 	uint8_t S;  // Pattern Table for Sprites
 	uint8_t B;  // Pattern Table for Background
@@ -44,18 +44,29 @@ private:
 	// Control Register 1 Variables	
 	uint16_t nameTableAddr, patternTableAddrSprite, 
 		patternTableAddrBackground;
-	uint8_t addrInc; // Get rid of this - Move to addr += addrInc;
+	uint8_t addrInc;
 	uint8_t pixelWidth = 8, pixelHeight;
 	bool VBlankShouldNMI;
 
 	// Control Register 2 Variables
 	bool isInColourMode, shouldClipBackground, shouldClipSprites,
 		shouldShowBackground, shouldShowSprites;
-	uint16_t colour; //	Background Colour in Monochrome Mode or 
+	uint8_t colourEmphasis; //	Background Colour in Monochrome Mode or 
 					 // Colour Intensity in Colour Mode
+
+	uint8_t fineX, fineY;
+	bool isNextScrollX = true;
+
+	uint16_t VRAMPtr;
+
 public:
 	void RunCycle();
 	void DMA();
+	void SPRRAMTransfer();
+	void DATA();
+	void SCROLL();
+	void ADDR();
+	void Render();
 
 	PPU(CPUMem* _CPUMemPtr);
 };

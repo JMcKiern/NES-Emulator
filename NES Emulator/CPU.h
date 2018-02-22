@@ -43,7 +43,7 @@ private:
 	uint8_t ReadNoTick(uint16_t offset);
 	
 	// PPU Pointer
-	PPU* PPUPtr;
+	//PPU* PPUPtr;
 
 	// Instructions
 	void ADC(uint16_t offset, AddrMode addrMode);
@@ -127,6 +127,7 @@ private:
 
 	// Timing
 	int cycle = 0;
+	bool hasPageCrossed, isPageCrossPossible;
 	void Tick();
 
 
@@ -144,11 +145,13 @@ public:
 	void PowerUp();
 	void EASY6502STARTUP();
 	void FunctionalTestStartup(std::string filename);
+	void C64TestStartup(std::string filename);
 	void LOADTEST(uint8_t* arr, unsigned int len);
 	void LoadFromFile(std::string filename, uint16_t toOffset);
 	void StartCycle();
 
 	// Running
+	uint16_t AddAndCheckForPageCrossing(uint8_t lowVal, uint16_t regVal);
 	void RunNextOpcode();
 	uint16_t GetPC();
 

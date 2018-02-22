@@ -85,16 +85,19 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="6502_functional_test.bin">
-      <Filter>Resource Files</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <Text Include="Guidelines.txt">
       <Filter>Resource Files</Filter>
     </Text>
     <Text Include="TODO.txt">
       <Filter>Resource Files</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Tests\6502_interrupt_test.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Tests\6502_functional_test.bin">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

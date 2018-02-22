@@ -34,33 +34,34 @@ void PPU::UpdateRegisters() {
 	s = ((CR2 >> 4) & 0x1);
 	BGR = ((CR2 >> 5) & 0x111);
 }
-//uint8_t PPU::ReadBothControlRegisters() {
-//	uint8_t CR1 = AccessPPUControlRegister(true);
-//	uint8_t CR2 = AccessPPUControlRegister(false);
-//
-//	{
-//		uint8_t nameTable = (CR1 & 0x11);
-//		if (nameTable == 0) nameTableAddr = 0x2000;
-//		else if (nameTable == 1) nameTableAddr = 0x2400;
-//		else if (nameTable == 2) nameTableAddr = 0x2800;
-//		else if (nameTable == 3) nameTableAddr = 0x2C00;
-//
-//		addrInc = ((CR1 >> 2) & 0x1) ? 32 : 1;
-//		patternTableAddrSprite = ((CR1 >> 3) & 0x1) ? 0x1000 : 0x0;
-//		patternTableAddrBackground = ((CR1 >> 4) & 0x1) ? 0x1000 : 0x0;
-//		pixelHeight = ((CR1 >> 5) & 0x1) ? 16 : 8;
-//		// Bit 6 not used
-//		VBlankShouldNMI = ((CR1 >> 7) & 0x1);
-//	}
-//	{
-//		isInColourMode = !(CR2 & 0x1);
-//		shouldClipBackground = !((CR2 >> 1) & 0x1);
-//		shouldClipSprites = !((CR2 >> 2) & 0x1);
-//		shouldShowBackground = ((CR2 >> 3) & 0x1);
-//		shouldShowSprites = ((CR2 >> 4) & 0x1);
-//		colour = ((CR2 >> 5) & 0x111);
-//	}
-//}
+uint8_t PPU::ReadBothControlRegisters() {
+	uint8_t CR1 = AccessPPUControlRegister(true);
+	uint8_t CR2 = AccessPPUControlRegister(false);
+
+	{
+		uint8_t nameTable = (CR1 & 0x11);
+		if (nameTable == 0) nameTableAddr = 0x2000;
+		else if (nameTable == 1) nameTableAddr = 0x2400;
+		else if (nameTable == 2) nameTableAddr = 0x2800;
+		else if (nameTable == 3) nameTableAddr = 0x2C00;
+
+		addrInc = ((CR1 >> 2) & 0x1) ? 32 : 1;
+		patternTableAddrSprite = ((CR1 >> 3) & 0x1) ? 0x1000 : 0x0;
+		patternTableAddrBackground = ((CR1 >> 4) & 0x1) ? 0x1000 : 0x0;
+		pixelHeight = ((CR1 >> 5) & 0x1) ? 16 : 8;
+		// Bit 6 not used
+		VBlankShouldNMI = ((CR1 >> 7) & 0x1);
+	}
+	{
+		isInColourMode = !(CR2 & 0x1);
+		shouldClipBackground = !((CR2 >> 1) & 0x1);
+		shouldClipSprites = !((CR2 >> 2) & 0x1);
+		shouldShowBackground = ((CR2 >> 3) & 0x1);
+		shouldShowSprites = ((CR2 >> 4) & 0x1);
+		colourEmphasis = ((CR2 >> 5) & 0x111);
+	}
+	return 1;
+}
 uint8_t PPU::AccessPPUControlRegister(bool shouldAccessCR1) {
 	if (shouldAccessCR1) {
 		return CPUMemPtr->Read(0x2000);
@@ -74,12 +75,36 @@ void PPU::SetPPUStatusRegister(uint8_t data) {
 }
 
 void PPU::RunCycle() {
+
 }
 void PPU::DMA() {
-	uint8_t operand = Read(0x4014);
+	uint8_t operand = CPUMemPtr->Read(0x4014);
 	for (int i = 0; i < 0x100; i++) {
-		SPRRAM[i] = Read((operand * 0x100) + i);
+		SPRRAM[i] = CPUMemPtr->Read((operand * 0x100) + i);
 	}
+}
+void PPU::Render() {
+}
+void PPU::SPRRAMTransfer() {
+	uint8_t addr = CPUMemPtr->Read(0x2003);
+	uint8_t data = CPUMemPtr->Read(0x2004);
+	SPRRAM[addr] = data;
+}
+void PPU::SCROLL() {
+	if (isNextScrollX) {
+		fineX = CPUMemPtr->Read(0x2005);
+	}
+	else {
+		fineY = CPUMemPtr->Read(0x2005);
+	}
+	isNextScrollX = !isNextScrollX;
+}
+void PPU::DATA() {
+	VRAMPtr = CPUMemPtr->Read(0x2006);
+	uint8_t data = CPUMemPtr->Read(0x2007);
+
+	VRAMPtr += addrInc;
+	CPUMemPtr->Write(0x2006, VRAMPtr);
 }
 
 PPU::PPU(CPUMem* _CPUMemPtr) {

@@ -44,11 +44,12 @@
     <ClInclude Include="RecentLog.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="6502_functional_test.bin" />
-  </ItemGroup>
-  <ItemGroup>
     <Text Include="Guidelines.txt" />
     <Text Include="TODO.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Tests\6502_functional_test.bin" />
+    <None Include="Tests\6502_interrupt_test.bin" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

@@ -14,11 +14,13 @@ const uint8_t len = 15;
 const std::string logFile = "log.txt";
 
 int main() {
-	CPU cpu(true, logFile);
+	CPU cpu(false, logFile);
 	//CPU cpu;
 	std::cout << "Loaded CPU\n";
 	//cpu.LOADTEST(test, len);
-	cpu.FunctionalTestStartup("6502_functional_test.bin");
+	//cpu.C64TestStartup("C:\\Users\\Jack\\Downloads\\testsuite - 2.15.tar\\testsuite - 2.15\\bin\\start");
+	cpu.FunctionalTestStartup("Tests/6502_functional_test.bin");
+	//cpu.FunctionalTestStartup("Tests/6502_interrupt_test.bin");
 	std::cout << "Loaded test\n";
 
 
@@ -30,11 +32,7 @@ int main() {
 	int i = 0;
 	while (true) {
  		cpu.RunNextOpcode();
-		if (cpu.GetPC() == 0x336d) break;
-		if (cpu.GetPC() == 0x09cf)
-			std::cout << "asdf";
-		if (cpu.GetPC() == 0x09f5)
-			std::cout << "asdf";
+		if (cpu.GetPC() == 0x336d) break; // Success
 		if (PC == cpu.GetPC()) throw -1;
 		PC = cpu.GetPC();
 		#ifdef _DEBUG_MODE

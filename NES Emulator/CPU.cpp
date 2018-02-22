@@ -11,7 +11,7 @@
 
 // CPU Memory
 void CPU::Write(uint16_t offset, uint8_t data) {
-	if (offset == 0x4014) PPUPtr->DMA();
+	//if (offset == 0x4014) PPUPtr->DMA();
 	cpuMem.Write(offset, data);
 	Tick();
 }
@@ -48,7 +48,10 @@ void CPU::ASL(uint16_t offset, AddrMode addrMode) {
 		A = (temp & 0xFF);
 	}
 	else {
+		if (!hasPageCrossed && addrMode == AM_ABSX) Tick();
 		uint8_t M = Read(offset);
+		if (addrMode == AM_ABS || addrMode == AM_ZP || addrMode == AM_ZPX
+			|| addrMode == AM_ABSX) Tick();
 		temp = M << 1;
 		Write(offset, (temp & 0xFF));
 	}
@@ -57,13 +60,28 @@ void CPU::ASL(uint16_t offset, AddrMode addrMode) {
 	N = (temp >> 7) & 0x1;
 }
 void CPU::BCC(uint16_t offset, AddrMode addrMode) {
-	if (C == 0) PC += static_cast<int8_t>(Read(offset));
+	int8_t value = static_cast<int8_t>(Read(offset));
+	if (C == 0) {
+		AddAndCheckForPageCrossing(ReadNoTick(PC + 1), PC & 0xFF);
+		PC += value;
+		Tick();
+	}
 }
 void CPU::BCS(uint16_t offset, AddrMode addrMode) {
-	if (C == 1) PC += static_cast<int8_t>(Read(offset));
+	int8_t value = static_cast<int8_t>(Read(offset));
+	if (C == 1) {
+		AddAndCheckForPageCrossing(ReadNoTick(PC + 1), PC & 0xFF);
+		PC += value;
+		Tick();
+	}
 }
 void CPU::BEQ(uint16_t offset, AddrMode addrMode) {
-	if (Z == 1) PC += static_cast<int8_t>(Read(offset));
+	int8_t value = static_cast<int8_t>(Read(offset));
+	if (Z == 1) {
+		AddAndCheckForPageCrossing(ReadNoTick(PC + 1), PC & 0xFF);
+		PC += value;
+		Tick();
+	}
 }
 void CPU::BIT(uint16_t offset, AddrMode addrMode) {
 	uint8_t M = Read(offset);
@@ -72,13 +90,28 @@ void CPU::BIT(uint16_t offset, AddrMode addrMode) {
 	N = (M >> 7) & 0x1;
 }
 void CPU::BMI(uint16_t offset, AddrMode addrMode) {
-	if (N == 1) PC += static_cast<int8_t>(Read(offset));
+	int8_t value = static_cast<int8_t>(Read(offset));
+	if (N == 1) {
+		AddAndCheckForPageCrossing(ReadNoTick(PC + 1), PC & 0xFF);
+		PC += value;
+		Tick();
+	}
 }
 void CPU::BNE(uint16_t offset, AddrMode addrMode) {
-	if (Z == 0) PC += static_cast<int8_t>(Read(offset));
+	int8_t value = static_cast<int8_t>(Read(offset));
+	if (Z == 0) {
+		AddAndCheckForPageCrossing(ReadNoTick(PC + 1), PC & 0xFF);
+		PC += value;
+		Tick();
+	}
 }
 void CPU::BPL(uint16_t offset, AddrMode addrMode) {
-	if (N == 0) PC += static_cast<int8_t>(Read(offset));
+	int8_t value = static_cast<int8_t>(Read(offset));
+	if (N == 0) {
+		AddAndCheckForPageCrossing(ReadNoTick(PC + 1), PC & 0xFF);
+		PC += value;
+		Tick();
+	}
 }
 void CPU::BRK(uint16_t offset, AddrMode addrMode) { // TODO: Check if correct
 	PC += 1;
@@ -89,10 +122,20 @@ void CPU::BRK(uint16_t offset, AddrMode addrMode) { // TODO: Check if correct
 	I = 1; // http://6502.org/tutorials/interrupts.html#2.2
 }
 void CPU::BVC(uint16_t offset, AddrMode addrMode) {
-	if (V == 0) PC += static_cast<int8_t>(Read(offset));
+	int8_t value = static_cast<int8_t>(Read(offset));
+	if (V == 0) {
+		AddAndCheckForPageCrossing(ReadNoTick(PC + 1), PC & 0xFF);
+		PC += value;
+		Tick();
+	}
 }
 void CPU::BVS(uint16_t offset, AddrMode addrMode) {
-	if (V == 1) PC += static_cast<int8_t>(Read(offset));
+	int8_t value = static_cast<int8_t>(Read(offset));
+	if (V == 1) {
+		AddAndCheckForPageCrossing(ReadNoTick(PC + 1), PC & 0xFF);
+		PC += value;
+		Tick();
+	}
 }
 void CPU::CLC(uint16_t offset, AddrMode addrMode) {
 	C = 0;
@@ -125,7 +168,10 @@ void CPU::CPY(uint16_t offset, AddrMode addrMode) {
 	N = ((Y - M) >> 7) & 0x1;
 }
 void CPU::DEC(uint16_t offset, AddrMode addrMode) {
+	if (!hasPageCrossed && addrMode == AM_ABSX) Tick();
 	uint8_t M = Read(offset) - 1;
+	if (addrMode == AM_ABS || addrMode == AM_ZP || addrMode == AM_ZPX
+		|| addrMode == AM_ABSX) Tick();
 	Write(offset, M);
 	Z = M == 0;
 	N = (M >> 7) & 0x1;
@@ -147,7 +193,10 @@ void CPU::EOR(uint16_t offset, AddrMode addrMode) {
 	N = (A >> 7) & 0x1;
 }
 void CPU::INC(uint16_t offset, AddrMode addrMode) {
+	if (!hasPageCrossed && addrMode == AM_ABSX) Tick();
 	uint8_t M = Read(offset) + 1;
+	if (addrMode == AM_ABS || addrMode == AM_ZP || addrMode == AM_ZPX
+		|| addrMode == AM_ABSX) Tick();
 	Write(offset, M);
 	Z = M == 0;
 	N = (M >> 7) & 0x1;
@@ -165,7 +214,8 @@ void CPU::INY(uint16_t offset, AddrMode addrMode) {
 void CPU::JMP(uint16_t offset, AddrMode addrMode) {
 	PC = offset;
 }
-void CPU::JSR(uint16_t offset, AddrMode addrMode) {
+void CPU::JSR(uint16_t offset, AddrMode addrMode) { 
+	// Potential Error: ADH should only be fetched on cycle 6
 	PC -= 1;
 	StackPush((PC >> 8) & 0xFF);	// 4
 	StackPush(PC & 0xFF);			// 5
@@ -196,7 +246,10 @@ void CPU::LSR(uint16_t offset, AddrMode addrMode) {
 		A = (temp & 0xFF);
 	}
 	else {
+		if (!hasPageCrossed && addrMode == AM_ABSX) Tick();
 		uint8_t M = Read(offset);
+		if (addrMode == AM_ABS || addrMode == AM_ZP || addrMode == AM_ZPX
+			|| addrMode == AM_ABSX) Tick();
 		temp = M >> 1;
 		oldBit = M & 0x1;
 		Write(offset, (temp & 0xFF));
@@ -220,11 +273,13 @@ void CPU::PHP(uint16_t offset, AddrMode addrMode) {
 	PushP(true);
 }
 void CPU::PLA(uint16_t offset, AddrMode addrMode) {
+	Tick();
 	A = StackPop();
 	Z = A == 0;
 	N = (A >> 7) & 0x1;
 }
 void CPU::PLP(uint16_t offset, AddrMode addrMode) {
+	Tick();
 	PopToP();
 }
 void CPU::ROL(uint16_t offset, AddrMode addrMode) {
@@ -235,7 +290,10 @@ void CPU::ROL(uint16_t offset, AddrMode addrMode) {
 		A = (temp & 0xFF);
 	}
 	else {
+		if (!hasPageCrossed && addrMode == AM_ABSX) Tick();
 		uint8_t M = Read(offset);
+		if (addrMode == AM_ABS || addrMode == AM_ZP || addrMode == AM_ZPX
+			|| addrMode == AM_ABSX) Tick();
 		temp = M << 1;
 		temp = temp | C;
 		Write(offset, (temp & 0xFF));
@@ -254,7 +312,10 @@ void CPU::ROR(uint16_t offset, AddrMode addrMode) {
 		A = (temp & 0xFF);
 	}
 	else {
+		if (!hasPageCrossed && addrMode == AM_ABSX) Tick();
 		uint8_t M = Read(offset);
+		if (addrMode == AM_ABS || addrMode == AM_ZP || addrMode == AM_ZPX
+			|| addrMode == AM_ABSX) Tick();
 		temp = M >> 1;
 		temp = temp | (C << 7);
 		oldBit = M & 0x1;
@@ -265,19 +326,18 @@ void CPU::ROR(uint16_t offset, AddrMode addrMode) {
 	N = (temp >> 7) & 0x1;
 }
 void CPU::RTI(uint16_t offset, AddrMode addrMode) {
-	Tick(); Tick();					// 2,3 Check pg133 of book. A
+	Tick();
 	PopToP();						// 4
 	uint8_t PC_l = StackPop();		// 5
 	uint8_t PC_h = StackPop();		// 6
 	PC = (PC_h << 8) + PC_l;
 }
 void CPU::RTS(uint16_t offset, AddrMode addrMode) {
-	Tick(); Tick();					// 2,3
+	Tick();
 	uint8_t PC_l = StackPop();		// 4
 	uint8_t PC_h = StackPop();		// 5
 	PC = (PC_h << 8) + PC_l;
-	Tick();							// 6
-	PC += 1;
+	PC += 1; Tick();
 }
 void CPU::SBC(uint16_t offset, AddrMode addrMode) {
 	uint8_t M = Read(offset);
@@ -299,12 +359,15 @@ void CPU::SEI(uint16_t offset, AddrMode addrMode) {
 	I = 1;
 }
 void CPU::STA(uint16_t offset, AddrMode addrMode) {
+	if (!hasPageCrossed && (addrMode == AM_ABSX || addrMode == AM_ABSY || addrMode == AM_INDIDX)) Tick();
 	Write(offset, A);
 }
 void CPU::STX(uint16_t offset, AddrMode addrMode) {
+	if (!hasPageCrossed && addrMode == AM_ABSX || addrMode == AM_ABSY) Tick();
 	Write(offset, X);
 }
 void CPU::STY(uint16_t offset, AddrMode addrMode) {
+	if (!hasPageCrossed && addrMode == AM_ABSX || addrMode == AM_ABSY) Tick();
 	Write(offset, Y);
 }
 void CPU::TAX(uint16_t offset, AddrMode addrMode) {
@@ -399,8 +462,8 @@ void CPU::SetupOperationTable() {
 	operationTable[0x79] = Operation(INSTR_ADC, "ADC", AM_ABSY, "ABSOLUTE, Y ( INS $????,Y )", &CPU::ADC, (1 << 4) + (1 << 5));
 	operationTable[0x61] = Operation(INSTR_ADC, "ADC", AM_IDXIND, "INDEXED INDIRECT ( INS ($??,X) )", &CPU::ADC, 1 << 6);
 	operationTable[0x71] = Operation(INSTR_ADC, "ADC", AM_INDIDX, "INDIRECT INDEXED ( INS ($??),Y )", &CPU::ADC, (1 << 5) + (1 << 6));
-	operationTable[0x29] = Operation(INSTR_AND, "AND", AM_IMM, "IMMEDIATE ( INS #?? )", &CPU::AND, 1 << 1);
-	operationTable[0x25] = Operation(INSTR_AND, "AND", AM_ZP, "ZERO PAGE ( INS $?? )", &CPU::AND, 1 << 2);
+	operationTable[0x29] = Operation(INSTR_AND, "AND", AM_IMM, "IMMEDIATE ( INS #?? )", &CPU::AND, 1 << 2);
+	operationTable[0x25] = Operation(INSTR_AND, "AND", AM_ZP, "ZERO PAGE ( INS $?? )", &CPU::AND, 1 << 3);
 	operationTable[0x35] = Operation(INSTR_AND, "AND", AM_ZPX, "ZERO PAGE, X ( INS $??,X )", &CPU::AND, 1 << 4);
 	operationTable[0x2D] = Operation(INSTR_AND, "AND", AM_ABS, "ABSOLUTE ( INS $???? )", &CPU::AND, 1 << 4);
 	operationTable[0x3D] = Operation(INSTR_AND, "AND", AM_ABSX, "ABSOLUTE, X ( INS $????,X )", &CPU::AND, (1 << 4) + (1 << 5));
@@ -616,6 +679,15 @@ void CPU::FunctionalTestStartup(std::string filename) {
 	PC = 0x400;
 	SP = 0xFF;
 }
+void CPU::C64TestStartup(std::string filename) {
+	LoadFromFile(filename, 0);
+	SetP(0x34, true);
+	A = 0;
+	X = 0;
+	Y = 0;
+	PC = 0x400;
+	SP = 0xFF;
+}
 void CPU::StartCycle() {
 	Tick();
 	Tick();
@@ -650,9 +722,19 @@ void CPU::LoadFromFile(std::string filename, uint16_t toOffset) {
 }
 
 // Running
+uint16_t CPU::AddAndCheckForPageCrossing(uint8_t lowVal, uint16_t regVal) {
+	isPageCrossPossible = true;
+	uint16_t addition = lowVal + regVal;
+	if (addition & 0x100) {
+		Tick(); // Page Boundary crossed so must waste cycle
+		hasPageCrossed = true;
+	}
+	return addition;
+}
 void CPU::RunNextOpcode() {
 	cycle = 0;
-
+	hasPageCrossed = false;
+	isPageCrossPossible = false;
 	uint8_t opcode = Read(PC);
 
 	Operation op = operationTable[opcode];
@@ -661,20 +743,20 @@ void CPU::RunNextOpcode() {
 	uint8_t argLen = 0;
 
 	switch (op.addrMode) {
-		case AM_IMP:	argLen = 0;	argOffset = NULL; Tick();	 																							break;
-		case AM_ACC:	argLen = 0;	argOffset = NULL;																								break;
-		case AM_IMM:	argLen = 1;	argOffset = PC + 1;																								break;
-		case AM_ZP:		argLen = 1;	argOffset = Read(PC + 1);																						break;
-		case AM_ZPX:	argLen = 1;	argOffset = ((Read(PC + 1) + X) & 0xFF);																		break;
-		case AM_ZPY:	argLen = 1;	argOffset = ((Read(PC + 1) + Y) & 0xFF);																		break;
-		case AM_ABS:	argLen = 2;	argOffset = (Read(PC + 1)) + ((Read(PC + 2)) << 8);																break;
-		case AM_ABSX:	argLen = 2;	argOffset = (Read(PC + 1) + (Read(PC + 2) << 8)) + X; 															break;
-		case AM_ABSY:	argLen = 2;	argOffset = (Read(PC + 1) + (Read(PC + 2) << 8)) + Y; 															break;
-		case AM_IDXIND:	argLen = 1;	argOffset = Read(((Read(PC + 1) + X) & 0xFF)) + (Read(((Read(PC + 1) + X + 1) & 0xFF)) << 8); 					break;
-		case AM_INDIDX:	argLen = 1;	argOffset = Read((Read(PC + 1))) + (Read((Read(PC + 1) + 1)) << 8) + Y; 										break; // TODO: Fix so doesn't mess with cycles
-		case AM_REL:	argLen = 1;	argOffset = PC + 1;																								break;
-		case AM_IND:	argLen = 2;	argOffset = Read((Read(PC + 1) + (Read(PC + 2) << 8))) + (Read((Read(PC + 1) + (Read(PC + 2) << 8)) + 1) << 8);	break;
-		default:		throw std::invalid_argument("Invalid AddrMode: " + std::to_string(op.addrMode) + "(" + op.addrModeStr + ")");				break;
+	case AM_IMP:	argLen = 0;	argOffset = NULL; Tick();	 																							break;
+	case AM_ACC:	argLen = 0;	argOffset = NULL;	Tick();																							break;
+	case AM_IMM:	argLen = 1;	argOffset = PC + 1;																								break;
+	case AM_ZP:		argLen = 1;	argOffset = Read(PC + 1);																						break;
+	case AM_ZPX:	argLen = 1;	argOffset = ((Read(PC + 1) + X) & 0xFF);	Tick();																	break;
+	case AM_ZPY:	argLen = 1;	argOffset = ((Read(PC + 1) + Y) & 0xFF);	Tick();																	break;
+	case AM_ABS:	argLen = 2;	argOffset = (Read(PC + 1)) + ((Read(PC + 2)) << 8);																break;
+	case AM_ABSX:	argLen = 2;	argOffset = ((Read(PC + 2) << 8)) + AddAndCheckForPageCrossing(Read(PC + 1), X); 															break;
+	case AM_ABSY:	argLen = 2;	argOffset = ((Read(PC + 2) << 8)) + AddAndCheckForPageCrossing(Read(PC + 1), Y);														break;
+	case AM_IDXIND:{	argLen = 1;	 uint8_t BAL = Read(PC + 1); Tick(); argOffset = Read(((BAL + X) & 0xFF)) + (Read(((BAL + X + 1) & 0xFF)) << 8);					break; }
+	case AM_INDIDX: {	argLen = 1;	uint8_t IAL = Read(PC + 1); argOffset = (Read((IAL + 1)) << 8) + AddAndCheckForPageCrossing(Read((IAL)), Y); 										break; } // TODO: Fix so doesn't mess with cycles
+	case AM_REL:	argLen = 1;	argOffset = PC + 1;																							break;
+	case AM_IND: {	argLen = 2;	uint8_t IAL = Read(PC + 1); uint8_t IAH = Read(PC + 2); argOffset = Read((IAL + (IAH << 8))) + (Read((IAL + (IAH << 8)) + 1) << 8);	break; }
+	default:		throw std::invalid_argument("Invalid AddrMode: " + std::to_string(op.addrMode) + "(" + op.addrModeStr + ")");				break;
 	}
 
 	#ifdef _DEBUG_MODE
@@ -690,10 +772,10 @@ void CPU::RunNextOpcode() {
 
 	PC += argLen + 1;
 	(this->*op.Run)(argOffset, op.addrMode);
-	//if (!((op.numCycles >> cycle) & 0x1)) {
-	//	std::cout << cycle;
-	//	throw - 1;
-	//}
+	if (!((op.numCycles >> cycle) & 0x1)) {
+		std::cout << cycle;
+		throw - 1;
+	}
 	CheckForInterrupt();
 }
 uint16_t CPU::GetPC() {
