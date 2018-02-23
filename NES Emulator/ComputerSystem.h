@@ -21,7 +21,7 @@ class ComputerSystem {
 	uint16_t successPC;
 public:
 	int Run();
-	void LoadFunctionalTest(std::string filename, uint16_t successPC, bool shouldSetupRegisterInterrupts);
+	void LoadFunctionalTest(std::string filename, uint16_t startPC, uint16_t successPC, bool shouldSetupRegisterInterrupts, uint16_t memOffset = 0x0);
 	ComputerSystem();
 	ComputerSystem(bool shouldSetupBlank);
 };

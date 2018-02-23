@@ -154,6 +154,7 @@ public:
 	void StartCycle();
 
 	// Running
+	void BranchAndCheckForPageCrossing(int8_t relVal);
 	uint16_t AddAndCheckForPageCrossing(uint8_t lowVal, uint16_t regVal);
 	void RunNextOpcode();
 	uint16_t GetPC();

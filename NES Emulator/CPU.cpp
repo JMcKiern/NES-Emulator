@@ -64,25 +64,19 @@ void CPU::ASL(uint16_t offset, AddrMode addrMode) {
 void CPU::BCC(uint16_t offset, AddrMode addrMode) {
 	int8_t value = static_cast<int8_t>(Read(offset));
 	if (C == 0) {
-		AddAndCheckForPageCrossing(ReadNoTick(PC + 1), PC & 0xFF);
-		PC += value;
-		Tick();
+		BranchAndCheckForPageCrossing(value);
 	}
 }
 void CPU::BCS(uint16_t offset, AddrMode addrMode) {
 	int8_t value = static_cast<int8_t>(Read(offset));
 	if (C == 1) {
-		AddAndCheckForPageCrossing(ReadNoTick(PC + 1), PC & 0xFF);
-		PC += value;
-		Tick();
+		BranchAndCheckForPageCrossing(value);
 	}
 }
 void CPU::BEQ(uint16_t offset, AddrMode addrMode) {
 	int8_t value = static_cast<int8_t>(Read(offset));
 	if (Z == 1) {
-		AddAndCheckForPageCrossing(ReadNoTick(PC + 1), PC & 0xFF);
-		PC += value;
-		Tick();
+		BranchAndCheckForPageCrossing(value);
 	}
 }
 void CPU::BIT(uint16_t offset, AddrMode addrMode) {
@@ -94,25 +88,19 @@ void CPU::BIT(uint16_t offset, AddrMode addrMode) {
 void CPU::BMI(uint16_t offset, AddrMode addrMode) {
 	int8_t value = static_cast<int8_t>(Read(offset));
 	if (N == 1) {
-		AddAndCheckForPageCrossing(ReadNoTick(PC + 1), PC & 0xFF);
-		PC += value;
-		Tick();
+		BranchAndCheckForPageCrossing(value);
 	}
 }
 void CPU::BNE(uint16_t offset, AddrMode addrMode) {
 	int8_t value = static_cast<int8_t>(Read(offset));
 	if (Z == 0) {
-		AddAndCheckForPageCrossing(ReadNoTick(PC + 1), PC & 0xFF);
-		PC += value;
-		Tick();
+		BranchAndCheckForPageCrossing(value);
 	}
 }
 void CPU::BPL(uint16_t offset, AddrMode addrMode) {
 	int8_t value = static_cast<int8_t>(Read(offset));
 	if (N == 0) {
-		AddAndCheckForPageCrossing(ReadNoTick(PC + 1), PC & 0xFF);
-		PC += value;
-		Tick();
+		BranchAndCheckForPageCrossing(value);
 	}
 }
 void CPU::BRK(uint16_t offset, AddrMode addrMode) { // TODO: Check if correct
@@ -126,17 +114,13 @@ void CPU::BRK(uint16_t offset, AddrMode addrMode) { // TODO: Check if correct
 void CPU::BVC(uint16_t offset, AddrMode addrMode) {
 	int8_t value = static_cast<int8_t>(Read(offset));
 	if (V == 0) {
-		AddAndCheckForPageCrossing(ReadNoTick(PC + 1), PC & 0xFF);
-		PC += value;
-		Tick();
+		BranchAndCheckForPageCrossing(value);
 	}
 }
 void CPU::BVS(uint16_t offset, AddrMode addrMode) {
 	int8_t value = static_cast<int8_t>(Read(offset));
 	if (V == 1) {
-		AddAndCheckForPageCrossing(ReadNoTick(PC + 1), PC & 0xFF);
-		PC += value;
-		Tick();
+		BranchAndCheckForPageCrossing(value);
 	}
 }
 void CPU::CLC(uint16_t offset, AddrMode addrMode) {
@@ -466,7 +450,7 @@ void CPU::SetupOperationTable() {
 	operationTable[0x3D] = Operation(INSTR_AND, "AND", AM_ABSX, "ABSOLUTE, X ( INS $????,X )", &CPU::AND, (1 << 4) + (1 << 5));
 	operationTable[0x39] = Operation(INSTR_AND, "AND", AM_ABSY, "ABSOLUTE, Y ( INS $????,Y )", &CPU::AND, (1 << 4) + (1 << 5));
 	operationTable[0x21] = Operation(INSTR_AND, "AND", AM_IDXIND, "INDEXED INDIRECT ( INS ($??,X) )", &CPU::AND, 1 << 6);
-	operationTable[0x31] = Operation(INSTR_AND, "AND", AM_INDIDX, "INDIRECT INDEXED ( INS ($??),Y )", &CPU::AND, 1 << 5);
+	operationTable[0x31] = Operation(INSTR_AND, "AND", AM_INDIDX, "INDIRECT INDEXED ( INS ($??),Y )", &CPU::AND, (1 << 5) + (1 << 6));
 	operationTable[0x0A] = Operation(INSTR_ASL, "ASL", AM_ACC, "ACCUMULATOR ( INS A )", &CPU::ASL, 1 << 2);
 	operationTable[0x06] = Operation(INSTR_ASL, "ASL", AM_ZP, "ZERO PAGE ( INS $?? )", &CPU::ASL, 1 << 5);
 	operationTable[0x16] = Operation(INSTR_ASL, "ASL", AM_ZPX, "ZERO PAGE, X ( INS $??,X )", &CPU::ASL, 1 << 6);
@@ -555,7 +539,7 @@ void CPU::SetupOperationTable() {
 	operationTable[0x1D] = Operation(INSTR_ORA, "ORA", AM_ABSX, "ABSOLUTE, X ( INS $????,X )", &CPU::ORA, (1 << 4) + (1 << 5));
 	operationTable[0x19] = Operation(INSTR_ORA, "ORA", AM_ABSY, "ABSOLUTE, Y ( INS $????,Y )", &CPU::ORA, (1 << 4) + (1 << 5));
 	operationTable[0x01] = Operation(INSTR_ORA, "ORA", AM_IDXIND, "INDEXED INDIRECT ( INS ($??,X) )", &CPU::ORA, 1 << 6);
-	operationTable[0x11] = Operation(INSTR_ORA, "ORA", AM_INDIDX, "INDIRECT INDEXED ( INS ($??),Y )", &CPU::ORA, 1 << 5);
+	operationTable[0x11] = Operation(INSTR_ORA, "ORA", AM_INDIDX, "INDIRECT INDEXED ( INS ($??),Y )", &CPU::ORA, (1 << 5) + (1 << 6));
 	operationTable[0x48] = Operation(INSTR_PHA, "PHA", AM_IMP, "IMPLIED ( INS )", &CPU::PHA, 1 << 3);
 	operationTable[0x08] = Operation(INSTR_PHP, "PHP", AM_IMP, "IMPLIED ( INS )", &CPU::PHP, 1 << 3);
 	operationTable[0x68] = Operation(INSTR_PLA, "PLA", AM_IMP, "IMPLIED ( INS )", &CPU::PLA, 1 << 4);
@@ -704,12 +688,20 @@ void CPU::LoadFromFile(std::string filename, uint16_t toOffset) {
 	f.read(memblock, size);
 	f.close();
 	for (unsigned int i = 0; i < size; ++i) {
-		Write(toOffset + i, *(memblock + i));
+		WriteNoTick(toOffset + i, *(memblock + i));
 	}
 	delete[] memblock;
 }
 
 // Running
+void CPU::BranchAndCheckForPageCrossing(int8_t relVal) {
+	uint16_t newPC = PC + relVal;
+	Tick();
+	if ((newPC & 0xFF00) != (PC & 0xFF00)) {
+		Tick();
+	}
+	PC = newPC;
+}
 uint16_t CPU::AddAndCheckForPageCrossing(uint8_t lowVal, uint16_t regVal) {
 	isPageCrossPossible = true;
 	uint16_t addition = lowVal + regVal;

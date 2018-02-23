@@ -10,6 +10,7 @@ void ComputerSystem::UpdatePeripherals() {
 	}
 }
 int ComputerSystem::Run() {
+	std::cout << "Running..\n";
 	UpdatePeripherals();
 	lastPC = cpu.GetPC() - 1;
 	
@@ -17,36 +18,40 @@ int ComputerSystem::Run() {
 	while (lastPC != cpu.GetPC()) {
 		lastPC = cpu.GetPC();
 		cpu.RunNextOpcode();
+		if (hasSuccessPC && cpu.GetPC() == successPC) break;
 #ifdef _DEBUG_MODE
 		cpu.PrintDebugInfo();
 #endif
 		UpdatePeripherals();
 	}
 	auto finishTimer = std::chrono::system_clock::now();
+	lastPC = cpu.GetPC();
 
 	std::chrono::duration<double> elapsed_seconds = finishTimer - startTimer;
-	std::cout << "Has taken " << cpu.GetTotalCycles() << " cycles\n";
-	std::cout << "          " << elapsed_seconds.count() << " second\n";
-	std::cout << "\n";
-	std::cout << "That's " << cpu.GetTotalCycles() / (1.0 * elapsed_seconds.count())
+	std::cout << "Finished with: " << cpu.GetTotalCycles() << " cycles\n";
+	std::cout << "               " << elapsed_seconds.count() << " second\n";
+	std::cout << "               " << cpu.GetTotalCycles() / (1.0 * elapsed_seconds.count())
 		<< " Hz\n";
-	std::cout << '\n';
 	std::cout << "Success PC: " << successPC << '\n';
-	std::cout << "Final PC: " << cpu.GetPC() << '\n';
+	std::cout << "Final PC: " << cpu.GetPC() << "\n";
 
 	if (hasSuccessPC) {
 		if (lastPC == successPC) {
+			std::cout << "Success!\n\n";
 			return 0;
 		}
 		else {
+			std::cout << "Failure!\n\n";
 			return -1;
 		}
 	}
+	std::cout << "Unknown!\n\n";
 	return -2;
 }
-void ComputerSystem::LoadFunctionalTest(std::string filename, uint16_t _successPC, bool shouldSetupRegisterInterrupts) {
-	cpu.LoadFromFile(filename, 0);
-	cpu.SetPC(0x400);
+void ComputerSystem::LoadFunctionalTest(std::string filename, uint16_t startPC, uint16_t _successPC, bool shouldSetupRegisterInterrupts, uint16_t memOffset) {
+	std::cout << "Loading: " << filename << '\n';
+	cpu.LoadFromFile(filename, memOffset);
+	cpu.SetPC(startPC);
 	successPC = _successPC;
 	hasSuccessPC = true;
 	if (shouldSetupRegisterInterrupts) {

@@ -13,7 +13,7 @@ protected:
 	bool isIRQConnection;
 
 public:
-	virtual void UpdatePeripheral();
+	virtual void UpdatePeripheral() = 0;
 
 	Peripheral(CPU* _cpu, uint16_t _writeAddr, bool _isIRQConnection);
 	~Peripheral();
