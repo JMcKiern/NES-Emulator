@@ -25,10 +25,10 @@ struct Operation {
 	{}
 	Operation() :
 		instr(INSTR_ILLEGAL),
-		instrStr("ILLEGAL"),
+		instrStr("INSTR_ILLEGAL"),
 		addrMode(AM_ILLEGAL),
-		addrModeStr("ILLEGAL"),
+		addrModeStr("AM_ILLEGAL"),
 		Run(NULL),
-		numCycles(numCycles)
+		numCycles(-1)
 	{}
 };

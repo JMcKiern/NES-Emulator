@@ -29,5 +29,7 @@ private:
 public:
 	void Write(uint16_t offset, uint8_t data);
 	uint8_t Read(uint16_t offset);
-	CPUMem(bool shouldSetupMirrors);
+
+	CPUMem();
+	CPUMem(bool shouldSetupBlank);
 };

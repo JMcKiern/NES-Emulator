@@ -22,8 +22,14 @@ uint8_t CPUMem::Read(uint16_t offset) {
 	return *reinterpret_cast<uint8_t*>(mem + baseOffset);
 }
 
-CPUMem::CPUMem(bool shouldSetupMirrors) {
-	if (shouldSetupMirrors) SetupMirrors();
+CPUMem::CPUMem() {
+	SetupMirrors();
+#ifdef _DEBUG_MODE
+	std::cout << "Mem Address: " << std::hex << reinterpret_cast<uintptr_t>(mem) << '\n';
+#endif
+}
+CPUMem::CPUMem(bool shouldSetupBlank) {
+	if (!shouldSetupBlank) SetupMirrors();
 #ifdef _DEBUG_MODE
 	std::cout << "Mem Address: " << std::hex << reinterpret_cast<uintptr_t>(mem) << '\n';
 #endif

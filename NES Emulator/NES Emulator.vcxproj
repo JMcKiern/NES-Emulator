@@ -19,12 +19,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ComputerSystem.cpp" />
     <ClCompile Include="CPU.cpp" />
     <ClCompile Include="CPUMem.cpp" />
+    <ClCompile Include="Peripheral.cpp" />
+    <ClCompile Include="PeripheralConnection.cpp" />
+    <ClCompile Include="PeripheralLine.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mirror.cpp" />
     <ClCompile Include="MirrorManager.cpp" />
     <ClCompile Include="PPU.cpp" />
+    <ClCompile Include="RegisterInterrupt.cpp" />
     <ClCompile Include="VRAM.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -34,12 +39,17 @@
     <ClInclude Include="CPUMem.h" />
     <ClInclude Include="enums.h" />
     <ClInclude Include="Exceptions.h" />
+    <ClInclude Include="ComputerSystem.h" />
+    <ClInclude Include="PeripheralConnection.h" />
+    <ClInclude Include="PeripheralLine.h" />
     <ClInclude Include="Mirror.h" />
     <ClInclude Include="MirrorManager.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="Operation.h" />
     <ClInclude Include="Palette.h" />
+    <ClInclude Include="Peripheral.h" />
     <ClInclude Include="PPU.h" />
+    <ClInclude Include="RegisterInterrupt.h" />
     <ClInclude Include="VRAM.h" />
     <ClInclude Include="RecentLog.h" />
   </ItemGroup>

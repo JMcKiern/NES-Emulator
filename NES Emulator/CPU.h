@@ -7,6 +7,7 @@
 #include "CPUMem.h"
 #include "enums.h"
 #include "Log.h"
+#include "PeripheralLine.h"
 
 // TODO:
 //		Check for proper cycle count
@@ -38,9 +39,10 @@ private:
 
 	// CPU Memory
 	CPUMem cpuMem;
-	void Write(uint16_t offset, uint8_t data);
 	uint8_t Read(uint16_t offset);
+	void Write(uint16_t offset, uint8_t data);
 	uint8_t ReadNoTick(uint16_t offset);
+	void WriteNoTick(uint16_t offset, uint8_t data);
 	
 	// PPU Pointer
 	//PPU* PPUPtr;
@@ -120,23 +122,25 @@ private:
 	Log log;
 
 	// Interrupts // pg143 (154) for turning off
-	int _IRQ = 0;
-	bool _NMI = false;
+	PeripheralLine irqLine, nmiLine;
 	bool hasNMIBeenProcessed = true; // Potential Error: if _NMI starts low and goes high in first RunOpcode() loop then will miss
-	void RespondToInterrupt(bool isIRQ); // Priority = Start > _NMI > _IRQ
 	void CheckForInterrupt();
+	void RespondToInterrupt(bool isIRQ); // Priority = Start > _NMI > _IRQ
 
 	// Timing
-	int cycle = 0;
+	int currentOpNumCycles = 0;
+	int totalCycles = 0;
 	bool hasPageCrossed, isPageCrossPossible;
 	void Tick();
 
-
-
 public:
 	// Peripherals
-	void SetIRQ(bool stateOn);
-	void SetNMI(bool stateOn);
+	uint8_t PeripheralRead(uint16_t addr);
+	void PeripheralWrite(uint16_t addr, uint8_t data);
+	void AddIRQConnection(PeripheralConnection* irqConnection);
+	void RemoveIRQConnection(PeripheralConnection* irqConnection);
+	void AddNMIConnection(PeripheralConnection* nmiConnection);
+	void RemoveNMIConnection(PeripheralConnection* nmiConnection);
 
 	// Other Processors
 	//void WritePPURegister(uint8_t data, uint8_t offset);
@@ -145,8 +149,6 @@ public:
 	// Initialization
 	void PowerUp();
 	void EASY6502STARTUP();
-	void FunctionalTestStartup(std::string filename);
-	void C64TestStartup(std::string filename);
 	void LOADTEST(uint8_t* arr, unsigned int len);
 	void LoadFromFile(std::string filename, uint16_t toOffset);
 	void StartCycle();
@@ -156,11 +158,18 @@ public:
 	void RunNextOpcode();
 	uint16_t GetPC();
 
+	// Debugging
+	void SetPC(uint16_t _PC);
+	void SetI();
+	int GetTotalCycles();
+
 	// Logging
 	#ifdef _DEBUG_MODE
 		void PrintDebugInfo();
 	#endif
 
 	// Constructors
-	CPU::CPU(bool shouldSetupMirrors, std::string logFilename);
+	CPU();
+	CPU(bool shouldSetupBlank);
+	CPU(bool shouldSetupMirrors, std::string logFilename);
 };

@@ -10,19 +10,22 @@
 #include "PPU.h"
 
 // CPU Memory
-void CPU::Write(uint16_t offset, uint8_t data) {
-	//if (offset == 0x4014) PPUPtr->DMA();
-	cpuMem.Write(offset, data);
-	Tick();
-}
 uint8_t CPU::Read(uint16_t offset) { 
 	uint8_t data = cpuMem.Read(offset); 
 	Tick(); 
 	return data;
 }
+void CPU::Write(uint16_t offset, uint8_t data) {
+	//if (offset == 0x4014) PPUPtr->DMA();
+	cpuMem.Write(offset, data);
+	Tick();
+}
 uint8_t CPU::ReadNoTick(uint16_t offset) {
 	uint8_t data = cpuMem.Read(offset);
 	return data;
+}
+void CPU::WriteNoTick(uint16_t offset, uint8_t data) {
+	cpuMem.Write(offset, data);
 }
 
 // Instructions
@@ -50,8 +53,7 @@ void CPU::ASL(uint16_t offset, AddrMode addrMode) {
 	else {
 		if (!hasPageCrossed && addrMode == AM_ABSX) Tick();
 		uint8_t M = Read(offset);
-		if (addrMode == AM_ABS || addrMode == AM_ZP || addrMode == AM_ZPX
-			|| addrMode == AM_ABSX) Tick();
+		Tick();
 		temp = M << 1;
 		Write(offset, (temp & 0xFF));
 	}
@@ -170,8 +172,7 @@ void CPU::CPY(uint16_t offset, AddrMode addrMode) {
 void CPU::DEC(uint16_t offset, AddrMode addrMode) {
 	if (!hasPageCrossed && addrMode == AM_ABSX) Tick();
 	uint8_t M = Read(offset) - 1;
-	if (addrMode == AM_ABS || addrMode == AM_ZP || addrMode == AM_ZPX
-		|| addrMode == AM_ABSX) Tick();
+	Tick();
 	Write(offset, M);
 	Z = M == 0;
 	N = (M >> 7) & 0x1;
@@ -195,8 +196,7 @@ void CPU::EOR(uint16_t offset, AddrMode addrMode) {
 void CPU::INC(uint16_t offset, AddrMode addrMode) {
 	if (!hasPageCrossed && addrMode == AM_ABSX) Tick();
 	uint8_t M = Read(offset) + 1;
-	if (addrMode == AM_ABS || addrMode == AM_ZP || addrMode == AM_ZPX
-		|| addrMode == AM_ABSX) Tick();
+	Tick();
 	Write(offset, M);
 	Z = M == 0;
 	N = (M >> 7) & 0x1;
@@ -217,9 +217,9 @@ void CPU::JMP(uint16_t offset, AddrMode addrMode) {
 void CPU::JSR(uint16_t offset, AddrMode addrMode) { 
 	// Potential Error: ADH should only be fetched on cycle 6
 	PC -= 1;
-	StackPush((PC >> 8) & 0xFF);	// 4
-	StackPush(PC & 0xFF);			// 5
-	Tick();							// 6
+	StackPush((PC >> 8) & 0xFF);
+	StackPush(PC & 0xFF);
+	Tick();
 	PC = offset;
 }
 void CPU::LDA(uint16_t offset, AddrMode addrMode) {
@@ -248,8 +248,7 @@ void CPU::LSR(uint16_t offset, AddrMode addrMode) {
 	else {
 		if (!hasPageCrossed && addrMode == AM_ABSX) Tick();
 		uint8_t M = Read(offset);
-		if (addrMode == AM_ABS || addrMode == AM_ZP || addrMode == AM_ZPX
-			|| addrMode == AM_ABSX) Tick();
+		Tick();
 		temp = M >> 1;
 		oldBit = M & 0x1;
 		Write(offset, (temp & 0xFF));
@@ -292,8 +291,7 @@ void CPU::ROL(uint16_t offset, AddrMode addrMode) {
 	else {
 		if (!hasPageCrossed && addrMode == AM_ABSX) Tick();
 		uint8_t M = Read(offset);
-		if (addrMode == AM_ABS || addrMode == AM_ZP || addrMode == AM_ZPX
-			|| addrMode == AM_ABSX) Tick();
+		Tick();
 		temp = M << 1;
 		temp = temp | C;
 		Write(offset, (temp & 0xFF));
@@ -314,8 +312,7 @@ void CPU::ROR(uint16_t offset, AddrMode addrMode) {
 	else {
 		if (!hasPageCrossed && addrMode == AM_ABSX) Tick();
 		uint8_t M = Read(offset);
-		if (addrMode == AM_ABS || addrMode == AM_ZP || addrMode == AM_ZPX
-			|| addrMode == AM_ABSX) Tick();
+		Tick();
 		temp = M >> 1;
 		temp = temp | (C << 7);
 		oldBit = M & 0x1;
@@ -334,8 +331,8 @@ void CPU::RTI(uint16_t offset, AddrMode addrMode) {
 }
 void CPU::RTS(uint16_t offset, AddrMode addrMode) {
 	Tick();
-	uint8_t PC_l = StackPop();		// 4
-	uint8_t PC_h = StackPop();		// 5
+	uint8_t PC_l = StackPop();
+	uint8_t PC_h = StackPop();
 	PC = (PC_h << 8) + PC_l;
 	PC += 1; Tick();
 }
@@ -363,11 +360,11 @@ void CPU::STA(uint16_t offset, AddrMode addrMode) {
 	Write(offset, A);
 }
 void CPU::STX(uint16_t offset, AddrMode addrMode) {
-	if (!hasPageCrossed && addrMode == AM_ABSX || addrMode == AM_ABSY) Tick();
+	if (!hasPageCrossed && (addrMode == AM_ABSX || addrMode == AM_ABSY)) Tick();
 	Write(offset, X);
 }
 void CPU::STY(uint16_t offset, AddrMode addrMode) {
-	if (!hasPageCrossed && addrMode == AM_ABSX || addrMode == AM_ABSY) Tick();
+	if (!hasPageCrossed && (addrMode == AM_ABSX || addrMode == AM_ABSY)) Tick();
 	Write(offset, Y);
 }
 void CPU::TAX(uint16_t offset, AddrMode addrMode) {
@@ -610,6 +607,19 @@ void CPU::SetupOperationTable() {
 
 
 // Interrupts
+void CPU::CheckForInterrupt() {
+	if (!nmiLine.GetState()) hasNMIBeenProcessed = false;
+	while ((irqLine.GetState() && I == 0) || (nmiLine.GetState() && !hasNMIBeenProcessed)) {
+		if (nmiLine.GetState() && !hasNMIBeenProcessed) {
+			RespondToInterrupt(false);
+			hasNMIBeenProcessed = true;
+			break;
+		}
+		else if (irqLine.GetState() && I == 0) {
+			RespondToInterrupt(true); // BRK ??
+		}
+	}
+}
 void CPU::RespondToInterrupt(bool isIRQ) {
 	//PC += 1;
 	StackPush((PC >> 8) & 0xFF);					// 3
@@ -623,39 +633,31 @@ void CPU::RespondToInterrupt(bool isIRQ) {
 	}
 	I = 1;
 }
-void CPU::CheckForInterrupt() { // Check interal timings wrt _NMI taking over before _IRQ vectors are selected
-	if (!_NMI) hasNMIBeenProcessed = false;
-	while ((_IRQ && I == 0) || (_NMI && !hasNMIBeenProcessed)) {
-		if (_NMI && !hasNMIBeenProcessed) {
-			RespondToInterrupt(false);
-			hasNMIBeenProcessed = true;
-			break;
-		}
-		else if (_IRQ && I == 0) {
-			RespondToInterrupt(true); // BRK ??
-		}
-	}
-}
 
-// Peripherals
-void CPU::SetIRQ(bool stateOn) {
-	if (stateOn) {
-		_IRQ++;
-	}
-	else if (!stateOn && _IRQ > 0) {
-		_IRQ--;
-	}
-	else {
-		_IRQ = 0;
-	}
+// Peripheral
+uint8_t CPU::PeripheralRead(uint16_t addr) {
+	return ReadNoTick(addr);
 }
-void CPU::SetNMI(bool stateOn) {
-	_NMI = stateOn;
+void CPU::PeripheralWrite(uint16_t addr, uint8_t data) {
+	WriteNoTick(addr, data);
+}
+void CPU::AddIRQConnection(PeripheralConnection* irqConnection) {
+	irqLine.AddConnection(irqConnection);
+}
+void CPU::RemoveIRQConnection(PeripheralConnection* irqConnection) {
+	irqLine.RemoveConnection(irqConnection);
+}
+void CPU::AddNMIConnection(PeripheralConnection* nmiConnection) {
+	nmiLine.AddConnection(nmiConnection);
+}
+void CPU::RemoveNMIConnection(PeripheralConnection* nmiConnection) {
+	nmiLine.RemoveConnection(nmiConnection);
 }
 
 // Timing
 void CPU::Tick() {
-	cycle++;
+	currentOpNumCycles++;
+	totalCycles++;
 }
 
 void CPU::PowerUp() {
@@ -672,24 +674,6 @@ void CPU::EASY6502STARTUP() {
 	X = 0;
 	Y = 0;
 	PC = 0x600;
-	SP = 0xFF;
-}
-void CPU::FunctionalTestStartup(std::string filename) {
-	LoadFromFile(filename, 0);
-	SetP(0x34, true);
-	A = 0;
-	X = 0;
-	Y = 0;
-	PC = 0x400;
-	SP = 0xFF;
-}
-void CPU::C64TestStartup(std::string filename) {
-	LoadFromFile(filename, 0);
-	SetP(0x34, true);
-	A = 0;
-	X = 0;
-	Y = 0;
-	PC = 0x400;
 	SP = 0xFF;
 }
 void CPU::StartCycle() {
@@ -736,31 +720,33 @@ uint16_t CPU::AddAndCheckForPageCrossing(uint8_t lowVal, uint16_t regVal) {
 	return addition;
 }
 void CPU::RunNextOpcode() {
-	cycle = 0;
+	CheckForInterrupt();
+
+	currentOpNumCycles = 0;
 	hasPageCrossed = false;
 	isPageCrossPossible = false;
 	uint8_t opcode = Read(PC);
 
-	Operation op = operationTable[opcode];
+	Operation& op = operationTable[opcode];
 
 	uint16_t argOffset = NULL;
 	uint8_t argLen = 0;
 
 	switch (op.addrMode) {
-	case AM_IMP:	argLen = 0;	argOffset = NULL; Tick();	 																							break;
-	case AM_ACC:	argLen = 0;	argOffset = NULL;	Tick();																							break;
-	case AM_IMM:	argLen = 1;	argOffset = PC + 1;																								break;
-	case AM_ZP:		argLen = 1;	argOffset = Read(PC + 1);																						break;
-	case AM_ZPX:	argLen = 1;	argOffset = ((Read(PC + 1) + X) & 0xFF);	Tick();																	break;
-	case AM_ZPY:	argLen = 1;	argOffset = ((Read(PC + 1) + Y) & 0xFF);	Tick();																	break;
-	case AM_ABS:	argLen = 2;	argOffset = (Read(PC + 1)) + ((Read(PC + 2)) << 8);																break;
-	case AM_ABSX:	argLen = 2;	argOffset = ((Read(PC + 2) << 8)) + AddAndCheckForPageCrossing(Read(PC + 1), X); 															break;
-	case AM_ABSY:	argLen = 2;	argOffset = ((Read(PC + 2) << 8)) + AddAndCheckForPageCrossing(Read(PC + 1), Y);														break;
-	case AM_IDXIND:{	argLen = 1;	 uint8_t BAL = Read(PC + 1); Tick(); argOffset = Read(((BAL + X) & 0xFF)) + (Read(((BAL + X + 1) & 0xFF)) << 8);					break; }
-	case AM_INDIDX: {	argLen = 1;	uint8_t IAL = Read(PC + 1); argOffset = (Read((IAL + 1)) << 8) + AddAndCheckForPageCrossing(Read((IAL)), Y); 										break; } // TODO: Fix so doesn't mess with cycles
-	case AM_REL:	argLen = 1;	argOffset = PC + 1;																							break;
-	case AM_IND: {	argLen = 2;	uint8_t IAL = Read(PC + 1); uint8_t IAH = Read(PC + 2); argOffset = Read((IAL + (IAH << 8))) + (Read((IAL + (IAH << 8)) + 1) << 8);	break; }
-	default:		throw std::invalid_argument("Invalid AddrMode: " + std::to_string(op.addrMode) + "(" + op.addrModeStr + ")");				break;
+		case AM_IMP: {		argLen = 0;	argOffset = NULL;	Tick();	 																										break; }
+		case AM_ACC: {		argLen = 0;	argOffset = NULL;	Tick();																											break; }
+		case AM_IMM: {		argLen = 1;	argOffset = PC + 1;																													break; }
+		case AM_ZP: {		argLen = 1;	argOffset = Read(PC + 1);																											break; }
+		case AM_ZPX: {		argLen = 1;	argOffset = ((Read(PC + 1) + X) & 0xFF);	Tick();																					break; }
+		case AM_ZPY: {		argLen = 1;	argOffset = ((Read(PC + 1) + Y) & 0xFF);	Tick();																					break; }
+		case AM_ABS: {		argLen = 2;	argOffset = (Read(PC + 1)) + ((Read(PC + 2)) << 8);																					break; }
+		case AM_ABSX: {		argLen = 2;	argOffset = ((Read(PC + 2) << 8)) + AddAndCheckForPageCrossing(Read(PC + 1), X); 													break; }
+		case AM_ABSY: {		argLen = 2;	argOffset = ((Read(PC + 2) << 8)) + AddAndCheckForPageCrossing(Read(PC + 1), Y);													break; }
+		case AM_IDXIND: {	argLen = 1;	uint8_t BAL = Read(PC + 1); Tick(); argOffset = Read(((BAL + X) & 0xFF)) + (Read(((BAL + X + 1) & 0xFF)) << 8);						break; }
+		case AM_INDIDX: {	argLen = 1;	uint8_t IAL = Read(PC + 1); argOffset = (Read((IAL + 1)) << 8) + AddAndCheckForPageCrossing(Read((IAL)), Y); 						break; }
+		case AM_REL: {		argLen = 1;	argOffset = PC + 1;																													break; }
+		case AM_IND: {		argLen = 2;	uint8_t IAL = Read(PC + 1); uint8_t IAH = Read(PC + 2); argOffset = Read((IAL + (IAH << 8))) + (Read((IAL + (IAH << 8)) + 1) << 8);	break; }
+		default: {			throw std::invalid_argument("Invalid AddrMode: " + std::to_string(op.addrMode) + "(" + op.addrModeStr + ")");									break; }
 	}
 
 	#ifdef _DEBUG_MODE
@@ -776,20 +762,24 @@ void CPU::RunNextOpcode() {
 
 	PC += argLen + 1;
 	(this->*op.Run)(argOffset, op.addrMode);
-	if (!((op.numCycles >> cycle) & 0x1)) {
-		std::cout << cycle;
+	if (!((op.numCycles >> currentOpNumCycles) & 0x1)) {
+		std::cout << currentOpNumCycles;
 		throw - 1;
 	}
-	// Start - Used in 6502_interrupt_test
-	//if ((ReadNoTick(0xbffc) >> 0) & 0x1) SetIRQ(true);
-	//if ((ReadNoTick(0xbffc) >> 1) & 0x1) SetNMI(true);
-	_IRQ = ((ReadNoTick(0xbffc) >> 0) & 0x1);
-	SetNMI((ReadNoTick(0xbffc) >> 1) & 0x1);
-	// End
-	CheckForInterrupt();
 }
 uint16_t CPU::GetPC() {
 	return PC;
+}
+
+// Debugging
+void CPU::SetPC(uint16_t _PC) {
+	PC = _PC;
+}
+void CPU::SetI() {
+	I = 1;
+}
+int CPU::GetTotalCycles() {
+	return totalCycles;
 }
 
 // Logging
@@ -813,6 +803,17 @@ void CPU::PrintDebugInfo() {
 	log << "\n\n";
 }
 #endif
+
+
+CPU::CPU() {
+	SetupOperationTable();
+	StartCycle();
+}
+CPU::CPU(bool shouldSetupBlank) :
+	cpuMem(shouldSetupBlank)
+{
+	SetupOperationTable();
+}
 
 // Constructors
 CPU::CPU(bool shouldSetupMirrors, std::string logFilename) : 

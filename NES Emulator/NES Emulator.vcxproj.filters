@@ -16,11 +16,17 @@
     <Filter Include="Header Files\CPU">
       <UniqueIdentifier>{096e815d-007d-4106-83cf-0a7f00c33587}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\CPU">
+      <UniqueIdentifier>{924dd23c-ef05-46cf-8542-b3abfb7e0f2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Peripherals">
+      <UniqueIdentifier>{1bd6d99c-dab7-4643-812d-be5d47251c00}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Peripherals">
+      <UniqueIdentifier>{e6d97de4-1065-4a7e-b5cd-40d3de5e7f39}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CPU.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -36,8 +42,26 @@
     <ClCompile Include="VRAM.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CPUMem.cpp">
+    <ClCompile Include="ComputerSystem.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CPU.cpp">
+      <Filter>Source Files\CPU</Filter>
+    </ClCompile>
+    <ClCompile Include="CPUMem.cpp">
+      <Filter>Source Files\CPU</Filter>
+    </ClCompile>
+    <ClCompile Include="Peripheral.cpp">
+      <Filter>Source Files\Peripherals</Filter>
+    </ClCompile>
+    <ClCompile Include="PeripheralConnection.cpp">
+      <Filter>Source Files\Peripherals</Filter>
+    </ClCompile>
+    <ClCompile Include="PeripheralLine.cpp">
+      <Filter>Source Files\Peripherals</Filter>
+    </ClCompile>
+    <ClCompile Include="RegisterInterrupt.cpp">
+      <Filter>Source Files\Peripherals</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -82,6 +106,21 @@
     </ClInclude>
     <ClInclude Include="BitFlag.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ComputerSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PeripheralConnection.h">
+      <Filter>Header Files\Peripherals</Filter>
+    </ClInclude>
+    <ClInclude Include="PeripheralLine.h">
+      <Filter>Header Files\Peripherals</Filter>
+    </ClInclude>
+    <ClInclude Include="Peripheral.h">
+      <Filter>Header Files\Peripherals</Filter>
+    </ClInclude>
+    <ClInclude Include="RegisterInterrupt.h">
+      <Filter>Header Files\Peripherals</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -18,3 +18,6 @@ in *.cpp gaps after bottom of function only when moving to different catagory
 ptr * are on the side of the type (eg int* x; not int *x;)
 
 Methods definitions should be in the same order as their declarations
+
+All default constructors are the ones that would be used in the NES. Any
+others may require additional setup before use.
