@@ -4,7 +4,6 @@
 #include <string>
 #include "BitFlag.h"
 #include "Operation.h"
-#include "CPUMem.h"
 #include "enums.h"
 #include "Log.h"
 #include "PeripheralLine.h"
@@ -14,7 +13,7 @@
 
 class PPU;
 
-class CPU {
+class CPU_6502 {
 private:
 	// CPU Registers
 	union {
@@ -37,16 +36,7 @@ private:
 		};
 	};
 
-	// CPU Memory
-	CPUMem cpuMem;
-	uint8_t Read(uint16_t offset);
-	void Write(uint16_t offset, uint8_t data);
-	uint8_t ReadNoTick(uint16_t offset);
-	void WriteNoTick(uint16_t offset, uint8_t data);
 	
-	// PPU Pointer
-	//PPU* PPUPtr;
-
 	// Instructions
 	void ADC(uint16_t offset, AddrMode addrMode);
 	void AND(uint16_t offset, AddrMode addrMode);
@@ -112,14 +102,13 @@ private:
 	// Processor Status Management
 	void PopToP();
 	void PushP(bool shouldSetBit4);
-	void SetP(uint8_t val, bool shouldSetBit4);
 
-	// Operation Table
-	Operation operationTable[0xFF];
-	void SetupOperationTable();
-	
-	// Log file
-	Log log;
+	// Page Crossing
+	int currentOpNumCycles = 0;
+	int totalCycles = 0;
+	bool hasPageCrossed, isPageCrossPossible;
+	void BranchAndCheckForPageCrossing(int8_t relVal);
+	uint16_t AddAndCheckForPageCrossing(uint8_t lowVal, uint16_t regVal);
 
 	// Interrupts // pg143 (154) for turning off
 	PeripheralLine irqLine, nmiLine;
@@ -127,11 +116,27 @@ private:
 	void CheckForInterrupt();
 	void RespondToInterrupt(bool isIRQ); // Priority = Start > _NMI > _IRQ
 
+protected:
+	// CPU Memory
+	uint8_t* RAM;
+	virtual uint8_t Read(uint16_t offset, bool shouldTick = true);
+	virtual void Write(uint16_t offset, uint8_t data, bool shouldTick = true);
+	uint8_t ReadNoTick(uint16_t offset);
+	void WriteNoTick(uint16_t offset, uint8_t data);
+
 	// Timing
-	int currentOpNumCycles = 0;
-	int totalCycles = 0;
-	bool hasPageCrossed, isPageCrossPossible;
 	void Tick();
+
+	// Log object ptr
+	Log* log;
+
+	// Operation Table
+	Operation operationTable[0xFF];
+	void SetupOperationTable();
+
+	// StartUp
+	void SetP(uint8_t val, bool shouldSetBit4);
+	void SetSP(uint8_t val);
 
 public:
 	// Peripherals
@@ -142,20 +147,13 @@ public:
 	void AddNMIConnection(PeripheralConnection* nmiConnection);
 	void RemoveNMIConnection(PeripheralConnection* nmiConnection);
 
-	// Other Processors
-	//void WritePPURegister(uint8_t data, uint8_t offset);
-	//uint8_t ReadPPURegister(uint8_t offset);
-
 	// Initialization
 	void PowerUp();
 	void EASY6502STARTUP();
 	void LOADTEST(uint8_t* arr, unsigned int len);
 	void LoadFromFile(std::string filename, uint16_t toOffset);
-	void StartCycle();
 
 	// Running
-	void BranchAndCheckForPageCrossing(int8_t relVal);
-	uint16_t AddAndCheckForPageCrossing(uint8_t lowVal, uint16_t regVal);
 	void RunNextOpcode();
 	uint16_t GetPC();
 
@@ -165,12 +163,9 @@ public:
 	int GetTotalCycles();
 
 	// Logging
-	#ifdef _DEBUG_MODE
-		void PrintDebugInfo();
-	#endif
+	void PrintDebugInfo();
 
-	// Constructors
-	CPU();
-	CPU(bool shouldSetupBlank);
-	CPU(bool shouldSetupMirrors, std::string logFilename);
+	// Constructor
+	CPU_6502(Log* log, int sizeOfRam = 0x10000);
+	~CPU_6502();
 };

@@ -1,13 +1,13 @@
 #pragma once
 
-#include "CPU.h"
+#include "CPU_6502.h"
 #include "PeripheralConnection.h"
 
 class Peripheral {
 private:
 
 protected:
-	CPU* cpu;
+	CPU_6502* cpu;
 	PeripheralConnection peripheralConnection;
 	uint16_t addr;
 	bool isIRQConnection;
@@ -15,6 +15,6 @@ protected:
 public:
 	virtual void UpdatePeripheral() = 0;
 
-	Peripheral(CPU* _cpu, uint16_t _writeAddr, bool _isIRQConnection);
+	Peripheral(CPU_6502* _cpu, uint16_t _writeAddr, bool _isIRQConnection);
 	~Peripheral();
 };

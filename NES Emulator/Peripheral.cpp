@@ -1,6 +1,6 @@
 #include "Peripheral.h"
 
-Peripheral::Peripheral(CPU* _cpu, uint16_t _addr, bool _isIRQConnection) {
+Peripheral::Peripheral(CPU_6502* _cpu, uint16_t _addr, bool _isIRQConnection) {
 	cpu = _cpu;
 	isIRQConnection = _isIRQConnection;
 	if (isIRQConnection) {

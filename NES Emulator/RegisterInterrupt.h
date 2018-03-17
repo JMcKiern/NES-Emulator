@@ -6,5 +6,5 @@ private:
 
 public:
 	void UpdatePeripheral() override;
-	RegisterInterrupt(CPU* _cpu, uint16_t _addr, bool _isIRQConnection, uint8_t _bitNum);
+	RegisterInterrupt(CPU_6502* _cpu, uint16_t _addr, bool _isIRQConnection, uint8_t _bitNum);
 };

@@ -4,8 +4,8 @@
 #include <cstdint>
 #include "enums.h"
 
-class CPU;
-typedef void (CPU::*OpFnPtr)(uint16_t offset, AddrMode addrMode);
+class CPU_6502;
+typedef void (CPU_6502::*OpFnPtr)(uint16_t offset, AddrMode addrMode);
 
 struct Operation {
 	Instr instr;
@@ -29,6 +29,6 @@ struct Operation {
 		addrMode(AM_ILLEGAL),
 		addrModeStr("AM_ILLEGAL"),
 		Run(NULL),
-		numCycles(-1)
+		numCycles(0xff)
 	{}
 };

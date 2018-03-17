@@ -20,8 +20,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ComputerSystem.cpp" />
-    <ClCompile Include="CPU.cpp" />
-    <ClCompile Include="CPUMem.cpp" />
+    <ClCompile Include="CPU_6502.cpp" />
+    <ClCompile Include="CPU_NES.cpp" />
+    <ClCompile Include="GamePak.cpp" />
     <ClCompile Include="Peripheral.cpp" />
     <ClCompile Include="PeripheralConnection.cpp" />
     <ClCompile Include="PeripheralLine.cpp" />
@@ -35,11 +36,13 @@
   <ItemGroup>
     <ClInclude Include="BitFlag.h" />
     <ClInclude Include="Colour.h" />
-    <ClInclude Include="CPU.h" />
-    <ClInclude Include="CPUMem.h" />
+    <ClInclude Include="CPU_6502.h" />
+    <ClInclude Include="CPU_NES.h" />
     <ClInclude Include="enums.h" />
     <ClInclude Include="Exceptions.h" />
     <ClInclude Include="ComputerSystem.h" />
+    <ClInclude Include="FunctionalTest.h" />
+    <ClInclude Include="GamePak.h" />
     <ClInclude Include="PeripheralConnection.h" />
     <ClInclude Include="PeripheralLine.h" />
     <ClInclude Include="Mirror.h" />
@@ -51,7 +54,6 @@
     <ClInclude Include="PPU.h" />
     <ClInclude Include="RegisterInterrupt.h" />
     <ClInclude Include="VRAM.h" />
-    <ClInclude Include="RecentLog.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Guidelines.txt" />
@@ -60,6 +62,7 @@
   <ItemGroup>
     <None Include="Tests\6502_functional_test.bin" />
     <None Include="Tests\6502_interrupt_test.bin" />
+    <None Include="Tests\timingtest-1.bin" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

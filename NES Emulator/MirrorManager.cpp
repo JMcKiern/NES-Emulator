@@ -3,14 +3,6 @@
 #include "MirrorManager.h"
 #include "Exceptions.h"
 
-//bool MirrorManager::ContainsAddress(uint16_t addr) {
-//	for (auto it = mirrors.begin(); it != mirrors.end(); it++) {
-//		if (it->ContainsAddress(addr)) {
-//			return true;
-//		}
-//	}
-//	return false;
-//}
 void MirrorManager::AddMirror(uint16_t baseAddr, std::vector<uint16_t> vec, uint16_t length) {
 	if (baseAddr != UnMirrorAddr(baseAddr) || (baseAddr + length - 1) != UnMirrorAddr(baseAddr + length - 1)) { // If baseAddr is already in a mirror
 		throw AddressAlreadyMirroredException();
@@ -22,15 +14,6 @@ void MirrorManager::AddMirror(uint16_t baseAddr, std::vector<uint16_t> vec, uint
 	}
 	mirrors.push_back(Mirror(baseAddr, vec, length));
 }
-//bool MirrorManager::FindMirror(uint16_t addr, uint16_t& offsetFromMirror, Mirror& mirror) {
-//	for (auto it = mirrors.begin(); it != mirrors.end(); it++) {
-//		if (it->ContainsAddress(addr, offsetFromMirror)) {
-//			mirror = *it;
-//			return true;
-//		}
-//	}
-//	return false;
-//}
 uint16_t MirrorManager::UnMirrorAddrSingleIter(uint16_t addr) {
 	for (auto it = mirrors.begin(); it != mirrors.end(); it++) {
 		addr = it->UnMirrorAddr(addr);

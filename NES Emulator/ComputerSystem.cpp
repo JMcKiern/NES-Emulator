@@ -17,11 +17,9 @@ int ComputerSystem::Run() {
 	auto startTimer = std::chrono::system_clock::now();
 	while (lastPC != cpu.GetPC()) {
 		lastPC = cpu.GetPC();
+		cpu.PrintDebugInfo();
 		cpu.RunNextOpcode();
 		if (hasSuccessPC && cpu.GetPC() == successPC) break;
-#ifdef _DEBUG_MODE
-		cpu.PrintDebugInfo();
-#endif
 		UpdatePeripherals();
 	}
 	auto finishTimer = std::chrono::system_clock::now();
@@ -48,23 +46,14 @@ int ComputerSystem::Run() {
 	std::cout << "Unknown!\n\n";
 	return -2;
 }
-void ComputerSystem::LoadFunctionalTest(std::string filename, uint16_t startPC, uint16_t _successPC, bool shouldSetupRegisterInterrupts, uint16_t memOffset) {
-	std::cout << "Loading: " << filename << '\n';
-	cpu.LoadFromFile(filename, memOffset);
+void ComputerSystem::LoadINES(std::string filename, uint16_t startPC) {
+	gp.LoadINes(filename);
 	cpu.SetPC(startPC);
-	successPC = _successPC;
-	hasSuccessPC = true;
-	if (shouldSetupRegisterInterrupts) {
-		peripherals.push_back(std::make_unique<RegisterInterrupt>(&cpu, 0xbffc, true, 0));	// IRQ
-		peripherals.push_back(std::make_unique<RegisterInterrupt>(&cpu, 0xbffc, false, 1)); // NMI
-	}
-	cpu.SetI();
+	cpu.StartNESTEST();
 }
 
-ComputerSystem::ComputerSystem() {
-
-}
-ComputerSystem::ComputerSystem(bool shouldSetupBlank) :
-	cpu(true)
+ComputerSystem::ComputerSystem(std::string logFile/*= ""*/) :
+	log(logFile),
+	cpu(&log, &gp)
 {
 }
