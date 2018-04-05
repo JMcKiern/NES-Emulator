@@ -19,47 +19,61 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ComputerSystem.cpp" />
+    <ClCompile Include="Console.cpp" />
+    <ClCompile Include="Controller.cpp" />
     <ClCompile Include="CPU_6502.cpp" />
     <ClCompile Include="CPU_NES.cpp" />
+    <ClCompile Include="Display\Camera.cpp" />
+    <ClCompile Include="Display\GLEntityHandler.cpp" />
+    <ClCompile Include="Display\GLScene.cpp" />
+    <ClCompile Include="Display\GLUtils.cpp" />
+    <ClCompile Include="Display\maths_funcs.cpp" />
+    <ClCompile Include="Display\stb_image.c" />
     <ClCompile Include="GamePak.cpp" />
     <ClCompile Include="Peripheral.cpp" />
     <ClCompile Include="PeripheralConnection.cpp" />
     <ClCompile Include="PeripheralLine.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Mirror.cpp" />
-    <ClCompile Include="MirrorManager.cpp" />
     <ClCompile Include="PPU.cpp" />
     <ClCompile Include="RegisterInterrupt.cpp" />
-    <ClCompile Include="VRAM.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BitFlag.h" />
     <ClInclude Include="Colour.h" />
+    <ClInclude Include="Controller.h" />
     <ClInclude Include="CPU_6502.h" />
     <ClInclude Include="CPU_NES.h" />
+    <ClInclude Include="Display\Camera.h" />
+    <ClInclude Include="Display\GLEntityHandler.h" />
+    <ClInclude Include="Display\GLScene.h" />
+    <ClInclude Include="Display\GLUtils.h" />
+    <ClInclude Include="Display\maths_funcs.h" />
+    <ClInclude Include="Display\stb_image.h" />
     <ClInclude Include="enums.h" />
     <ClInclude Include="Exceptions.h" />
-    <ClInclude Include="ComputerSystem.h" />
+    <ClInclude Include="Console.h" />
     <ClInclude Include="FunctionalTest.h" />
     <ClInclude Include="GamePak.h" />
     <ClInclude Include="PeripheralConnection.h" />
     <ClInclude Include="PeripheralLine.h" />
-    <ClInclude Include="Mirror.h" />
-    <ClInclude Include="MirrorManager.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="Operation.h" />
     <ClInclude Include="Palette.h" />
     <ClInclude Include="Peripheral.h" />
     <ClInclude Include="PPU.h" />
     <ClInclude Include="RegisterInterrupt.h" />
-    <ClInclude Include="VRAM.h" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="frage.txt" />
+    <Text Include="vearrt.txt" />
     <Text Include="Guidelines.txt" />
     <Text Include="TODO.txt" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Display\test.frag" />
+    <None Include="Display\test.vert" />
+    <None Include="Display\test_fs.glsl" />
+    <None Include="Display\test_vs.glsl" />
     <None Include="Tests\6502_functional_test.bin" />
     <None Include="Tests\6502_interrupt_test.bin" />
     <None Include="Tests\timingtest-1.bin" />
@@ -115,14 +129,24 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <TargetName>$(ProjectName)1</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <TargetName>$(ProjectName)1</TargetName>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\OpenGL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>C:\OpenGL\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;glew32.lib;opengl32.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -138,10 +162,14 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>C:\OpenGL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>C:\OpenGL\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;glew32.lib;opengl32.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

@@ -416,11 +416,11 @@ void CPU_6502::PushP(bool shouldSetBit4) {
 	temp = temp | ((C & 0x1) << C.GetBitNum());
 	StackPush(temp);
 }
-void CPU_6502::SetP(uint8_t val, bool shouldSetBit4) {
+void CPU_6502::SetP(uint8_t val/*, bool shouldSetBit4*/) {
 	N = ((val >> N.GetBitNum()) & 0x1);
 	V = ((val >> V.GetBitNum()) & 0x1);
 	// Bit 5 is ignored 
-	if (shouldSetBit4) B = ((val >> B.GetBitNum()) & 0x1);
+	//if (shouldSetBit4) B = ((val >> B.GetBitNum()) & 0x1);
 	D = ((val >> D.GetBitNum()) & 0x1);
 	I = ((val >> I.GetBitNum()) & 0x1);
 	Z = ((val >> Z.GetBitNum()) & 0x1);
@@ -639,7 +639,7 @@ void CPU_6502::Tick() {
 }
 
 void CPU_6502::EASY6502STARTUP() {
-	SetP(0x30, true);
+	SetP(0x30);
 	A = 0;
 	X = 0;
 	Y = 0;
@@ -751,6 +751,18 @@ void CPU_6502::SetI() {
 }
 void CPU_6502::SetSP(uint8_t val) {
 	SP = val;
+}
+uint8_t CPU_6502::GetSP() {
+	return SP;
+}
+void CPU_6502::SetA(uint8_t val) {
+	A = val;
+}
+void CPU_6502::SetX(uint8_t val) {
+	X = val;
+}
+void CPU_6502::SetY(uint8_t val) {
+	Y = val;
 }
 int CPU_6502::GetTotalCycles() {
 	return totalCycles;

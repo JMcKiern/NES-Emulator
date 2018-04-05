@@ -48,9 +48,6 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ComputerSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Peripheral.cpp">
       <Filter>Source Files\Peripherals</Filter>
     </ClCompile>
@@ -63,17 +60,8 @@
     <ClCompile Include="RegisterInterrupt.cpp">
       <Filter>Source Files\Peripherals</Filter>
     </ClCompile>
-    <ClCompile Include="VRAM.cpp">
-      <Filter>Source Files\PPU</Filter>
-    </ClCompile>
     <ClCompile Include="PPU.cpp">
       <Filter>Source Files\PPU</Filter>
-    </ClCompile>
-    <ClCompile Include="MirrorManager.cpp">
-      <Filter>Source Files\Other</Filter>
-    </ClCompile>
-    <ClCompile Include="Mirror.cpp">
-      <Filter>Source Files\Other</Filter>
     </ClCompile>
     <ClCompile Include="GamePak.cpp">
       <Filter>Source Files</Filter>
@@ -84,11 +72,32 @@
     <ClCompile Include="CPU_NES.cpp">
       <Filter>Source Files\CPU</Filter>
     </ClCompile>
+    <ClCompile Include="Console.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Display\GLEntityHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Display\GLScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Display\GLUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Display\maths_funcs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Display\Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Display\stb_image.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ComputerSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="PeripheralConnection.h">
       <Filter>Header Files\Peripherals</Filter>
     </ClInclude>
@@ -110,20 +119,11 @@
     <ClInclude Include="PPU.h">
       <Filter>Header Files\PPU</Filter>
     </ClInclude>
-    <ClInclude Include="VRAM.h">
-      <Filter>Header Files\PPU</Filter>
-    </ClInclude>
     <ClInclude Include="Colour.h">
       <Filter>Header Files\PPU</Filter>
     </ClInclude>
     <ClInclude Include="Palette.h">
       <Filter>Header Files\PPU</Filter>
-    </ClInclude>
-    <ClInclude Include="Mirror.h">
-      <Filter>Header Files\Other</Filter>
-    </ClInclude>
-    <ClInclude Include="MirrorManager.h">
-      <Filter>Header Files\Other</Filter>
     </ClInclude>
     <ClInclude Include="Log.h">
       <Filter>Header Files\Other</Filter>
@@ -137,13 +137,37 @@
     <ClInclude Include="GamePak.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FunctionalTest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="CPU_6502.h">
-      <Filter>Header Files\CPU\Instructions</Filter>
+      <Filter>Header Files\CPU</Filter>
     </ClInclude>
     <ClInclude Include="CPU_NES.h">
-      <Filter>Header Files\CPU\Instructions</Filter>
+      <Filter>Header Files\CPU</Filter>
     </ClInclude>
-    <ClInclude Include="FunctionalTest.h">
+    <ClInclude Include="Console.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Display\GLEntityHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Display\GLScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Display\GLUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Display\maths_funcs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Display\Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Display\stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -152,6 +176,12 @@
       <Filter>Resource Files</Filter>
     </Text>
     <Text Include="TODO.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="vearrt.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="frage.txt">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>
@@ -164,6 +194,18 @@
     </None>
     <None Include="Tests\timingtest-1.bin">
       <Filter>Resource Files\Tests</Filter>
+    </None>
+    <None Include="Display\test.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Display\test.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Display\test_fs.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Display\test_vs.glsl">
+      <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
 </Project>

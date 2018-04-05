@@ -24,6 +24,11 @@ struct MapperNotImplementedException : public std::exception {
 };
 struct InvalidFileTypeException : public std::exception {
 	const char* what() const throw () {
-		return "Mapper has not been implemented!";
+		return "Invalid File Type!";
+	}
+};
+struct MemoryAddressNotValidException : public std::exception {
+	const char* what() const throw () {
+		return "Memory address not valid! Either illegal or not implemented.";
 	}
 };

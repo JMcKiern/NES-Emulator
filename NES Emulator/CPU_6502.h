@@ -27,7 +27,7 @@ private:
 				BitFlag<7> N; // Negative Flag
 				BitFlag<6> V; // Overflow Flag
 							  // BitFlag<5> is unused
-				BitFlag<4> B; // Break Command Flag
+				//BitFlag<4> B; // Break Command Flag
 				BitFlag<3> D; // Decimal Mode Flag - NOT USED IN 2A03
 				BitFlag<2> I; // Interrupt Disable Flag
 				BitFlag<1> Z; // Zero Flag
@@ -104,8 +104,6 @@ private:
 	void PushP(bool shouldSetBit4);
 
 	// Page Crossing
-	int currentOpNumCycles = 0;
-	int totalCycles = 0;
 	bool hasPageCrossed, isPageCrossPossible;
 	void BranchAndCheckForPageCrossing(int8_t relVal);
 	uint16_t AddAndCheckForPageCrossing(uint8_t lowVal, uint16_t regVal);
@@ -125,7 +123,9 @@ protected:
 	void WriteNoTick(uint16_t offset, uint8_t data);
 
 	// Timing
-	void Tick();
+	int currentOpNumCycles = 0;
+	int totalCycles = 0;
+	virtual void Tick();
 
 	// Log object ptr
 	Log* log;
@@ -135,8 +135,12 @@ protected:
 	void SetupOperationTable();
 
 	// StartUp
-	void SetP(uint8_t val, bool shouldSetBit4);
+	void SetP(uint8_t val/*, bool shouldSetBit4*/);
 	void SetSP(uint8_t val);
+	uint8_t GetSP();
+	void SetA(uint8_t val);
+	void SetX(uint8_t val);
+	void SetY(uint8_t val);
 
 public:
 	// Peripherals

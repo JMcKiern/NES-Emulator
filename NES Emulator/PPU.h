@@ -1,22 +1,26 @@
 #pragma once
 
 #include <cstdint>
-#include "PeripheralConnection.h"
-#include "VRAM.h"
+#include <memory>
 #include "CPU_NES.h"
-// TODO:
-//		Add Tick()
+#include "GamePak.h"
+#include "PeripheralConnection.h"
+#include "Palette.h"
+#include "Display\GLScene.h"
 
 class CPU_NES;
 
+// Documentation:
+//		Shifter: Go in on high side, out on 
 class PPU {
 private:
 
-	// VRAM (PPU Memory)
-	VRAM vram;
+	// PPU Memory
+	uint8_t vram[0x4000];
+	uint8_t PaletteRAM[0x20];
+	uint16_t UnMirror(uint16_t offset);
 	void Write(uint16_t offset, uint8_t data);
 	uint8_t Read(uint16_t offset);
-	uint8_t ReadNoTick(uint16_t offset);
 
 	// PPUCTRL Variables	
 	uint16_t nameTableAddr;
@@ -39,6 +43,7 @@ private:
 	bool isSpriteOverflow;
 	bool isSprite0Hit;
 	bool isInVBlank;
+	bool hasNotifiedVBlank = false;
 	uint8_t lastWrite = 0;
 
 	// PPUSCROLL Variables
@@ -74,10 +79,20 @@ private:
 	int cycle = 0;		// going across 0 <= x <= 340
 	int scanline = -1;	// going down -1 <= y <= 260
 	void RenderTick();
-	void RenderPixel();
+	void ChoosePixel();
+	void RenderPixel(uint8_t outPxl, uint8_t outAttr, bool isSprite);
 
-	uint16_t bsr16Bg[2];
-	uint8_t bsr8Bg[2];
+	// Rendering - Background
+	//		Note: this implementation shifts left and takes high bit
+	//			whereas NES shifts right and takes low bit
+	uint16_t bsr16Bg[2]; // bitmap
+	uint8_t bsr8Bg[2]; // palette attributes
+	uint8_t attrLatch;
+	uint8_t nextNTByte;
+	uint8_t nextTileLow, nextTileHigh;
+	uint8_t nextAttrByte;
+	uint8_t bgNTTemp;
+	void LoadTile(int x, int y, int stepNum);
 
 	// Rendering - Sprites
 	//	OAM (also known as Sprite Ram or SPR-RAM)
@@ -87,10 +102,21 @@ private:
 	void SpriteEvaluation();
 	uint8_t oamSLAddr;
 	uint8_t spriteEvalTemp;
-	uint8_t bsrSpr[8][2];
-	uint8_t lchSpr[8];
-	uint8_t ctrSpr[8];
+	uint8_t bsrSpr[8][2]; // bitmap data, 0 = low, 1 = high
+	uint8_t lchSpr[8]; // attributes
+	uint8_t ctrSpr[8]; // x positions
+	int n = 0;
+	int m = 0;
+	int numSpritesOAMSL = 0;
+	bool allSpritesEvaluated = false;
+	bool hadFirstEmptySprite = false;
+	
+	GLScene* gls;
 
+	Palette palette;
+
+	// GamePak
+	GamePak* gp;
 
 public:
 	void RunCycle();
@@ -102,5 +128,5 @@ public:
 	void Tick();
 	void PowerUp();
 
-	PPU(CPU_NES* _CPUPtr);
+	PPU(CPU_NES* _CPUPtr, GamePak* _gp, GLScene* _gls);
 };
