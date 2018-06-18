@@ -3,6 +3,8 @@
 #include <string>
 #include <sstream>
 #include <fstream>
+#include <GL\glew.h>
+#include <GLFW\glfw3.h>
 #include "maths_funcs.h"
 #include "stb_image.h"
 
@@ -71,4 +73,23 @@ std::string readShaderFile(std::string fileName) {
 	sstr << f.rdbuf();
 	f.close();
 	return sstr.str();
+}
+GLuint loadShaderProg(std::string vertexShaderFile, std::string fragmentShaderFile) {
+	GLuint sProg;
+	std::string vs = readShaderFile(vertexShaderFile);
+	const char *vertex_shader = vs.c_str();
+	std::string fs = readShaderFile(fragmentShaderFile);
+	const char *fragment_shader = fs.c_str();
+	GLuint vert_shader, frag_shader;
+	vert_shader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vert_shader, 1, &vertex_shader, NULL);
+	glCompileShader(vert_shader);
+	frag_shader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(frag_shader, 1, &fragment_shader, NULL);
+	glCompileShader(frag_shader);
+	sProg = glCreateProgram();
+	glAttachShader(sProg, frag_shader);
+	glAttachShader(sProg, vert_shader);
+	glLinkProgram(sProg);
+	return sProg;
 }

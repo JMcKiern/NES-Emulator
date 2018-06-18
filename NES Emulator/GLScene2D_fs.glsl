@@ -3,7 +3,6 @@
 in vec2 texture_coordinates;
 
 uniform sampler2D basic_texture;
-uniform sampler2D basic_texture1;
 
 out vec4 frag_colour;
 

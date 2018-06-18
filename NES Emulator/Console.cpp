@@ -111,7 +111,7 @@ Console::Console(std::string logFile/*= ""*/) :
 	log(logFile),
 	cpu(&log, &ppu, &gp, &controller),
 	ppu(&cpu, &gp, &gls),
-	gls(&log)
+	gls(&log, RES_X, RES_Y)
 {} 
 Console::~Console() {
 	glfwTerminate();

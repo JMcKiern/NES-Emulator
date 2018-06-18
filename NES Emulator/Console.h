@@ -14,6 +14,8 @@
 class Console {
 	CPU_NES cpu;
 	PPU ppu;
+	const int RES_X = 256;
+	const int RES_Y = 240;
 	std::vector<std::unique_ptr<Peripheral>> peripherals;
 	void UpdatePeripherals();
 	GamePak gp;

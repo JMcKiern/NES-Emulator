@@ -5,25 +5,6 @@
 #include "GLScene2D.h"
 #include "../Log.h"
 
-GLuint GLScene2D::loadShaderProg(std::string vertexShaderFile, std::string fragmentShaderFile) {
-	GLuint sProg;
-	std::string vs = readShaderFile(vertexShaderFile);
-	const char *vertex_shader = vs.c_str();
-	std::string fs = readShaderFile(fragmentShaderFile);
-	const char *fragment_shader = fs.c_str();
-	GLuint vert_shader, frag_shader;
-	vert_shader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vert_shader, 1, &vertex_shader, NULL);
-	glCompileShader(vert_shader);
-	frag_shader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(frag_shader, 1, &fragment_shader, NULL);
-	glCompileShader(frag_shader);
-	sProg = glCreateProgram();
-	glAttachShader(sProg, frag_shader);
-	glAttachShader(sProg, vert_shader);
-	glLinkProgram(sProg);
-	return sProg;
-}
 void GLScene2D::SetPixel(int x, int y, uint8_t r, uint8_t g, uint8_t b) {
 	int offset = 3 * (x + RES_X * (RES_Y - y - 1));
 	pixels[offset]     = r;
@@ -53,9 +34,6 @@ bool GLScene2D::InitGL() {
 	//glClearColor(0.0f, 0.0f, 0.0f, 0.5f);               // Black Background
 	//glClearDepth(1.0f);                                 // Depth Buffer Setup
 
-	GLuint points_vbo;
-	GLuint vt_vbo;
-
 	GLfloat points[] = {
 		-1.0,  -1.0f,  0.0f,
 		 1.0f, -1.0f,  0.0f,
@@ -63,12 +41,6 @@ bool GLScene2D::InitGL() {
 		 1.0f,	1.0f,  0.0f,
 		-1.0f,  1.0f,  0.0f,
 		-1.0f, -1.0f,  0.0f };
-
-	for (int i = 0; i < 18; ++i) {
-		if ((i - 1) % 3 == 0)
-			points[i] /= (float) RES_X * 1.0 / RES_Y;
-		points[i] *= (float)scaleFactor;
-	}
 
 	GLfloat texcoords[] = {
 		0.0f, 0.0f,
@@ -90,28 +62,36 @@ bool GLScene2D::InitGL() {
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);
 
-	return true;                                        // Initialization Went OK
-}
-
-bool GLScene2D::DrawGLScene(GLFWwindow* window, int w_width, int w_height) {
-	if (!shouldScreenUpdate) {
-		return false;
-	}
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glViewport(0, 0, w_width, w_height);
-	shouldScreenUpdate = false;
-	glhScreen.LoadTexture(pixels, RES_X, RES_Y, 0);
-	glhScreen.BindAndDraw(shader_programme);
-	glfwSwapBuffers(window);
 	return true;
 }
 
-GLScene2D::GLScene2D(Log* _log) {
-	log = _log;
+bool GLScene2D::DrawGLScene(GLFWwindow* window, int w_width, int w_height) {
+	if (shouldScreenUpdate) {
+		shouldScreenUpdate = false;
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		double arScreen = RES_X * 1.0 / RES_Y;
+		double arWindow = w_width * 1.0 / w_height;
+		if (arScreen > arWindow) { // Letterboxing
+			int height = static_cast<int>(w_width * 1.0 / arScreen);
+			int offset_y = static_cast<int>((w_height - height) * 1.0 / 2.0);
+			glViewport(0, offset_y, w_width, height);
+		}
+		else { // Pillarboxing
+			int width = static_cast<int>(w_height * arScreen);
+			int offset_x = static_cast<int>((w_width - width) * 1.0 / 2.0);
+			glViewport(offset_x, 0, width, w_height);
+		}
+		glhScreen.LoadTexture(pixels, RES_X, RES_Y, 0);
+		glhScreen.BindAndDraw(shader_programme);
+		glfwSwapBuffers(window);
+		return true;
+	}
+	return false;
+}
+void GLScene2D::SetupPixels() {
 	for (int y = 0; y < RES_Y; y++) {
 		for (int x = 0; x < RES_X; x++) {
-			uint8_t r, g, b, a;
+			uint8_t r, g, b;
 			bool isGrey = y % 2 == 0 ? x % 2 == 0 : (x - 1) % 2 == 0;
 			if (isGrey) {
 				r = g = b = 0xFF;
@@ -122,4 +102,15 @@ GLScene2D::GLScene2D(Log* _log) {
 			SetPixel(x, y, r, g, b);
 		}
 	}
+}
+
+GLScene2D::GLScene2D(Log* _log, int _RES_X, int _RES_Y) {
+	log = _log;
+	RES_X = _RES_X;
+	RES_Y = _RES_Y;
+	pixels = new uint8_t[3 * RES_X * RES_Y];
+	SetupPixels();
+}
+GLScene2D::~GLScene2D() {
+	delete pixels;
 }

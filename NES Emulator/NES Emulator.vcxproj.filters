@@ -178,10 +178,10 @@
     <Text Include="TODO.txt">
       <Filter>Resource Files</Filter>
     </Text>
-    <Text Include="vearrt.txt">
+    <Text Include="GLScene2D_fs.glsl">
       <Filter>Resource Files</Filter>
     </Text>
-    <Text Include="frage.txt">
+    <Text Include="GLScene2D_vs.glsl">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>
@@ -194,18 +194,6 @@
     </None>
     <None Include="Tests\timingtest-1.bin">
       <Filter>Resource Files\Tests</Filter>
-    </None>
-    <None Include="Display\test.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Display\test.vert">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Display\test_fs.glsl">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Display\test_vs.glsl">
-      <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
 </Project>

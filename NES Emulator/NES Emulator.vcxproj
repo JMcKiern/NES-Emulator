@@ -64,16 +64,12 @@
     <ClInclude Include="RegisterInterrupt.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="frage.txt" />
-    <Text Include="vearrt.txt" />
+    <Text Include="GLScene2D_fs.glsl" />
+    <Text Include="GLScene2D_vs.glsl" />
     <Text Include="Guidelines.txt" />
     <Text Include="TODO.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Display\test.frag" />
-    <None Include="Display\test.vert" />
-    <None Include="Display\test_fs.glsl" />
-    <None Include="Display\test_vs.glsl" />
     <None Include="Tests\6502_functional_test.bin" />
     <None Include="Tests\6502_interrupt_test.bin" />
     <None Include="Tests\timingtest-1.bin" />
