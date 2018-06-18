@@ -2,7 +2,6 @@
 
 #include <string>
 #include <GL\glew.h>
-#include <GLFW\glfw3.h>
 #include "maths_funcs.h"
 
 // Collection of general functions to help with OpenGL

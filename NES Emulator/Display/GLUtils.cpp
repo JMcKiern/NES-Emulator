@@ -1,10 +1,9 @@
+#include <GL\glew.h>
 #include <math.h>
 #include <cstdio>
 #include <string>
 #include <sstream>
 #include <fstream>
-#include <GL\glew.h>
-#include <GLFW\glfw3.h>
 #include "maths_funcs.h"
 #include "stb_image.h"
 

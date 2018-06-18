@@ -8,8 +8,6 @@
 // Includes the points and texture
 // Note: vbo[0] MUST be the points to draw 
 // (numPoints = size / dim for SetVBO when vboNum = 0)
-// TODO:
-//		Rename BindAndDraw()
 class GLEntityHandler {
 private:
 	GLuint vbo[2]; // 0 = points, 1 = texcoords

@@ -1,12 +1,11 @@
 #pragma once
 
-#include <string>
 #include <GL\glew.h>
 #include <GLFW\glfw3.h>
+#include <string>
 #include "maths_funcs.h"
 #include "GLUtils.h"
 #include "../Log.h"
-#include "Camera.h"
 #include "GLEntityHandler.h"
 
 // GLScene2D - allows an array of RGB pixels to be displayed
@@ -16,12 +15,6 @@ private:
 	const std::string fragmentShaderFile = "GLScene2D_fs.glsl";
 
 	GLuint shader_programme;
-	GLuint vao;
-	GLuint tex;
-	GLuint tex1;
-	mat4 projMat;
-	int view_mat_location;
-	int proj_mat_location;
 
 	bool shouldScreenUpdate = true;
 	int RES_X, RES_Y;

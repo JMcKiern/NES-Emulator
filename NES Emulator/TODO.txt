@@ -1,10 +1,8 @@
-Sort out timing
-	Add DMA link from write
-	Implement unsupported/undocumented opcodes
-	Replace direct calls to Tick() with dummy reads and writes
-	Add GamePak, JoyPad, PPU
+Implement unsupported/undocumented opcodes
+Replace direct calls to Tick() with dummy reads and writes
+Add GamePak, JoyPad, PPU
 
-	Mapppers to implement: NROM, UNROM, CNROM, MMC1, MMC3
+Mapppers to implement: NROM, UNROM, CNROM, MMC1, MMC3
 
 
 
@@ -21,3 +19,5 @@ Sort out timing
 DONE---
 Page Crossing
 Memory Mirrors
+Sort out timing
+Add DMA link from write
