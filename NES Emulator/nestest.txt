@@ -1,0 +1,3 @@
+Renderer: Intel(R) HD Graphics 630
+OpenGL version supported 4.4.0 - Build 21.20.16.4526
+

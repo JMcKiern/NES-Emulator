@@ -2,7 +2,6 @@
 
 #include "Colour.h"
 
-// TODO: $3F10/$3F14/$3F18/$3F1C are mirrors of $3F00/$3F04/$3F08/$3F0C
 struct Palette {
 	Colour palette[0x40];
 
@@ -72,6 +71,6 @@ struct Palette {
 			Colour(0x00, 0x00, 0x00),
 			Colour(0x00, 0x00, 0x00),
 			Colour(0x00, 0x00, 0x00)
-	}
+		}
 	{}
 };
