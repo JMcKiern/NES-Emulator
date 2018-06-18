@@ -21,8 +21,8 @@ class CPU_NES : public CPU_6502 {
 	void Tick();
 
 public:
-	void PPURequestingWrite(uint8_t data, uint8_t offset);
-	uint8_t PPURequestingRead(uint8_t offset);
+	void PPURequestingWrite(uint16_t data, uint8_t offset);
+	uint8_t PPURequestingRead(uint16_t offset);
 
 	void PowerUp();
 

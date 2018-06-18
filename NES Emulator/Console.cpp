@@ -44,7 +44,7 @@ void Console::KeyCB(GLFWwindow* _window, int key, int scancode, int action, int 
 	if (window != _window) return;
 	for (int i = 0; i < 8; i++) {
 		if (key == keyMap[i]) {
-			controller.SetKey(i, action); 
+			//controller.SetKey(i, action); 
 			if (action == GLFW_PRESS) {
 				controller.SetKey(i, true);
 			}
@@ -72,7 +72,8 @@ int Console::Run() {
 		if (hasSuccessPC && cpu.GetPC() == successPC) break;
 
 		i++;
-		glfwPollEvents();
+		if (i % 100 == 0)
+			glfwPollEvents();
 		UpdatePeripherals();
 		if (i % 10000 == 0)
 			gls.DrawGLScene(window, w_width, w_height);

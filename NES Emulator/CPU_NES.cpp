@@ -64,10 +64,10 @@ void CPU_NES::Write(uint16_t offset, uint8_t data, bool shouldTick/*= true*/) {
 	}
 }
 // Other Processors
-void CPU_NES::PPURequestingWrite(uint8_t offset, uint8_t data) {
+void CPU_NES::PPURequestingWrite(uint16_t offset, uint8_t data) {
 	WriteNoTick(offset, data);
 }
-uint8_t CPU_NES::PPURequestingRead(uint8_t offset) {
+uint8_t CPU_NES::PPURequestingRead(uint16_t offset) {
 	return ReadNoTick(offset);
 }
 void CPU_NES::StartCycle() {

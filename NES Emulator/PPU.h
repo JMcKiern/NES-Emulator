@@ -6,7 +6,7 @@
 #include "GamePak.h"
 #include "PeripheralConnection.h"
 #include "Palette.h"
-#include "Display\GLScene.h"
+#include "Display\GLScene2D.h"
 
 class CPU_NES;
 
@@ -92,7 +92,9 @@ private:
 	uint8_t nextTileLow, nextTileHigh;
 	uint8_t nextAttrByte;
 	uint8_t bgNTTemp;
-	void LoadTile(int x, int y, int stepNum);
+	void LoadBGTile(int x, int y, int stepNum);
+	void FlushBGShifters();
+	void ShiftBGShifters();
 
 	// Rendering - Sprites
 	//	OAM (also known as Sprite Ram or SPR-RAM)
@@ -105,13 +107,14 @@ private:
 	uint8_t bsrSpr[8][2]; // bitmap data, 0 = low, 1 = high
 	uint8_t lchSpr[8]; // attributes
 	uint8_t ctrSpr[8]; // x positions
-	int n = 0;
-	int m = 0;
+	uint8_t spritePixelsLeft[8];
 	int numSpritesOAMSL = 0;
 	bool allSpritesEvaluated = false;
 	bool hadFirstEmptySprite = false;
+	void LoadSpritesForScanline();
+	uint8_t ReverseByte(uint8_t byte);
 	
-	GLScene* gls;
+	GLScene2D* gls;
 
 	Palette palette;
 
@@ -128,5 +131,5 @@ public:
 	void Tick();
 	void PowerUp();
 
-	PPU(CPU_NES* _CPUPtr, GamePak* _gp, GLScene* _gls);
+	PPU(CPU_NES* _CPUPtr, GamePak* _gp, GLScene2D* _gls);
 };

@@ -1,6 +1,5 @@
 Sort out timing
 	Add DMA link from write
-	Check stack values for interrupts (wat?)
 	Implement unsupported/undocumented opcodes
 	Replace direct calls to Tick() with dummy reads and writes
 	Add GamePak, JoyPad, PPU

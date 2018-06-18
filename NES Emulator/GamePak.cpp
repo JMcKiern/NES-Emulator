@@ -70,7 +70,13 @@ void GamePak::SetupINes() {
 
 	switch (mapperNum) {
 		case 0: {
-			PRGROML = PRGROMU = GetPtrPRG(0);
+			if (num16kPRGBanks == 1) {
+				PRGROML = PRGROMU = GetPtrPRG(0);
+			}
+			else {
+				PRGROML = GetPtrPRG(0);
+				PRGROMU = GetPtrPRG(1);
+			}
 			if (num8kCHRBanks > 0) {
 				CHRROM = GetPtrCHR(0);
 			}

@@ -156,6 +156,8 @@ void PPU::OAMDMA(uint8_t data) {
 // https://forums.nesdev.com/viewtopic.php?f=3&t=13226
 // http://wiki.nesdev.com/w/index.php/PPU_sprite_evaluation
 void PPU::SpriteEvaluation() {
+	static int n = 0;
+	static int m = 0;
 	if (cycle == 0) {
 		n = m = 0;
 		oamSLAddr = 0;
@@ -163,52 +165,35 @@ void PPU::SpriteEvaluation() {
 		numSpritesOAMSL = 0;
 		hadFirstEmptySprite = false;
 	}
-	else if (1 <= cycle && cycle <=64) {
+	else if (1 <= cycle && cycle <= 64) {
 		bool isOddCycle = cycle % 2 == 1;
 		if (isOddCycle) {
-			spriteEvalTemp = OAMDATA();
+			spriteEvalTemp = OAMDATA(); // Returns 0xFF here
 		}
 		else {
 			OAMSL[oamSLAddr] = spriteEvalTemp;
-			oamSLAddr = (oamSLAddr + 1) % 0xFF;
+			oamSLAddr = (oamSLAddr + 1) % 0x20;
 		}
 	}
 	else if (65 <= cycle && cycle <= 256) {
 		bool isOddCycle = cycle % 2 == 1;
 		if (isOddCycle) {
 			// Read
-			//spriteEvalTemp = OAM[oamAddr++];
 			spriteEvalTemp = OAM[n * 4 + m];
 		}
 		else {
 			// Write
 			if (!allSpritesEvaluated) {
 				if (numSpritesOAMSL < 8) { // Step 2.2b
+					OAMSL[oamSLAddr] = spriteEvalTemp;
 					if (m == 0) {
 						// Step 2.1
-						OAMSL[oamSLAddr] = spriteEvalTemp;
-						m++;
-					}
-					else {
 						uint8_t spriteY = OAMSL[oamSLAddr - (oamSLAddr % 4)];
 						if (spriteY <= scanline && // Should copy sprite
-							scanline <= (spriteY + spriteHeight)) {
+							scanline < (spriteY + spriteHeight)) {
 							// Step 2.1a
-							numSpritesOAMSL++;
-							oamSLAddr = (oamSLAddr + 1) % 0xFF;
-							OAMSL[oamSLAddr] = spriteEvalTemp;
 							m++;
-							if (m == 4) { // Finished copying sprite
-								// Step 2.2
-								n++;
-								if (n == 65) {
-									// Step 2.2a
-									n = 0;
-									allSpritesEvaluated = true;
-								}
-								m = 0;
-								oamSLAddr = (oamSLAddr + 1) % 0xFF;
-							}
+							oamSLAddr = (oamSLAddr + 1) % 0x20;
 						}
 						else { // Sprite not in range
 							n++;
@@ -219,13 +204,28 @@ void PPU::SpriteEvaluation() {
 							m = 0;
 						}
 					}
+					else {
+						m++;
+						oamSLAddr = (oamSLAddr + 1) % 0x20;
+						if (m == 4) { // Finished copying sprite
+							// Step 2.2
+							n++;
+							if (n == 65) {
+								// Step 2.2a
+								n = 0;
+								allSpritesEvaluated = true;
+							}
+							m = 0;
+							numSpritesOAMSL++;
+						}
+					}
 				}
 				else {
 					// Step 2.2c
 					// Step 2.3
 					uint8_t spriteY = OAMSL[oamSLAddr - m];
 					if (spriteY <= scanline && // Should copy sprite
-						scanline <= (spriteY + spriteHeight)) {
+						scanline < (spriteY + spriteHeight)) {
 						// Step 2.3a
 						isSpriteOverflow = true;
 					}
@@ -255,7 +255,7 @@ void PPU::SpriteEvaluation() {
 		int num = offset % 8 + 1;
 		if (sprite > numSpritesOAMSL - 1) {
 			if (hadFirstEmptySprite) {
-				hadFirstEmptySprite = true;
+				hadFirstEmptySprite = true; // TODO: What is this?
 			}
 
 
@@ -290,36 +290,34 @@ void PPU::ChoosePixel() {
 	if (shouldShowBackground || shouldShowSprites) {
 		uint8_t bgPxl, sprPxl;
 		uint8_t bgAttr, sprAttr;
+		bool isSpriteZero = false;
+		isSprite0Hit = false;
 		if (shouldShowBackground) {
-			bgPxl = ((((bsr16Bg[1] & 0x8000) != 0) & 1) << 1) | (((bsr16Bg[0] & 0x8000) != 0) & 1); // TODO: Correct? 
-			
-			// TODO: Below is incorrect
-			bgAttr = ((((bsr8Bg[1] & 0x80) != 0) & 1) << 1) | (((bsr8Bg[0] & 0x80) != 0) & 1); // TODO: Correct? 
-
-			// Note: below is done in RenderTick()
-			if ((cycle > 1) && ((cycle - 1) % 8 == 0)) {  // cycle = 9, 17, 25, ..., 257
-				// load bitmap data to bsr16[1] at bits 8 to 15 (upper 8 bits)
-				// load palette attributes
-			}
+			bgPxl = ((((bsr16Bg[1] & 0x8000) != 0) & 1) << 1) | (((bsr16Bg[0] & 0x8000) != 0) & 1);
+			bgAttr = ((((bsr8Bg[1] & 0x80) != 0) & 1) << 1) | (((bsr8Bg[0] & 0x80) != 0) & 1);
 		}
 		if (shouldShowSprites) {
 			for (int i = 0; i < 8; i++) { // Loop through sprites
+				if (ctrSpr[i] == 0) { // Sprite active
+					if (!hasSpriteBeenFound) {
+						sprPxl = ((bsrSpr[i][1] & 0x80) >> 6) | ((bsrSpr[i][0] & 0x80) >> 7);
+						sprAttr = lchSpr[i];
+						
+						// if pixel not transparent
+						// if not (color = 0 on palette = 0)
+						if (spritePixelsLeft[i] > 0 && !(sprPxl == 0 && ((sprAttr & 0x3) == 0))) {
+							hasSpriteBeenFound = true;
+							if (i == 0)
+								isSpriteZero = true;
+						}
+					}
+					if (spritePixelsLeft[i] > 0)
+						spritePixelsLeft[i]--;
+					bsrSpr[i][0] = bsrSpr[i][0] << 1;
+					bsrSpr[i][1] = bsrSpr[i][1] << 1;
+				}
 				if (ctrSpr[i] > 0) // Decrement X position
 					ctrSpr[i]--;
-				if (ctrSpr[i] == 0) { // Sprite active
-					sprPxl = ((bsrSpr[i][1] & 1) << 1) | (bsrSpr[i][0] & 1); // TODO: Correct? 
-					bsrSpr[i][0] = bsrSpr[i][0] >> 1;
-					bsrSpr[i][1] = bsrSpr[i][2] >> 1;
-					sprAttr = lchSpr[i] >> 1;
-					lchSpr[i] = lchSpr[i] >> 1;
-
-					// if pixel not transparent
-					// if not (color = 0 on palette = 0)
-					if (!(sprPxl == 0 && ((sprAttr & 0x3) == 0))) {
-						hasSpriteBeenFound = true;
-						break;
-					}
-				}
 			}
 		}
 
@@ -328,7 +326,7 @@ void PPU::ChoosePixel() {
 		bool isSprite;
 
 		if (shouldShowBackground && hasSpriteBeenFound) {
-			bool spritePriority = sprAttr & (1 << 5);
+			bool priority = sprAttr & (1 << 5);
 			if (bgPxl == 0 && sprPxl == 0) {
 				// BG ($3F00)
 				outPxl = 0;
@@ -348,7 +346,7 @@ void PPU::ChoosePixel() {
 				isSprite = false;
 			}
 			else {
-				if (spritePriority) {
+				if (!priority) {
 					// Sprite
 					outPxl = sprPxl;
 					outAttr = sprAttr;
@@ -360,6 +358,8 @@ void PPU::ChoosePixel() {
 					outAttr = bgAttr;
 					isSprite = false;
 				}
+				if (isSpriteZero)
+					isSprite0Hit = true;
 			}
 		}
 		else if (shouldShowBackground) {
@@ -381,9 +381,7 @@ void PPU::ChoosePixel() {
 			outAttr = 0;
 			isSprite = false;
 		}
-		// TODO: Get pixel color and output to texture
 		RenderPixel(outPxl, outAttr, isSprite);
-//		std::cout << "asd";
 	}
 }
 void PPU::RenderPixel(uint8_t outPxl, uint8_t outAttr, bool isSprite) {
@@ -396,15 +394,13 @@ void PPU::RenderPixel(uint8_t outPxl, uint8_t outAttr, bool isSprite) {
 	uint8_t palColour = Read(colourLoc);
 	Colour colour = palette.palette[palColour];
 
-	gls->SetPixel(cycle, scanline, colour.red, colour.green, colour.blue);
+	gls->SetPixel(cycle - 1, scanline, colour.red, colour.green, colour.blue);
 }
 
-void PPU::LoadTile(int x, int y, int stepNum) {
+void PPU::LoadBGTile(int x, int y, int stepNum) {
 	// TODO: No alternating between read and write cycles?
 	if (stepNum == 1) {
 		// Nametable table byte write (and read?)
-		//bgNTTemp = vram.Read(++VRAMPtr); // TODO: this is incorrect
-		// Cycle is +16 since reading two tiles ahead of current tile
 		bgNTTemp = Read(nameTableAddr + 32 * (y/8) + (x / 8));
 	}
 	else if (stepNum == 3) {
@@ -437,10 +433,106 @@ void PPU::LoadTile(int x, int y, int stepNum) {
 		}
 	}
 }
+void PPU::FlushBGShifters() {
+	// cycle = 9, 17, 25, ..., 257 and 329, 337
+	// Source: NTSC Frame Timing Diagram
+	if ((shouldShowBackground || shouldShowSprites) && -1 <= scanline && scanline <= 239) {
+		if (((1 < cycle && cycle <= 257) || (321 < cycle && cycle <= 337))
+			&& ((cycle - 1) % 8 == 0)) {
+			bsr16Bg[0] = (bsr16Bg[0] & 0xFF00) | nextTileLow;
+			bsr16Bg[1] = (bsr16Bg[1] & 0xFF00) | nextTileHigh;
+			attrLatch = nextAttrByte & 3;
+		}
+	}
+}
+void PPU::ShiftBGShifters() {
+	// cycle = 2 ... 257 and 322 ... 337
+	// Source: NTSC Frame Timing Diagram
+	if ((shouldShowBackground || shouldShowSprites) && -1 <= scanline && scanline <= 239) {
+		if ((1 < cycle && cycle <= 257) || (321 < cycle && cycle <= 337)) {
+			bsr16Bg[0] = (bsr16Bg[0] << 1);
+			bsr16Bg[1] = (bsr16Bg[1] << 1);
+			bsr8Bg[0] = (((bsr8Bg[0] << 1) & 0xFE) | (attrLatch & 1));
+			bsr8Bg[1] = (((bsr8Bg[1] << 1) & 0xFE) | ((attrLatch & 2) >> 1));
+		}
+	}
+}
+// https://stackoverflow.com/a/2602885
+uint8_t PPU::ReverseByte(uint8_t b) {
+	b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
+	b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
+	b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
+	return b;
+}
+void PPU::LoadSpritesForScanline() {
+	int spriteNum = (cycle - 257) / 8;
+	spritePixelsLeft[spriteNum] = 8;
+	int stepNum = (cycle - 257) % 8;
+	uint8_t spriteY = OAMSL[4 * spriteNum + 0];
+	bool shouldFlipHori = (OAMSL[4 * spriteNum + 2] >> 6) & 1;
+	bool shouldFlipVert = (OAMSL[4 * spriteNum + 2] >> 7) & 1;
+	// TODO: Reorder below using isSpriteOnCurrScanline
+	bool isSpriteOnCurrScanline = spriteY <= scanline && scanline < (spriteY + spriteHeight);
+	if (stepNum == 2) {
+		// Load Attr byte
+		if (isSpriteOnCurrScanline)
+			lchSpr[spriteNum] = OAMSL[4 * spriteNum + 2];
+		else
+			lchSpr[spriteNum] = 0;
+	}
+	else if (stepNum == 3) {
+		// Load X cord
+		if (isSpriteOnCurrScanline)
+			ctrSpr[spriteNum] = OAMSL[4 * spriteNum + 3];
+		else
+			ctrSpr[spriteNum] = 0;
+	}
+	else if (stepNum == 5 || stepNum == 7) {
+		// Tile bitmap low or high
+		// Read on 4 and write on 5?
+		// TODO: No alternating between read and write cycles?
+		bool isTileLow = stepNum == 5;
+		uint8_t tileIndexNum = OAMSL[4 * spriteNum + 1];
+		//if (tileIndexNum == 0xee)
+			//std::cout << "ASDF";
+		uint16_t YInTile = shouldFlipVert ? spriteHeight - (scanline - spriteY) : scanline - spriteY;
+		uint16_t tileAddr;
+		if (spriteHeight == 8) {
+			uint16_t patTabAddr = patternTableAddrSprite;
+			tileAddr = patTabAddr + (tileIndexNum << 4) + YInTile;
+		}
+		else {
+			uint16_t patTabAddr = (tileIndexNum & 1) ? 0x1000 : 0x0000;
+			tileAddr = patTabAddr + ((tileIndexNum & 0xFE) << 4) + YInTile;
+		}
+		if (isTileLow) {
+			if (isSpriteOnCurrScanline) {
+				if (!shouldFlipHori)
+					bsrSpr[spriteNum][0] = Read(tileAddr);
+				else
+					bsrSpr[spriteNum][0] = ReverseByte(Read(tileAddr));
+			}
+			else
+				bsrSpr[spriteNum][0] = 0;
+		}
+		else {
+			if (isSpriteOnCurrScanline) {
+				if (!shouldFlipHori)
+					bsrSpr[spriteNum][1] = Read(tileAddr + 8); // http://wiki.nesdev.com/w/index.php/PPU_pattern_tables
+				else
+					bsrSpr[spriteNum][1] = ReverseByte(Read(tileAddr + 8)); // http://wiki.nesdev.com/w/index.php/PPU_pattern_tables
+			}
+			else
+				bsrSpr[spriteNum][1] = 0;
+		}
+	}
+}
 
 // http://wiki.nesdev.com/w/index.php/PPU_rendering#Line-by-line_timing
 // Each 
 void PPU::RenderTick() {
+	if (scanline == 75)
+		int a = 2;
 	if (scanline == -1) {
 		// Pre-render scanline
 		if (cycle == 1) {
@@ -448,17 +540,9 @@ void PPU::RenderTick() {
 			isInVBlank = false;
 		}
 		else if (321 <= cycle && cycle <= 336) {
-			// Load Background tiles into registers
+			// Load first 2 background tiles for next scanline into registers
 			int stepNum = (cycle - 321) % 8;
-			LoadTile(cycle - 321, scanline + 1, stepNum);
-		}
-		if ((1 < cycle && cycle <= 257) || (321 <= cycle && cycle <= 337)) {
-			bool shouldFlushToShifters = (cycle - 1) % 8 == 0; // TODO: Check this
-			if (shouldFlushToShifters) {
-				bsr16Bg[0] = (bsr16Bg[0] & 0xFF00) | nextTileLow;
-				bsr16Bg[1] = (bsr16Bg[1] & 0xFF00) | nextTileHigh;
-				attrLatch = nextAttrByte & 3;
-			}
+			LoadBGTile(cycle - 321, scanline + 1, stepNum);
 		}
 	}
 	else if ((shouldShowBackground || shouldShowSprites) && 0 <= scanline && scanline <= 239) {
@@ -468,59 +552,19 @@ void PPU::RenderTick() {
 		}
 		else if (1 <= cycle && cycle <= 256) {
 			int stepNum = (cycle - 1) % 8;
-			LoadTile(cycle + 16, scanline, stepNum);
+			LoadBGTile(cycle + 16, scanline, stepNum);
 		}
 		else if (257 <= cycle && cycle <= 320) {
 			// Load Sprites into registers
-			// TODO: Flip the sprites here?
-			int spriteNum = (cycle - 257) / 8;
-			int stepNum = (cycle - 257) % 8;
-			if (stepNum == 2) {
-				// Load Attr byte
-				lchSpr[spriteNum] = OAMSL[4 * spriteNum + 2];
-			}
-			else if (stepNum == 3) {
-				// Load X cord
-				ctrSpr[spriteNum] = OAMSL[4 * spriteNum + 3];
-			}
-			else if (stepNum == 5 || stepNum == 7) {
-				// Tile bitmap low or high
-				// Read on 4 and write on 5?
-				// TODO: No alternating between read and write cycles?
-				bool isTileLow = stepNum == 5;
-				uint8_t tileIndexNum = OAMSL[4 * spriteNum + 1]; // Move this?
-				uint16_t patTabAddr;
-				if (spriteHeight == 8) {
-					patTabAddr = patternTableAddrSprite;
-				}
-				else {
-					patTabAddr = (tileIndexNum & 1) ? 0x1000 : 0x0000;
-				}
-				uint8_t tileAddr = patTabAddr + (tileIndexNum & 0xFE);
-				if (isTileLow) {
-					bsrSpr[spriteNum][0] = Read(tileAddr);
-				}
-				else {
-					// TODO: Fix vram
-					bsrSpr[spriteNum][1] = Read(tileAddr + 8); // http://wiki.nesdev.com/w/index.php/PPU_pattern_tables
-				}
-			}
+			LoadSpritesForScanline();
 		}
 		else if (321 <= cycle && cycle <= 336) {
 			// Load Background tiles into registers
 			int stepNum = (cycle - 321) % 8;
-			LoadTile(cycle - 321, scanline + 1, stepNum);
+			LoadBGTile(cycle - 321, scanline + 1, stepNum);
 		}
 		else if (337 <= cycle && cycle <= 340) {
 			// Load 2 nametable bytes
-		}
-		if ((1 < cycle && cycle <= 257) || (321 < cycle && cycle <= 337)) {
-			bool shouldFlushToShifters = (cycle - 1) % 8 == 0; // TODO: Check this
-			if (shouldFlushToShifters) {
-				bsr16Bg[0] = (bsr16Bg[0] & 0xFF00) | nextTileLow;
-				bsr16Bg[1] = (bsr16Bg[1] & 0xFF00) | nextTileHigh;
-				attrLatch = nextAttrByte & 3;
-			}
 		}
 	}
 	else if (scanline == 240) {
@@ -535,20 +579,13 @@ void PPU::RenderTick() {
 void PPU::Tick() {
 	// TODO: Check order of these functions
 	RenderTick();
+	ShiftBGShifters();
+	FlushBGShifters();
 	if ((shouldShowBackground || shouldShowSprites) && (0 <= scanline && scanline <= 239)) {
-		if (shouldShowSprites) {
+		if (shouldShowSprites)
 			SpriteEvaluation();
-		}
-		if (0 <= cycle && cycle < 256)
+		if (1 <= cycle && cycle <= 256)
 			ChoosePixel();
-	}
-	if ((shouldShowBackground || shouldShowSprites) && -1 <= scanline && scanline <= 239) {
-		if ((1 < cycle && cycle <= 257) || (321 < cycle && cycle <= 337)) {
-			bsr16Bg[0] = (bsr16Bg[0] << 1); // Could be simplified if using one bsr for bg bitmap
-			bsr16Bg[1] = (bsr16Bg[1] << 1); // Could be simplified if using one bsr for bg bitmap
-			bsr8Bg[0] = (((bsr8Bg[0] << 1) & 0xFE) | (attrLatch & 1));
-			bsr8Bg[1] = (((bsr8Bg[1] << 1) & 0xFE) | ((attrLatch & 2) >> 1));
-		}
 	}
 
 	// Update scanline and cycle counters
@@ -574,7 +611,7 @@ void PPU::PowerUp() {
 	PPUADDR(0);
 }
 
-PPU::PPU(CPU_NES* _CPUPtr, GamePak* _gp, GLScene* _gls) {
+PPU::PPU(CPU_NES* _CPUPtr, GamePak* _gp, GLScene2D* _gls) {
 	CPUPtr = _CPUPtr;
 	PowerUp();
 	CPUPtr->AddNMIConnection(&cpuNMIConnection);

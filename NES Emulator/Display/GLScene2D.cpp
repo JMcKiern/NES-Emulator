@@ -2,57 +2,10 @@
 #include <GL\glew.h>
 #include <GLFW\glfw3.h>
 #include "stb_image.h"
-#include "GLScene.h"
+#include "GLScene2D.h"
 #include "../Log.h"
 
-unsigned char* GLScene::load_texture(const char *file_name, int& _width, int& _height) {
-	int x, y, n;
-	int force_channels = 4;
-	unsigned char *image_data = stbi_load(file_name, &x, &y, &n, force_channels);
-	if (!image_data) {
-		fprintf(stderr, "ERROR: could not load %s\n", file_name);
-		return false;
-	}
-	// NPOT check
-	if ((x & (x - 1)) != 0 || (y & (y - 1)) != 0) {
-		fprintf(stderr, "WARNING: texture %s is not power-of-2 dimensions\n",
-			file_name);
-	}
-	int width_in_bytes = x * 4;
-	unsigned char *top = NULL;
-	unsigned char *bottom = NULL;
-	unsigned char temp = 0;
-	int half_height = y / 2;
-
-	for (int row = 0; row < half_height; row++) {
-		top = image_data + row * width_in_bytes;
-		bottom = image_data + (y - row - 1) * width_in_bytes;
-		for (int col = 0; col < width_in_bytes; col++) {
-			temp = *top;
-			*top = *bottom;
-			*bottom = temp;
-			top++;
-			bottom++;
-		}
-	}
-	_width = x;
-	_height = y;
-	return image_data;
-}
-std::string GLScene::readShaderFile(std::string fileName) {
-	std::ifstream f;
-	f.open(fileName);
-	if (!f.is_open()) {
-		throw std::exception("Could not open shader file");
-	}
-
-	// https://stackoverflow.com/questions/116038/what-is-the-best-way-to-read-an-entire-file-into-a-stdstring-in-c
-	std::stringstream sstr;
-	sstr << f.rdbuf();
-	f.close();
-	return sstr.str();
-}
-GLuint GLScene::loadShaderProg(std::string vertexShaderFile, std::string fragmentShaderFile) {
+GLuint GLScene2D::loadShaderProg(std::string vertexShaderFile, std::string fragmentShaderFile) {
 	GLuint sProg;
 	std::string vs = readShaderFile(vertexShaderFile);
 	const char *vertex_shader = vs.c_str();
@@ -71,7 +24,7 @@ GLuint GLScene::loadShaderProg(std::string vertexShaderFile, std::string fragmen
 	glLinkProgram(sProg);
 	return sProg;
 }
-void GLScene::SetPixel(int x, int y, uint8_t r, uint8_t g, uint8_t b) {
+void GLScene2D::SetPixel(int x, int y, uint8_t r, uint8_t g, uint8_t b) {
 	int offset = 3 * (x + RES_X * (RES_Y - y - 1));
 	pixels[offset]     = r;
 	pixels[offset + 1] = g;
@@ -79,7 +32,7 @@ void GLScene::SetPixel(int x, int y, uint8_t r, uint8_t g, uint8_t b) {
 	shouldScreenUpdate = true;
 }
 
-bool GLScene::InitGL() {
+bool GLScene2D::InitGL() {
 	// Setup OpenGL
 	glewExperimental = GL_TRUE;
 	glewInit();
@@ -140,7 +93,7 @@ bool GLScene::InitGL() {
 	return true;                                        // Initialization Went OK
 }
 
-bool GLScene::DrawGLScene(GLFWwindow* window, int w_width, int w_height) {
+bool GLScene2D::DrawGLScene(GLFWwindow* window, int w_width, int w_height) {
 	if (!shouldScreenUpdate) {
 		return false;
 	}
@@ -154,7 +107,7 @@ bool GLScene::DrawGLScene(GLFWwindow* window, int w_width, int w_height) {
 	return true;
 }
 
-GLScene::GLScene(Log* _log) {
+GLScene2D::GLScene2D(Log* _log) {
 	log = _log;
 	for (int y = 0; y < RES_Y; y++) {
 		for (int x = 0; x < RES_X; x++) {

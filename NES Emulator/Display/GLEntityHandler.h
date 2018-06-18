@@ -5,7 +5,7 @@
 
 // Handles a GL Entity - an object that will be rendered
 // in the scene.
-// Eg the crosshair which includes the points and texture
+// Includes the points and texture
 // Note: vbo[0] MUST be the points to draw 
 // (numPoints = size / dim for SetVBO when vboNum = 0)
 // TODO:

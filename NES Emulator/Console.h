@@ -6,7 +6,7 @@
 #include "CPU_NES.h"
 #include "Peripheral.h"
 #include "Log.h"
-#include "Display\GLScene.h"
+#include "Display\GLScene2D.h"
 #include "Controller.h"
 
 // Contains everything to do with everything
@@ -56,7 +56,7 @@ class Console {
 	uint16_t lastPC; // Used to detect loop on single instruction
 	bool hasSuccessPC;
 	uint16_t successPC;
-	GLScene gls;
+	GLScene2D gls;
 public:
 	int Run();
 	void LoadINES(std::string filename);
