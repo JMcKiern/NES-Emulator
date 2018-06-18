@@ -10,14 +10,14 @@ int main() {
 		FunctionalTest("Tests/timingtest-1.bin", 0x1000, 0x1000, 0x1000, false);
 	}
 	{
-		const std::string logFile = "nestest";
+		const std::string logFile = "logfile";
 		Console console(logFile);
 		//console.LoadINES("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Nestest\\nestest.nes");
-		//console.LoadINES("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Games\\Donkey Kong Classics (U).nes");
+		console.LoadINES("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Games\\Donkey Kong Classics (U).nes");
 		//console.LoadINES("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Games\\color_test.nes");
 		//console.LoadINES("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Games\\Ice Climber (USA, Europe).nes");
 		//console.LoadINES("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Nestest\\nestest - jump to test.nes");
-		console.LoadINES("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Games\\Mario Bros (JU).nes");
+		//console.LoadINES("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Games\\Mario Bros (JU).nes");
 		//console.LoadINES("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Games\\Spelunker (USA).nes");
 		
 		int SystemReturnValue = console.Run();

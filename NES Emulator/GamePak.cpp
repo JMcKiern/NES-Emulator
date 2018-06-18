@@ -141,7 +141,13 @@ uint8_t GamePak::Read(uint16_t addr) {
 	else if (0xC000 <= addr && addr < 0x10000) {
 		return PRGROMU[addr - 0xC000];
 	}
-	throw MemoryAddressNotValidException();
+	else {
+		// TODO: This should point to Expansion ROM
+		// Taking from instruction 0xf3c5 = BIT 0x58a9
+		// of Ice Climbers and its operation on Mesen
+		return 0;
+	}
+	//throw MemoryAddressNotValidException();
 }
 void GamePak::Write(uint16_t addr, uint8_t data) {
 	RegisterUpdate(addr, data);
