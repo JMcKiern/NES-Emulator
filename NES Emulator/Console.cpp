@@ -65,7 +65,8 @@ int Console::Run() {
 	gls.InitGL();
 	auto startTimer = std::chrono::system_clock::now();
 	int i = 0;
-	while (lastPC != cpu.GetPC() && !glfwWindowShouldClose(window)) {
+	//while (lastPC != cpu.GetPC() && !glfwWindowShouldClose(window)) {
+	while (!glfwWindowShouldClose(window)) {
 		lastPC = cpu.GetPC();
 		//cpu.PrintDebugInfo();
 		cpu.RunNextOpcode();

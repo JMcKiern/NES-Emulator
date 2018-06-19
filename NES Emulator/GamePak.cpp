@@ -2,6 +2,9 @@
 #include "GamePak.h"
 
 void GamePak::LoadINes(std::string filename) {
+	if (isGameLoaded) {
+		throw std::exception("Game already loaded");
+	}
 	std::ifstream f;
 	std::streampos sizef;
 
@@ -80,6 +83,9 @@ void GamePak::SetupINes() {
 			if (num8kCHRBanks > 0) {
 				CHRROM = GetPtrCHR(0);
 			}
+			else {
+				CHRRAM = new uint8_t[0x2000];
+			}
 			break;
 		}
 		case 2: {
@@ -106,6 +112,7 @@ void GamePak::SetupINes() {
 			break;
 		}
 	}
+	isGameLoaded = true;
 }
 
 void GamePak::RegisterUpdate(uint16_t addr, uint8_t data) {
@@ -184,7 +191,10 @@ uint8_t GamePak::PPURead(uint16_t addr) {
 		case 0:
 		case 2:
 		case 3:
-			return CHRROM[addr];
+			if (num8kCHRBanks > 0)
+				return CHRROM[addr];
+			else
+				return CHRRAM[addr];
 		default: {
 			throw MemoryAddressNotValidException();
 			return -1;
@@ -197,7 +207,10 @@ void GamePak::PPUWrite(uint16_t addr, uint8_t data) {
 		case 0:
 		case 2:
 		case 3:
-			CHRROM[addr] = data;
+			if (num8kCHRBanks > 0)
+				CHRROM[addr] = data;
+			else
+				CHRRAM[addr] = data;
 			break;
 		default: {
 			throw MemoryAddressNotValidException();
@@ -209,4 +222,6 @@ void GamePak::PPUWrite(uint16_t addr, uint8_t data) {
 
 GamePak::~GamePak() {
 	if (size != -1) delete[] cartridge;
+	if (num8kCHRBanks == 0 && mapperNum == 0)
+		delete[] CHRRAM;
 }

@@ -13,9 +13,9 @@ class GamePak {
 	uint8_t* PRGROML;
 	uint8_t* PRGRAM;
 	uint8_t* CHRROM;
+	uint8_t* CHRRAM;
 	uint8_t SRAM[0x8000 - 0x6000];
 	uint8_t ExpansionROM[0x6000 - 0x4200];
-
 
 	char* cartridge;
 	int size = -1;
@@ -31,6 +31,7 @@ class GamePak {
 
 	bool CheckINes();
 	void SetupINes();
+	bool isGameLoaded = false;
 
 	uint16_t GetOffsetPRG(uint8_t bankNum);
 	uint16_t GetOffsetCHR(uint8_t bankNum);
