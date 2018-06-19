@@ -120,7 +120,6 @@ void PPU::OAMDATA(uint8_t data) {
 	oamAddr++;
 }
 uint8_t PPU::OAMDATA() {
-	if (1 <= cycle && cycle <= 64) return 0xFF;
 	return OAM[oamAddr];
 }
 void PPU::PPUSCROLL(uint8_t data) {
@@ -152,7 +151,7 @@ uint8_t PPU::PPUDATA() {
 }
 void PPU::OAMDMA(uint8_t data) {
 	for (int i = 0; i < 0x100; i++) {
-		OAM[i] = CPUPtr->PPURequestingRead((data * 0x100) + i);
+		OAM[(oamAddr + i) % 0x100] = CPUPtr->PPURequestingRead((data * 0x100) + i);
 	}
 }
 
@@ -171,7 +170,12 @@ void PPU::SpriteEvaluation() {
 	else if (1 <= cycle && cycle <= 64) {
 		bool isOddCycle = cycle % 2 == 1;
 		if (isOddCycle) {
-			spriteEvalTemp = OAMDATA(); // Returns 0xFF here
+			// It is unclear whether OAMDATA() should return 0xFF
+			// (as in Sprite Evaluation page on wiki) or if there
+			// should be no OAMDATA() call and just set it to 0xFF
+			// In order to make sprite_ram.nes work the 2nd option
+			// should be chosen.
+			spriteEvalTemp = 0xFF;
 		}
 		else {
 			OAMSL[oamSLAddr] = spriteEvalTemp;
