@@ -7,7 +7,7 @@ uint16_t PPU::UnMirror(uint16_t offset) {
 	if (0x4000 <= offset && offset < 0x10000) {
 		offset = offset % 0x4000;
 	}
-	if (0x3f20 <= offset && offset < 0x4000) {
+	if (0x3f00 <= offset && offset < 0x4000) {
 		offset = offset % 0x20 + 0x3f00;
 		// $3F10/$3F14/$3F18/$3F1C are mirrors of $3F00/$3F04/$3F08/$3F0C
 		if ((offset & 0x3) == 0 && offset >= 0x3f10)
