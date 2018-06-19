@@ -39,7 +39,10 @@ uint8_t PPU::Read(uint16_t offset) {
 	offset = UnMirror(offset);
 	if (0x3f00 <= offset && offset <= 0x3f20) {
 		// Palette Ram
-		return PaletteRAM[offset - 0x3f00];
+		if (isInColourMode)
+			return PaletteRAM[offset - 0x3f00];
+		else
+			return (PaletteRAM[offset - 0x3f00] & 0x30);
 	}
 	else {
 		if (gp->isVRAM(offset)) {
