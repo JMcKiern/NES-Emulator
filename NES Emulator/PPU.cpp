@@ -108,10 +108,8 @@ uint8_t PPU::PPUSTATUS() { // Potential Error: 5 LSB should not be zero
 	status |= (regLatch & 0x1F);
 	status |= ((isSpriteOverflow & 0x1) << 5);
 	status |= ((isSprite0Hit & 0x1) << 6);
-	if (isInVBlank && !hasNotifiedVBlank) {
-		status |= ((isInVBlank & 0x1) << 7);
-		hasNotifiedVBlank = true;
-	}
+	status |= ((isInVBlank & 0x1) << 7);
+	isInVBlank = false;
 	return status;
 }
 void PPU::OAMADDR(uint8_t data) {
@@ -162,7 +160,7 @@ void PPU::OAMDMA(uint8_t data) {
 // https://forums.nesdev.com/viewtopic.php?f=3&t=13226
 // http://wiki.nesdev.com/w/index.php/PPU_sprite_evaluation
 void PPU::SpriteEvaluation() {
-	static int n = 0;
+	static int n = 0; // TODO: Move to class
 	static int m = 0;
 	if (cycle == 0) {
 		n = m = 0;
@@ -607,8 +605,10 @@ void PPU::Tick() {
 	if (cycle == 0) {
 		scanline = ((scanline + 1 + 1) % 262) - 1;
 	}
-	bool nmiState = VBlankShouldNMI && isInVBlank;
-	cpuNMIConnection.SetState(nmiState);
+	if (VBlankShouldNMI && isInVBlank)
+		cpuNMIConnection.SetState(LOW);
+	else
+		cpuNMIConnection.SetState(HIGH);
 }
 
 void PPU::PowerUp() {

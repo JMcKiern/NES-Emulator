@@ -110,7 +110,8 @@ private:
 
 	// Interrupts // pg143 (154) for turning off
 	PeripheralLine irqLine, nmiLine;
-	bool hasNMIBeenProcessed = true; // Potential Error: if _NMI starts low and goes high in first RunOpcode() loop then will miss
+	bool nmiFlipFlop = false;
+	DigitalState prevNMIState = LOW; //TODO: Check if should be HIGH;
 	void CheckForInterrupt();
 	void RespondToInterrupt(bool isIRQ); // Priority = Start > _NMI > _IRQ
 

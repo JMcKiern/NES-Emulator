@@ -1,9 +1,15 @@
 #pragma once
 
+enum DigitalState {
+	LOW,
+	HIGH
+};
+
 class PeripheralConnection {
 private:
-	bool isOn;
+	DigitalState lineState;
 public:
-	bool GetState();
-	void SetState(bool _isOn);
+	DigitalState GetState();
+	void SetState(DigitalState _isOn);
+	PeripheralConnection();
 };

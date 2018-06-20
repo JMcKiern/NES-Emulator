@@ -586,16 +586,21 @@ void CPU_6502::SetupOperationTable() {
 
 // Interrupts
 void CPU_6502::CheckForInterrupt() {
-	if (!nmiLine.GetState()) hasNMIBeenProcessed = false;
-	while ((irqLine.GetState() && I == 0) || (nmiLine.GetState() && !hasNMIBeenProcessed)) {
-		if (nmiLine.GetState() && !hasNMIBeenProcessed) {
+	bool NMI = nmiLine.GetState() == LOW && prevNMIState == HIGH;
+	prevNMIState = nmiLine.GetState(); // TODO: Place this in correct location
+	bool IRQ = irqLine.GetState() == LOW && I == 0;
+
+	while (IRQ || NMI) {
+		if (NMI) {
+			nmiFlipFlop = true;
 			RespondToInterrupt(false);
-			hasNMIBeenProcessed = true;
 			break;
 		}
-		else if (irqLine.GetState() && I == 0) {
+		else if (IRQ) {
 			RespondToInterrupt(true); // BRK ??
 		}
+		NMI = nmiLine.GetState() == LOW && prevNMIState == HIGH;
+		IRQ = irqLine.GetState() == LOW && I == 0;
 	}
 }
 void CPU_6502::RespondToInterrupt(bool isIRQ) {
@@ -608,6 +613,7 @@ void CPU_6502::RespondToInterrupt(bool isIRQ) {
 	}
 	else { // is _NMI
 		PC = Read(0xFFFA) + (Read(0xFFFB) << 8);	// 6, 7
+		nmiFlipFlop = false;
 	}
 	I = 1;
 }

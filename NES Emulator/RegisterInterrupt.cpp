@@ -1,7 +1,10 @@
 #include "RegisterInterrupt.h"
 
 void RegisterInterrupt::UpdatePeripheral() {
-	peripheralConnection.SetState(((cpu->PeripheralRead(addr) >> bitNum) & 0x1));
+	if (((cpu->PeripheralRead(addr) >> bitNum) & 0x1))
+		peripheralConnection.SetState(LOW);
+	else
+		peripheralConnection.SetState(HIGH);
 }
 
 RegisterInterrupt::RegisterInterrupt(CPU_6502* _cpu, uint16_t _addr, bool _isIRQConnection, uint8_t _bitNum) :

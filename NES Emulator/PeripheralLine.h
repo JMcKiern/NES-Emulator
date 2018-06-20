@@ -11,5 +11,5 @@ private:
 public:
 	void AddConnection(PeripheralConnection* _peripheralConnection);
 	void RemoveConnection(PeripheralConnection* _peripheralConnection);
-	bool GetState();
+	DigitalState GetState();
 };

@@ -1,8 +1,11 @@
 #include "PeripheralConnection.h"
 
-bool PeripheralConnection::GetState() {
-	return isOn;
+DigitalState PeripheralConnection::GetState() {
+	return lineState;
 }
-void PeripheralConnection::SetState(bool _isOn) {
-	isOn = _isOn;
+void PeripheralConnection::SetState(DigitalState _lineState) {
+	lineState = _lineState;
+}
+PeripheralConnection::PeripheralConnection() {
+	lineState = HIGH;
 }
