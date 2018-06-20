@@ -586,20 +586,16 @@ void CPU_6502::SetupOperationTable() {
 
 // Interrupts
 void CPU_6502::CheckForInterrupt() {
-	bool NMI = nmiLine.GetState() == LOW && prevNMIState == HIGH;
-	prevNMIState = nmiLine.GetState(); // TODO: Place this in correct location
 	bool IRQ = irqLine.GetState() == LOW && I == 0;
 
-	while (IRQ || NMI) {
-		if (NMI) {
-			nmiFlipFlop = true;
+	while (IRQ || nmiFlipFlop) {
+		if (nmiFlipFlop) {
 			RespondToInterrupt(false);
 			break;
 		}
 		else if (IRQ) {
 			RespondToInterrupt(true); // BRK ??
 		}
-		NMI = nmiLine.GetState() == LOW && prevNMIState == HIGH;
 		IRQ = irqLine.GetState() == LOW && I == 0;
 	}
 }
@@ -642,6 +638,12 @@ void CPU_6502::RemoveNMIConnection(PeripheralConnection* nmiConnection) {
 void CPU_6502::Tick() {
 	currentOpNumCycles++;
 	totalCycles++;
+
+	bool NMI = nmiLine.GetState() == LOW && prevNMIState == HIGH;
+	prevNMIState = nmiLine.GetState(); // TODO: Place this in correct location
+	if (NMI)
+		nmiFlipFlop = true;
+	
 }
 
 void CPU_6502::EASY6502STARTUP() {

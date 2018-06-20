@@ -543,7 +543,6 @@ void PPU::RenderTick() {
 	if (scanline == -1) {
 		// Pre-render scanline
 		if (cycle == 1) {
-			hasNotifiedVBlank = false;
 			isInVBlank = false;
 		}
 		else if (321 <= cycle && cycle <= 336) {
@@ -596,7 +595,8 @@ void PPU::Tick() {
 	}
 
 	// Update scanline and cycle counters
-	if (scanline == -1 && isOddFrame && cycle == 339) {
+	if (scanline == -1 && isOddFrame && cycle == 339 && (shouldShowBackground || shouldShowSprites)) {
+		// TODO: Should be both bg and sprite?
 		cycle = 0;
 	}
 	else {
@@ -604,6 +604,11 @@ void PPU::Tick() {
 	}
 	if (cycle == 0) {
 		scanline = ((scanline + 1 + 1) % 262) - 1;
+	}
+
+	if (cycle == 0 && scanline == -1) {
+		// Start of new frame
+		isOddFrame = !isOddFrame;
 	}
 	if (VBlankShouldNMI && isInVBlank)
 		cpuNMIConnection.SetState(LOW);

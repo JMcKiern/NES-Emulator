@@ -94,8 +94,8 @@ void CPU_NES::Reset() {
 }
 
 void CPU_NES::Tick() {
-	currentOpNumCycles++;
-	totalCycles++;
+	CPU_6502::Tick();
+	
 	for (int i=0;i<3;i++) {
 		PPUPtr->Tick();
 	}

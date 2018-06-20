@@ -30,6 +30,7 @@ private:
 
 	// PPUMASK Variables
 	bool isInColourMode;
+	// TODO: Implement clipping
 	bool shouldClipBackground;
 	bool shouldClipSprites;
 	bool shouldShowBackground;
@@ -41,7 +42,6 @@ private:
 	bool isSpriteOverflow;
 	bool isSprite0Hit;
 	bool isInVBlank;
-	bool hasNotifiedVBlank = false;
 
 	// PPUSCROLL Variables
 	uint8_t fineX, fineY;
