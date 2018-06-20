@@ -56,7 +56,7 @@ uint8_t PPU::Read(uint16_t offset) {
 }
 
 void PPU::WriteReg(uint16_t offset, uint8_t data) {
-	lastWrite = data;
+	regLatch = data;
 	switch (offset) {
 		case 0x2000: PPUCTRL(data); break;
 		case 0x2001: PPUMASK(data); break;
@@ -66,9 +66,7 @@ void PPU::WriteReg(uint16_t offset, uint8_t data) {
 		case 0x2006: PPUADDR(data); break;
 		case 0x2007: PPUDATA(data); break;
 		case 0x4014: OAMDMA(data); break;
-		default:
-			throw std::out_of_range::out_of_range("Attempted PPU write at " + offset);
-			break;
+		default: break;
 	}
 }
 uint8_t PPU::ReadReg(uint16_t offset) {
@@ -77,7 +75,8 @@ uint8_t PPU::ReadReg(uint16_t offset) {
 		case 0x2004: return OAMDATA();
 		case 0x2007: return PPUDATA();
 		default:
-			return PPUSTATUS(); // Reset data bus
+			isNextByteUpper = true;
+			return regLatch;
 	}
 }
 void PPU::PPUCTRL(uint8_t data) {
@@ -106,7 +105,7 @@ void PPU::PPUMASK(uint8_t data) {
 uint8_t PPU::PPUSTATUS() { // Potential Error: 5 LSB should not be zero
 	isNextByteUpper = true; // Reset data bus
 	uint8_t status = 0;
-	status |= (lastWrite & 0x1F);
+	status |= (regLatch & 0x1F);
 	status |= ((isSpriteOverflow & 0x1) << 5);
 	status |= ((isSprite0Hit & 0x1) << 6);
 	if (isInVBlank && !hasNotifiedVBlank) {
@@ -123,6 +122,7 @@ void PPU::OAMDATA(uint8_t data) {
 	oamAddr++;
 }
 uint8_t PPU::OAMDATA() {
+	regLatch = OAM[oamAddr];
 	return OAM[oamAddr];
 }
 void PPU::PPUSCROLL(uint8_t data) {
@@ -149,6 +149,7 @@ void PPU::PPUDATA(uint8_t data) {
 }
 uint8_t PPU::PPUDATA() {
 	uint8_t data = Read(VRAMPtr);
+	regLatch = data;
 	VRAMPtr += addrInc;
 	return data;
 }
@@ -541,8 +542,6 @@ void PPU::LoadSpritesForScanline() {
 // http://wiki.nesdev.com/w/index.php/PPU_rendering#Line-by-line_timing
 // Each 
 void PPU::RenderTick() {
-	if (scanline == 75)
-		int a = 2;
 	if (scanline == -1) {
 		// Pre-render scanline
 		if (cycle == 1) {
@@ -558,7 +557,7 @@ void PPU::RenderTick() {
 	else if ((shouldShowBackground || shouldShowSprites) && 0 <= scanline && scanline <= 239) {
 		// Visible scanlines
 		if (cycle == 0) {
-
+			// Idle
 		}
 		else if (1 <= cycle && cycle <= 256) {
 			int stepNum = (cycle - 1) % 8;

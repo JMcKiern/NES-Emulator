@@ -3,7 +3,7 @@ Replace direct calls to Tick() with dummy reads and writes
 Add JoyPad
 Add speed limiter
 Add scrolling
-Add support for color emphasis
+Add support for color emphasis (what about in monochrome mode)
 Add ability for swapping of games without having to destroy GamePak?
 
 Mapppers to implement: NROM, UNROM, CNROM, MMC1, MMC3

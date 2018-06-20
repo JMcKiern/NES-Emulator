@@ -10,8 +10,6 @@
 
 class CPU_NES;
 
-// Documentation:
-//		Shifter: Go in on high side, out on 
 class PPU {
 private:
 
@@ -44,7 +42,6 @@ private:
 	bool isSprite0Hit;
 	bool isInVBlank;
 	bool hasNotifiedVBlank = false;
-	uint8_t lastWrite = 0;
 
 	// PPUSCROLL Variables
 	uint8_t fineX, fineY;
@@ -59,6 +56,7 @@ private:
 	uint8_t PPUADDRUpper;
 
 	// PPU Registers - Used to communicate with CPU
+	uint8_t regLatch = 0;
 	void PPUCTRL(uint8_t data);
 	void PPUMASK(uint8_t data);
 	uint8_t PPUSTATUS();
