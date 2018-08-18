@@ -32,7 +32,7 @@ private:
 			writeCounter = 0;
 			f = new std::ofstream;
 			f->exceptions(std::ifstream::failbit | std::ifstream::badbit);
-			f->open(filename + ".txt", std::ios::out | std::ios::trunc);
+			f->open(filename, std::ios::out | std::ios::trunc);
 			out = f;
 			isOn = true;
 		}
@@ -62,6 +62,7 @@ public:
 	}
 	~Log() {
 		if (fileMode && f->is_open()) {
+			flush();
 			f->close();
 			delete f;
 		}
@@ -72,15 +73,5 @@ template<typename T>
 Log& operator<<(Log& log, T const& data) {
 	if (!log.isOn) return log;
 	(*log.out) << data;
-	if (log.fileMode) log.writeCounter++;
-	if (log.writeCounter >= 2000000) {
-		log.writeCounter = 0;
-		log.f->close();
-		if (!log.secondFile)
-			log.f->open(log.filename + " (1).txt", std::ios::out | std::ios::trunc);
-		else
-			log.f->open(log.filename + ".txt", std::ios::out | std::ios::trunc);
-		log.secondFile = !log.secondFile;
-	}
 	return log;
 }

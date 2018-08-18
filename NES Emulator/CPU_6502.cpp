@@ -786,7 +786,6 @@ void CPU_6502::PrintDebugInfo() {
 	(*log) << " P:" << std::setw(2) << (unsigned int)P+0x20;
 	(*log) << " SP:" << std::setw(2) << (unsigned int)SP;
 	(*log) << '\n';
-	log->flush(); // Flush to files
 	/*
 	if (SP != 0xFF) (*log) << "\n ";
 	for (uint8_t i = 0xFF; i>SP; i--) {
