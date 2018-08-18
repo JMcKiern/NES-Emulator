@@ -172,12 +172,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Guidelines.txt">
-      <Filter>Resource Files</Filter>
-    </Text>
-    <Text Include="TODO.txt">
-      <Filter>Resource Files</Filter>
-    </Text>
     <Text Include="GLScene2D_fs.glsl">
       <Filter>Resource Files</Filter>
     </Text>

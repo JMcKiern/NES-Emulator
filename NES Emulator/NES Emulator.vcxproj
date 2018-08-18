@@ -64,8 +64,6 @@
   <ItemGroup>
     <Text Include="GLScene2D_fs.glsl" />
     <Text Include="GLScene2D_vs.glsl" />
-    <Text Include="Guidelines.txt" />
-    <Text Include="TODO.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Tests\6502_functional_test.bin" />
