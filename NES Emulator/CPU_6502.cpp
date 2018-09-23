@@ -640,10 +640,10 @@ void CPU_6502::Tick() {
 	totalCycles++;
 
 	bool NMI = nmiLine.GetState() == LOW && prevNMIState == HIGH;
-	prevNMIState = nmiLine.GetState(); // TODO: Place this in correct location
+	prevNMIState = nmiLine.GetState();
 	if (NMI)
 		nmiFlipFlop = true;
-	
+
 }
 
 void CPU_6502::EASY6502STARTUP() {
@@ -699,8 +699,6 @@ uint16_t CPU_6502::AddAndCheckForPageCrossing(uint8_t lowVal, uint16_t regVal) {
 void CPU_6502::RunNextOpcode() {
 	CheckForInterrupt();
 
-	//if (PC == 0xd951)
-		//throw - 1;
 	currentOpNumCycles = 0;
 	hasPageCrossed = false;
 	isPageCrossPossible = false;
@@ -740,6 +738,13 @@ void CPU_6502::RunNextOpcode() {
 		(*log) << "\n";
 	#endif
 
+	PrintDebugInfo();
+
+	// Update values for logging
+	prevPC = PC;
+	prevOp = op;
+	prevArgOffset = argOffset;
+
 	PC += argLen + 1;
 	(this->*op.Run)(argOffset, op.addrMode);
 	if (!((op.numCycles >> currentOpNumCycles) & 0x1)) {
@@ -777,13 +782,27 @@ int CPU_6502::GetTotalCycles() {
 }
 
 // Logging
-void CPU_6502::PrintDebugInfo() {
-	(*log) << std::hex << std::setfill('0');
-	(*log) << std::setw(4) << (unsigned int)PC;
+void CPU_6502::PrintDebugInfoMesenBasic() {
+	(*log) << std::hex << std::uppercase << std::setfill('0');
+
+	(*log) << std::setw(4) << (unsigned int)prevPC;
+	(*log) << std::setw(4) << prevOp.instrStr;
+	(*log) << std::setw(4) << prevArgOffset;
+
 	(*log) << " A:" << std::setw(2) << (unsigned int)A;
 	(*log) << " X:" << std::setw(2) << (unsigned int)X;
 	(*log) << " Y:" << std::setw(2) << (unsigned int)Y;
 	(*log) << " P:" << std::setw(2) << (unsigned int)P+0x20;
+	(*log) << " SP:" << std::setw(2) << (unsigned int)SP;
+}
+
+void CPU_6502::PrintDebugInfo() {
+	(*log) << std::hex << std::uppercase << std::setfill('0');
+	(*log) << std::setw(4) << (unsigned int)PC;
+	(*log) << " A:" << std::setw(2) << (unsigned int)A;
+	(*log) << " X:" << std::setw(2) << (unsigned int)X;
+	(*log) << " Y:" << std::setw(2) << (unsigned int)Y;
+	(*log) << " P:" << std::setw(2) << (unsigned int)P;
 	(*log) << " SP:" << std::setw(2) << (unsigned int)SP;
 	(*log) << '\n';
 	/*

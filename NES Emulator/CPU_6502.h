@@ -36,7 +36,6 @@ private:
 		};
 	};
 
-	
 	// Instructions
 	void ADC(uint16_t offset, AddrMode addrMode);
 	void AND(uint16_t offset, AddrMode addrMode);
@@ -128,8 +127,12 @@ protected:
 	int totalCycles = 0;
 	virtual void Tick();
 
-	// Log object ptr
+	// Logging
 	Log* log;
+	uint16_t prevPC;
+	Operation prevOp;
+	uint16_t prevArgOffset;
+	void PrintDebugInfoMesenBasic();
 
 	// Operation Table
 	Operation operationTable[0xFF];

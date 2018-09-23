@@ -1,3 +1,4 @@
+#include <iomanip>
 #include "CPU_NES.h"
 
 uint16_t CPU_NES::UnMirror(uint16_t offset) {
@@ -11,7 +12,7 @@ uint16_t CPU_NES::UnMirror(uint16_t offset) {
 }
 
 // CPU Memory
-uint8_t CPU_NES::Read(uint16_t offset, bool shouldTick/*= true*/) { 
+uint8_t CPU_NES::Read(uint16_t offset, bool shouldTick/*= true*/) {
 	if (shouldTick) Tick();
 	offset = UnMirror(offset);
 	if (offset >= 0x0 && offset < 0x800) {
@@ -63,6 +64,16 @@ void CPU_NES::Write(uint16_t offset, uint8_t data, bool shouldTick/*= true*/) {
 		throw MemoryAddressNotValidException();
 	}
 }
+
+// Logging
+void CPU_NES::PrintDebugInfoMesen() {
+	PrintDebugInfoMesenBasic();
+	(*log) << std::hex << std::uppercase << std::setfill('0');
+	//(*log) << " CYC:" << std::setw(3) << (unsigned int)PPUPtr->GetPPUCycle();
+	//(*log) << " SL:" << std::setw(2) << (unsigned int)PPUPtr->GetPPUScanline();
+	(*log) << '\n';
+}
+
 // Other Processors
 void CPU_NES::PPURequestingWrite(uint16_t offset, uint8_t data) {
 	WriteNoTick(offset, data);
@@ -95,7 +106,7 @@ void CPU_NES::Reset() {
 
 void CPU_NES::Tick() {
 	CPU_6502::Tick();
-	
+
 	for (int i=0;i<3;i++) {
 		PPUPtr->Tick();
 	}

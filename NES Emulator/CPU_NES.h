@@ -10,6 +10,9 @@ class CPU_NES : public CPU_6502 {
 	uint8_t Read(uint16_t offset, bool shouldTick = true);
 	void Write(uint16_t offset, uint8_t data, bool shouldTick = true);
 
+	// Logging
+	void PrintDebugInfoMesen();
+
 	// Other Processors
 	PPU* PPUPtr;
 
