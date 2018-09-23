@@ -29,6 +29,7 @@ public:
 	bool InitGL();
 	void SetPixel(int x, int y, uint8_t r, uint8_t g, uint8_t b);
 	bool DrawGLScene(GLFWwindow* window, int w_width, int w_height);
+	std::string GetScreenHash();
 
 	GLScene2D(Log* log, int _RES_X, int _RES_Y);
 	~GLScene2D();

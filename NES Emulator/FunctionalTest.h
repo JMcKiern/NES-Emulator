@@ -9,13 +9,13 @@
 #include "Peripheral.h"
 #include "RegisterInterrupt.h"
 
-void FunctionalTest(std::string filename, uint16_t memOffset, uint16_t startPC, uint16_t _successPC, bool shouldSetupRegisterInterrupts) {
+bool FunctionalTest(std::string filename, uint16_t memOffset, uint16_t startPC, uint16_t _successPC, bool shouldSetupRegisterInterrupts, bool shouldPrint) {
 	Log log("");
 	log.SetState(false); // Do not log CPU
 	CPU_6502 cpu(&log);
 	std::vector<std::unique_ptr<Peripheral>> peripherals;
 
-	std::cout << "Loading: " << filename << '\n';
+	if (shouldPrint) std::cout << "Loading: " << filename << '\n';
 	cpu.LoadFromFile(filename, memOffset);
 	cpu.SetPC(startPC);
 	uint16_t successPC = _successPC;
@@ -25,7 +25,7 @@ void FunctionalTest(std::string filename, uint16_t memOffset, uint16_t startPC, 
 	}
 	cpu.SetI();
 
-	std::cout << "Running..\n";
+	if (shouldPrint) std::cout << "Running..\n";
 	for (std::vector<std::unique_ptr<Peripheral>>::iterator it = peripherals.begin(); it != peripherals.end(); it++) {
 		(*it)->UpdatePeripheral();
 	}
@@ -47,17 +47,27 @@ void FunctionalTest(std::string filename, uint16_t memOffset, uint16_t startPC, 
 	auto finishTimer = std::chrono::system_clock::now();
 
 	std::chrono::duration<double> elapsed_seconds = finishTimer - startTimer;
-	std::cout << "Finished with: " << cpu.GetTotalCycles() << " cycles\n";
-	std::cout << "               " << elapsed_seconds.count() << " second\n";
-	std::cout << "               " << cpu.GetTotalCycles() / (1.0 * elapsed_seconds.count())
-		<< " Hz\n";
-	std::cout << "Success PC: " << successPC << '\n';
-	std::cout << "Final PC: " << currPC << "\n";
 
-	if (currPC == successPC) {
+	if (currPC == successPC) std::cout << "Passed " << filename << '\n';
+
+	if (shouldPrint && currPC == successPC) {
+		std::cout << "Finished with: " << cpu.GetTotalCycles() << " cycles\n";
+		std::cout << "               " << elapsed_seconds.count() << " second\n";
+		std::cout << "               " << cpu.GetTotalCycles() / (1.0 * elapsed_seconds.count())
+			<< " Hz\n";
+		std::cout << "Success PC: " << successPC << '\n';
+		std::cout << "Final PC: " << currPC << "\n";
 		std::cout << "Success!\n\n";
 	}
-	else {
+	else if (currPC != successPC) {
+		std::cout << "Ran " << filename << '\n';
+		std::cout << "Finished with: " << cpu.GetTotalCycles() << " cycles\n";
+		std::cout << "               " << elapsed_seconds.count() << " second\n";
+		std::cout << "               " << cpu.GetTotalCycles() / (1.0 * elapsed_seconds.count())
+			<< " Hz\n";
+		std::cout << "Success PC: " << successPC << '\n';
+		std::cout << "Final PC: " << currPC << "\n";
 		std::cout << "Failure!\n\n";
 	}
+	return currPC == successPC;
 }

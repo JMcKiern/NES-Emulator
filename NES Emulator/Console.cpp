@@ -103,6 +103,65 @@ int Console::Run() {
 	std::cout << "Unknown!\n\n";
 	return -2;
 }
+void Console::RunInstrs(int numInstrs) {
+	log.SetState(false);
+	UpdatePeripherals();
+	lastPC = cpu.GetPC() - 1;
+	
+	CreateWindow();
+	SetCallbacks();
+	gls.InitGL();
+	auto startTimer = std::chrono::system_clock::now();
+	int i = 0;
+	while (!glfwWindowShouldClose(window)) {
+		lastPC = cpu.GetPC();
+		cpu.RunNextOpcode();
+		if (hasSuccessPC && cpu.GetPC() == successPC) break;
+
+		i++;
+		if (i % 100 == 0)
+			glfwPollEvents();
+		UpdatePeripherals();
+		if (i % 10000 == 0)
+			gls.DrawGLScene(window, w_width, w_height);
+		if (i > numInstrs)
+			break;
+	}
+}
+void Console::PrintHash() {
+	log.SetState(false);
+	UpdatePeripherals();
+	lastPC = cpu.GetPC() - 1;
+	
+	CreateWindow();
+	SetCallbacks();
+	gls.InitGL();
+	auto startTimer = std::chrono::system_clock::now();
+	long i = 0;
+	std::string prevHash = GetFrameHash();
+	while (!glfwWindowShouldClose(window)) {
+		lastPC = cpu.GetPC();
+		cpu.RunNextOpcode();
+		if (hasSuccessPC && cpu.GetPC() == successPC) break;
+
+		i++;
+		if (i % 100 == 0)
+			glfwPollEvents();
+		UpdatePeripherals();
+		if (i % 10000 == 0)
+			gls.DrawGLScene(window, w_width, w_height);
+		if (i % 100000 == 0) {
+			std::string currHash = GetFrameHash();
+			if (prevHash != currHash) {
+				std::cout << i << ", \"" << currHash << "\"\n";
+				prevHash = currHash;
+			}
+		}
+	}
+}
+std::string Console::GetFrameHash() {
+	return gls.GetScreenHash();
+}
 void Console::LoadINES(std::string filename) {
 	gp.LoadINes(filename);
 	cpu.PowerUp();

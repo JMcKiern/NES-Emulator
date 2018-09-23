@@ -52,6 +52,7 @@
     <ClInclude Include="Console.h" />
     <ClInclude Include="FunctionalTest.h" />
     <ClInclude Include="GamePak.h" />
+    <ClInclude Include="NesTest.h" />
     <ClInclude Include="PeripheralConnection.h" />
     <ClInclude Include="PeripheralLine.h" />
     <ClInclude Include="Log.h" />

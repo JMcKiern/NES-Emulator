@@ -61,6 +61,9 @@ class Console {
 	GLScene2D gls;
 public:
 	int Run();
+	void RunInstrs(int numInstrs);
+	void PrintHash();
+	std::string GetFrameHash();
 	void LoadINES(std::string filename);
 	Console(std::string logFile = "");
 	~Console();

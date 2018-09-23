@@ -1,5 +1,8 @@
 #include <GL\glew.h>
 #include <GLFW\glfw3.h>
+#include <string>
+#include <sstream>
+#include <iomanip>
 #include "stb_image.h"
 #include "GLScene2D.h"
 #include "../Log.h"
@@ -101,6 +104,22 @@ void GLScene2D::SetupPixels() {
 			SetPixel(x, y, r, g, b);
 		}
 	}
+}
+std::string GLScene2D::GetScreenHash() {
+	// https://gist.github.com/nitrix/34196ff0c93fdfb01d51
+	uint32_t magic = 5381;
+	for (int y = 0; y < RES_Y; y++) {
+		for (int x = 0; x < RES_X; x++) {
+			int offset = 3 * (x + RES_X * (RES_Y - y - 1));
+			for (int i = 0; i < 3; i++) {
+				uint8_t c = pixels[offset + i];
+				magic = ((magic << 5) + magic) + c; // magic * 33 + c
+			}
+		}
+	}
+	std::stringstream ss;
+	ss << std::hex << std::setw(8) << std::setfill('0') << magic;
+	return ss.str();
 }
 
 GLScene2D::GLScene2D(Log* _log, int _RES_X, int _RES_Y) {
