@@ -25,7 +25,6 @@ uint8_t Controller::Read() {
 		// Return 1 after all keys have been exhausted
 		val = 1;
 	}
-	val |= 0x40; // Open bus
 	IncCycle();
 	return val;
 }

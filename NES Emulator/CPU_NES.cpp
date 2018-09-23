@@ -13,32 +13,39 @@ uint16_t CPU_NES::UnMirror(uint16_t offset) {
 
 // CPU Memory
 uint8_t CPU_NES::Read(uint16_t offset, bool shouldTick/*= true*/) {
+	uint8_t value;
 	if (shouldTick) Tick();
 	offset = UnMirror(offset);
 	if (offset >= 0x0 && offset < 0x800) {
-		return *reinterpret_cast<uint8_t*>(RAM + offset);
+		value = *reinterpret_cast<uint8_t*>(RAM + offset);
 	}
 	else if ((offset >= 0x2000 && offset <= 0x2007) || (offset == 0x4014)) {
-		return PPUPtr->ReadReg(offset);
+		value = PPUPtr->ReadReg(offset);
 	}
 	else if (offset >= 0x4020 && offset <= 0xFFFF) {
-		return gamePak->Read(offset);
+		value = gamePak->Read(offset);
 	}
 	else if (offset >= 0x4000 && offset <= 0x4013 || offset == 0x4015) {
 		// Audio
-		return 0; // TODO
+		value = 0; // TODO
 	}
 	else if (offset >= 0x4016 && offset <= 0x4017) {
 		// Controllers
 		if (offset == 0x4016) {
-			return controller->Read();
+			value = controller->Read();
 		}
 		// TODO: Add other controllers
-		return 0;
+		else {
+			value = controller->Read();
+			//value = 0;
+		}
+		value |= (openBus & 0xe0);
 	}
 	else {
 		throw MemoryAddressNotValidException();
 	}
+	openBus = value;
+	return value;
 }
 
 void CPU_NES::Write(uint16_t offset, uint8_t data, bool shouldTick/*= true*/) {
