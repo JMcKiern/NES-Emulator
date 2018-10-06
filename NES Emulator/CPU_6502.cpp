@@ -586,8 +586,6 @@ void CPU_6502::SetupOperationTable() {
 
 // Interrupts
 void CPU_6502::CheckForInterrupt() {
-	bool IRQ = irqLine.GetState() == LOW && I == 0;
-
 	while (IRQ || nmiFlipFlop) {
 		if (nmiFlipFlop) {
 			RespondToInterrupt(false);
@@ -596,7 +594,6 @@ void CPU_6502::CheckForInterrupt() {
 		else if (IRQ) {
 			RespondToInterrupt(true); // BRK ??
 		}
-		IRQ = irqLine.GetState() == LOW && I == 0;
 	}
 }
 void CPU_6502::RespondToInterrupt(bool isIRQ) {
@@ -639,11 +636,11 @@ void CPU_6502::Tick() {
 	currentOpNumCycles++;
 	totalCycles++;
 
-	bool NMI = nmiLine.GetState() == LOW && prevNMIState == HIGH;
+	IRQ = irqLine.GetState() == LOW && I == 0;
+	NMI = nmiLine.GetState() == LOW && prevNMIState == HIGH;
 	prevNMIState = nmiLine.GetState();
 	if (NMI)
 		nmiFlipFlop = true;
-
 }
 
 void CPU_6502::EASY6502STARTUP() {

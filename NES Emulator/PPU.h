@@ -42,6 +42,8 @@ private:
 	bool isSpriteOverflow;
 	bool isSprite0Hit;
 	bool isInVBlank;
+	bool shouldSuppressSettingVBL = false;
+	bool shouldSuppressNMI = false;
 
 	// PPUSCROLL Variables
 	uint8_t fineX, fineY;

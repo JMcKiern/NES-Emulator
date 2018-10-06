@@ -113,6 +113,7 @@ private:
 	DigitalState prevNMIState = LOW; //TODO: Check if should be HIGH;
 	void CheckForInterrupt();
 	void RespondToInterrupt(bool isIRQ); // Priority = Start > _NMI > _IRQ
+	bool IRQ, NMI;
 
 protected:
 	// CPU Memory

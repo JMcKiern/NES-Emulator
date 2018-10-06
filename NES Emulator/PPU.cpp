@@ -110,6 +110,17 @@ uint8_t PPU::PPUSTATUS() { // Potential Error: 5 LSB should not be zero
 	status |= ((isSprite0Hit & 0x1) << 6);
 	status |= ((isInVBlank & 0x1) << 7);
 	isInVBlank = false;
+	// Reading 1 PPU clock before VBL should suppress setting 
+	if (cycle == 0 && scanline == 241) { 
+	//if (cycle == 340 && scanline == 240) { 
+		// This must be cycle == 0(1) since cycle corresponds to the cycle on
+		// prev(next) PPU tick
+		shouldSuppressSettingVBL = true;
+	}
+	// Reading flag when it's set should suppress NMI
+	if (cycle < 3 && scanline == 241) {
+		//shouldSuppressNMI = true;
+	}
 	return status;
 }
 void PPU::OAMADDR(uint8_t data) {
@@ -502,8 +513,6 @@ void PPU::LoadSpritesForScanline() {
 		// TODO: No alternating between read and write cycles?
 		bool isTileLow = stepNum == 5;
 		uint8_t tileIndexNum = OAMSL[4 * spriteNum + 1];
-		//if (tileIndexNum == 0xee)
-			//std::cout << "ASDF";
 		uint16_t YInTile = shouldFlipVert ? spriteHeight - (scanline - spriteY) : scanline - spriteY;
 		uint16_t tileAddr;
 		if (spriteHeight == 8) {
@@ -578,11 +587,30 @@ void PPU::RenderTick() {
 	}
 	else if (241 <= scanline && scanline <= 260) {
 		if (cycle == 1 && scanline == 241) {
-			isInVBlank = true;
+			if (!shouldSuppressSettingVBL) {
+				isInVBlank = true;
+			}
+			shouldSuppressSettingVBL = false;
 		}
 	}
 }
 void PPU::Tick() {
+	// Update scanline and cycle counters
+	if (scanline == -1 && isOddFrame && cycle == 339 && (shouldShowBackground || shouldShowSprites)) {
+		cycle = 0;
+	}
+	else {
+		cycle = (cycle + 1) % 341;
+	}
+	if (cycle == 0) {
+		scanline = ((scanline + 1 + 1) % 262) - 1;
+	}
+	if (cycle == 0 && scanline == 0) {
+		// Start of new frame
+		isOddFrame = !isOddFrame;
+		shouldSuppressNMI = false;
+	}
+	
 	// TODO: Check order of these functions
 	RenderTick();
 	ShiftBGShifters();
@@ -594,26 +622,14 @@ void PPU::Tick() {
 			ChoosePixel();
 	}
 
-	// Update scanline and cycle counters
-	if (scanline == -1 && isOddFrame && cycle == 339 && (shouldShowBackground || shouldShowSprites)) {
-		// TODO: Should be both bg and sprite?
-		cycle = 0;
+	bool isInVBlankNextCycle = false; // scanline == 241 && cycle == 0;
+	if (VBlankShouldNMI && (isInVBlank || isInVBlankNextCycle) && !shouldSuppressNMI) {
+		cpuNMIConnection.SetState(LOW);
 	}
 	else {
-		cycle = (cycle + 1) % 341;
-	}
-	if (cycle == 0) {
-		scanline = ((scanline + 1 + 1) % 262) - 1;
-	}
-
-	if (cycle == 0 && scanline == -1) {
-		// Start of new frame
-		isOddFrame = !isOddFrame;
-	}
-	if (VBlankShouldNMI && isInVBlank)
-		cpuNMIConnection.SetState(LOW);
-	else
 		cpuNMIConnection.SetState(HIGH);
+	}
+	
 }
 
 void PPU::PowerUp() {
