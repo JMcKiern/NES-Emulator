@@ -33,8 +33,8 @@ class GamePak {
 	void SetupINes();
 	bool isGameLoaded = false;
 
-	uint16_t GetOffsetPRG(uint8_t bankNum);
-	uint16_t GetOffsetCHR(uint8_t bankNum);
+	uint32_t GetOffsetPRG(uint8_t bankNum);
+	uint32_t GetOffsetCHR(uint8_t bankNum);
 	uint8_t* GetPtrPRG(uint8_t bankNum);
 	uint8_t* GetPtrCHR(uint8_t bankNum);
 	void RegisterUpdate(uint16_t addr, uint8_t data);

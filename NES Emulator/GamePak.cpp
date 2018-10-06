@@ -34,31 +34,31 @@ bool GamePak::CheckINes() {
 	}
 	return true;
 }
-uint16_t GamePak::GetOffsetPRG(uint8_t bankNum) {
+uint32_t GamePak::GetOffsetPRG(uint8_t bankNum) {
 	if (bankNum < 0 || bankNum >= num16kPRGBanks) {
 		std::out_of_range::out_of_range("Attempted to access nonexistant bank number.");
 	}
-	uint16_t offset = 0x10; // Header
+	uint32_t offset = 0x10; // Header
 	if (isTrainer) offset += 0x200; // Trainer
 	offset += 0x4000 * bankNum; // PRG Banks
 	return offset;
 }
-uint16_t GamePak::GetOffsetCHR(uint8_t bankNum) {
+uint32_t GamePak::GetOffsetCHR(uint8_t bankNum) {
 	if (bankNum < 0 || bankNum >= num8kCHRBanks) {
 		std::out_of_range::out_of_range("Attempted to access nonexistant bank number.");
 	}
-	uint16_t offset = 0x10; // Header
+	uint32_t offset = 0x10; // Header
 	if (isTrainer) offset += 0x200; // Trainer
 	offset += 0x4000 * num16kPRGBanks; // PRG Banks
 	offset += 0x2000 * bankNum; // CHR Banks
 	return offset;
 }
 uint8_t* GamePak::GetPtrPRG(uint8_t bankNum) {
-	uint16_t offset = GetOffsetPRG(bankNum);
+	uint32_t offset = GetOffsetPRG(bankNum);
 	return reinterpret_cast<uint8_t*>(cartridge + offset);
 }
 uint8_t* GamePak::GetPtrCHR(uint8_t bankNum) {
-	uint16_t offset = GetOffsetCHR(bankNum);
+	uint32_t offset = GetOffsetCHR(bankNum);
 	return reinterpret_cast<uint8_t*>(cartridge + offset);
 }
 void GamePak::SetupINes() {
@@ -94,6 +94,9 @@ void GamePak::SetupINes() {
 			if (num8kCHRBanks > 0) {
 				CHRROM = GetPtrCHR(0);
 			}
+			else {
+				CHRRAM = new uint8_t[0x2000];
+			}
 			break;
 		}
 		case 3: {
@@ -120,8 +123,8 @@ void GamePak::RegisterUpdate(uint16_t addr, uint8_t data) {
 		case 0: break;
 		case 2: { // TODO: Bus conflicts?
 			if (0x8000 <= addr && addr < 0x10000) {
-				uint8_t bankNum = data & 0xF;
-				PRGROMU = GetPtrPRG(bankNum);
+				uint8_t bankNum = data & 0x7;
+				PRGROML = GetPtrPRG(bankNum);
 			}
 			break;
 		}
