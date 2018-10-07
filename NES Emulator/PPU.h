@@ -76,8 +76,8 @@ private:
 	int dispWidth = 240;
 	int disp[256][240];
 	bool isOddFrame = false;
-	int cycle = 0;		// going across 0 <= x <= 340
-	int scanline = -1;	// going down -1 <= y <= 260
+	int cycle = 0;		// going across 0 <= x <= 340 (x = cycle - 1, due to idle cycle)
+	int scanline = -1;	// going down -1 <= y <= 260  (y = scanline)
 	void RenderTick();
 	void ChoosePixel();
 	void RenderPixel(uint8_t outPxl, uint8_t outAttr, bool isSprite);
@@ -113,6 +113,7 @@ private:
 	bool hadFirstEmptySprite = false;
 	void LoadSpritesForScanline();
 	uint8_t ReverseByte(uint8_t byte);
+	void ShiftSprShifters();
 	
 	GLScene2D* gls;
 

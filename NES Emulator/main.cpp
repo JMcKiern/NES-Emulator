@@ -4,7 +4,7 @@
 #include "Console.h"
 
 int main() {
-	if (false) {
+	if (true) {
 		// 6502
 		FunctionalTest("Tests/6502_functional_test.bin", 0x0, 0x400, 0x336d, false, false);
 		FunctionalTest("Tests/6502_interrupt_test.bin", 0x0, 0x400, 0x06f5, true, false);
@@ -47,6 +47,19 @@ int main() {
 
 		//PrintHash("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Tests\\PPU\\nmi_sync\\demo_ntsc.nes");
 
+		Test("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Tests\\PPU\\ppu_sprite_hit\\rom_singles\\01-basics.nes", 319189, "c7b5608e");
+		Test("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Tests\\PPU\\ppu_sprite_hit\\rom_singles\\02-alignment.nes", 289939, "3b3ed10a");
+		Test("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Tests\\PPU\\ppu_sprite_hit\\rom_singles\\03-corners.nes", 186100, "4c9b3486");
+		Test("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Tests\\PPU\\ppu_sprite_hit\\rom_singles\\04-flip.nes", 165301, "ceb0a080");
+		Test("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Tests\\PPU\\ppu_sprite_hit\\rom_singles\\05-left_clip.nes", 294721, "0619e27c");
+		Test("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Tests\\PPU\\ppu_sprite_hit\\rom_singles\\06-right_edge.nes", 206910, "2ad906c9");
+		PrintHash("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Tests\\PPU\\ppu_sprite_hit\\rom_singles\\07-screen_bottom.nes");
+		Test("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Tests\\PPU\\ppu_sprite_hit\\rom_singles\\08-double_height.nes", 186120, "b2b60be3");
+		PrintHash("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Tests\\PPU\\ppu_sprite_hit\\rom_singles\\09_timing.nes");
+		PrintHash("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Tests\\PPU\\ppu_sprite_hit\\rom_singles\\10_timing_order.nes");
+
+		//PrintHash("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Tests\\PPU\\ppu_open_bus\\ppu_open_bus.nes");
+
 	}
 	{
 		const std::string logFileName = "logfile.log";
@@ -56,7 +69,7 @@ int main() {
 		//console.LoadINES("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Games\\Mega Man (U).nes");
 		//console.LoadINES("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Games\\Super Mario Bros. (JU) (PRG0) [!].nes");
 		//console.LoadINES("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Games\\Ice Climber (USA, Europe).nes");
-		//console.LoadINES("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Games\\Mario Bros (JU).nes");
+		//console.LoadINES("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Games\\Mario Bros. (JU) [!].nes");
 		//console.LoadINES("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Games\\Spelunker (USA).nes");
 
 		// TESTS

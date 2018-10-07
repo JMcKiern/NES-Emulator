@@ -118,7 +118,7 @@ void Console::PrintHash() {
 
 		std::string currHash = GetFrameHash();
 		if (prevHash != currHash) {
-			std::cout << "\"" << currHash << "\"\n";
+			std::cout << cpu.GetTotalNumInstrs() << ", \"" << currHash << "\"\n";
 			prevHash = currHash;
 		}
 	}

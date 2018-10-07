@@ -175,6 +175,8 @@ void PPU::OAMDMA(uint8_t data) {
 // https://forums.nesdev.com/viewtopic.php?f=3&t=13226
 // http://wiki.nesdev.com/w/index.php/PPU_sprite_evaluation
 void PPU::SpriteEvaluation() {
+	if (!(0 <= scanline && scanline <= 239))
+		return;
 	static int n = 0; // TODO: Move to class
 	static int m = 0;
 	if (cycle == 0) {
@@ -311,14 +313,19 @@ void PPU::ChoosePixel() {
 	//		First non-transparent pixel moves to multiplexer to join bg pixel
 	// Chose pixel
 	bool hasSpriteBeenFound = false;
+	bool isSpriteZero = false;
 	if (shouldShowBackground || shouldShowSprites) {
-		uint8_t bgPxl, sprPxl;
-		uint8_t bgAttr, sprAttr;
-		bool isSpriteZero = false;
-		isSprite0Hit = false;
+		uint8_t bgPxl = 0, sprPxl = 0;
+		uint8_t bgAttr = 0, sprAttr = 0;
 		if (shouldShowBackground) {
 			bgPxl = ((((bsr16Bg[1] & 0x8000) != 0) & 1) << 1) | (((bsr16Bg[0] & 0x8000) != 0) & 1);
 			bgAttr = ((((bsr8Bg[1] & 0x80) != 0) & 1) << 1) | (((bsr8Bg[0] & 0x80) != 0) & 1);
+
+			// Clip background in leftmost 8 pixels of screen
+			if (shouldClipBackground && 1 <= cycle && cycle <= 8) {
+				bgPxl = 0;
+				bgAttr = 0;
+			}
 		}
 		if (shouldShowSprites) {
 			for (int i = 0; i < 8; i++) { // Loop through sprites
@@ -335,13 +342,20 @@ void PPU::ChoosePixel() {
 								isSpriteZero = true;
 						}
 					}
-					if (spritePixelsLeft[i] > 0)
-						spritePixelsLeft[i]--;
-					bsrSpr[i][0] = bsrSpr[i][0] << 1;
-					bsrSpr[i][1] = bsrSpr[i][1] << 1;
+					//if (spritePixelsLeft[i] > 0)
+						//spritePixelsLeft[i]--;
+					//bsrSpr[i][0] = bsrSpr[i][0] << 1;
+					//bsrSpr[i][1] = bsrSpr[i][1] << 1;
 				}
-				if (ctrSpr[i] > 0) // Decrement X position
-					ctrSpr[i]--;
+				//if (ctrSpr[i] > 0) // Decrement X position
+					//ctrSpr[i]--;
+			}
+			// Clip sprites in leftmost 8 pixels of screen
+			if ((shouldClipSprites && 1 <= cycle && cycle <= 8)) {
+				hasSpriteBeenFound = false;
+				isSpriteZero = false;
+				sprPxl = 0;
+				sprAttr = 0;
 			}
 		}
 
@@ -382,8 +396,12 @@ void PPU::ChoosePixel() {
 					outAttr = bgAttr;
 					isSprite = false;
 				}
-				if (isSpriteZero)
-					isSprite0Hit = true;
+				if (hasSpriteBeenFound && isSpriteZero) {
+					// Sprite 0 hit does not happen: At x=255 or y>239
+					if (!(cycle == 256)){// || scanline >= 239)) {
+						isSprite0Hit = true;
+					}
+				}
 			}
 		}
 		else if (shouldShowBackground) {
@@ -405,7 +423,8 @@ void PPU::ChoosePixel() {
 			outAttr = 0;
 			isSprite = false;
 		}
-		RenderPixel(outPxl, outAttr, isSprite);
+		//if (0 <= scanline && scanline <= 239)
+			RenderPixel(outPxl, outAttr, isSprite);
 	}
 }
 void PPU::RenderPixel(uint8_t outPxl, uint8_t outAttr, bool isSprite) {
@@ -517,7 +536,7 @@ void PPU::LoadSpritesForScanline() {
 		// TODO: No alternating between read and write cycles?
 		bool isTileLow = stepNum == 5;
 		uint8_t tileIndexNum = OAMSL[4 * spriteNum + 1];
-		uint16_t YInTile = shouldFlipVert ? spriteHeight - (scanline - spriteY) : scanline - spriteY;
+		uint16_t YInTile = shouldFlipVert ? spriteHeight - (scanline - spriteY) - 1 : scanline - spriteY;
 		uint16_t tileAddr;
 		if (spriteHeight == 8) {
 			uint16_t patTabAddr = patternTableAddrSprite;
@@ -557,6 +576,7 @@ void PPU::RenderTick() {
 		// Pre-render scanline
 		if (cycle == 1) {
 			isInVBlank = false;
+			isSprite0Hit = false; // Bit 6 of PPUSTATUS ($2002) is cleared to 0 at dot 1 of the pre-render line.
 		}
 		else if (321 <= cycle && cycle <= 336) {
 			// Load first 2 background tiles for next scanline into registers
@@ -598,6 +618,23 @@ void PPU::RenderTick() {
 		}
 	}
 }
+void PPU::ShiftSprShifters() {
+	// TODO: Are the sprite bsr's shifted even when not in visible pixels or when shouldShowSprites is off?
+	if (1 <= cycle && cycle <= 256 && 0 <= scanline && scanline <= 239) {
+		if (shouldShowSprites) {
+			for (int i = 0; i < 8; i++) {
+				if (ctrSpr[i] == 0) { // Sprite active
+					bsrSpr[i][0] = bsrSpr[i][0] << 1;
+					bsrSpr[i][1] = bsrSpr[i][1] << 1;
+					if (spritePixelsLeft[i] > 0)
+						spritePixelsLeft[i]--;
+				}
+				if (ctrSpr[i] > 0) // Decrement X position
+					ctrSpr[i]--;
+			}
+		}
+	}
+}
 void PPU::Tick() {
 	// Update scanline and cycle counters
 	if (scanline == -1 && isOddFrame && cycle == 339 && (shouldShowBackground || shouldShowSprites)) {
@@ -625,6 +662,7 @@ void PPU::Tick() {
 		if (1 <= cycle && cycle <= 256)
 			ChoosePixel();
 	}
+	ShiftSprShifters();
 
 	bool isInVBlankNextCycle = false; // scanline == 241 && cycle == 0;
 	if (VBlankShouldNMI && (isInVBlank || isInVBlankNextCycle) && !shouldSuppressNMI) {
