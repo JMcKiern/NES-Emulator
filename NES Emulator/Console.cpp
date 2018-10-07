@@ -3,6 +3,7 @@
 #include <iostream>
 #include <GL\glew.h>
 #include <GLFW\glfw3.h>
+#include <thread>
 #include "Console.h"
 #include "RegisterInterrupt.h"
 
@@ -55,107 +56,70 @@ void Console::KeyCB(GLFWwindow* _window, int key, int scancode, int action, int 
 		}
 	}
 }
-int Console::Run() {
-	std::cout << "Running..\n";
-	UpdatePeripherals();
-	lastPC = cpu.GetPC() - 1;
-	
-	CreateWindow();
-	SetCallbacks();
-	gls.InitGL();
-	auto startTimer = std::chrono::system_clock::now();
-	int i = 0;
-	//while (lastPC != cpu.GetPC() && !glfwWindowShouldClose(window)) {
-	while (!glfwWindowShouldClose(window)) {
-		lastPC = cpu.GetPC();
-		//cpu.PrintDebugInfo();
+void Console::RunFrame() {
+	using cycles = std::chrono::duration<int64_t, std::ratio<1, CLOCK_SPEED>>;
+	static int prevCycles = cpu.GetTotalCycles();
+	static auto nextFrame = std::chrono::system_clock::now() + cycles{ 0 };
+	std::this_thread::sleep_until(nextFrame);
+
+	bool isOddFrame = ppu.IsOddFrame();
+	while (isOddFrame == ppu.IsOddFrame()) {
 		cpu.RunNextOpcode();
-		if (hasSuccessPC && cpu.GetPC() == successPC) break;
-
-		i++;
-		if (i % 100 == 0)
-			glfwPollEvents();
-		UpdatePeripherals();
-		if (i % 10000 == 0)
-			gls.DrawGLScene(window, w_width, w_height);
 	}
-	auto finishTimer = std::chrono::system_clock::now();
-	lastPC = cpu.GetPC();
 
-	std::chrono::duration<double> elapsed_seconds = finishTimer - startTimer;
-	std::cout << "Finished with: " << cpu.GetTotalCycles() << " cycles\n";
-	std::cout << "               " << elapsed_seconds.count() << " second\n";
-	std::cout << "               " << cpu.GetTotalCycles() / (1.0 * elapsed_seconds.count())
-		<< " Hz\n";
-	std::cout << "Success PC: " << successPC << '\n';
-	std::cout << "Final PC: " << cpu.GetPC() << "\n";
-
-	if (hasSuccessPC) {
-		if (lastPC == successPC) {
-			std::cout << "Success!\n\n";
-			return 0;
-		}
-		else {
-			std::cout << "Failure!\n\n";
-			return -1;
-		}
-	}
-	std::cout << "Unknown!\n\n";
-	return -2;
+	int cyclesRun = cpu.GetTotalCycles() - prevCycles;
+	prevCycles = cpu.GetTotalCycles();
+	nextFrame += cycles{ cyclesRun };
 }
-void Console::RunInstrs(int numInstrs) {
+void Console::Run() {
+	UpdatePeripherals(); // Only needed for Register Interrupts
+	CreateWindow();
+	SetCallbacks();
+	gls.InitGL();
+
+	while (!glfwWindowShouldClose(window)) {
+		RunFrame();
+		glfwPollEvents();
+		UpdatePeripherals(); // Only needed for Register Interrupts
+		gls.DrawGLScene(window, w_width, w_height);
+	}
+}
+void Console::RunInstrs(int numInstrsToRun) {
 	log.SetState(false);
-	UpdatePeripherals();
-	lastPC = cpu.GetPC() - 1;
+	UpdatePeripherals(); // Only needed for Register Interrupts
 	
 	CreateWindow();
 	SetCallbacks();
 	gls.InitGL();
-	auto startTimer = std::chrono::system_clock::now();
-	int i = 0;
-	while (!glfwWindowShouldClose(window)) {
-		lastPC = cpu.GetPC();
-		cpu.RunNextOpcode();
-		if (hasSuccessPC && cpu.GetPC() == successPC) break;
 
-		i++;
-		if (i % 100 == 0)
-			glfwPollEvents();
-		UpdatePeripherals();
-		if (i % 10000 == 0)
-			gls.DrawGLScene(window, w_width, w_height);
-		if (i > numInstrs)
-			break;
+	int currInstrNum = 0;
+	while (!glfwWindowShouldClose(window) && currInstrNum <= numInstrsToRun) {
+		RunFrame();
+		glfwPollEvents();
+		UpdatePeripherals(); // Only needed for Register Interrupts
+		gls.DrawGLScene(window, w_width, w_height);
+		currInstrNum = cpu.GetTotalNumInstrs();
 	}
 }
 void Console::PrintHash() {
 	log.SetState(false);
-	UpdatePeripherals();
-	lastPC = cpu.GetPC() - 1;
+	UpdatePeripherals(); // Only needed for Register Interrupts
 	
 	CreateWindow();
 	SetCallbacks();
 	gls.InitGL();
-	auto startTimer = std::chrono::system_clock::now();
-	long i = 0;
+
 	std::string prevHash = GetFrameHash();
 	while (!glfwWindowShouldClose(window)) {
-		lastPC = cpu.GetPC();
-		cpu.RunNextOpcode();
-		if (hasSuccessPC && cpu.GetPC() == successPC) break;
+		RunFrame();
+		glfwPollEvents();
+		UpdatePeripherals(); // Only needed for Register Interrupts
+		gls.DrawGLScene(window, w_width, w_height);
 
-		i++;
-		if (i % 100 == 0)
-			glfwPollEvents();
-		UpdatePeripherals();
-		if (i % 10000 == 0)
-			gls.DrawGLScene(window, w_width, w_height);
-		if (i % 100000 == 0) {
-			std::string currHash = GetFrameHash();
-			if (prevHash != currHash) {
-				std::cout << i << ", \"" << currHash << "\"\n";
-				prevHash = currHash;
-			}
+		std::string currHash = GetFrameHash();
+		if (prevHash != currHash) {
+			std::cout << "\"" << currHash << "\"\n";
+			prevHash = currHash;
 		}
 	}
 }

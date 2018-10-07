@@ -122,7 +122,7 @@ private:
 	GamePak* gp;
 
 public:
-	void RunCycle();
+	bool IsOddFrame();
 
 	// PPU Registers Access Functions for the CPU
 	void WriteReg(uint16_t offset, uint8_t data);

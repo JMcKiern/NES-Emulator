@@ -126,6 +126,7 @@ protected:
 	// Timing
 	int currentOpNumCycles = 0;
 	int totalCycles = 0;
+	int totalNumInstrs = 0;
 	virtual void Tick();
 
 	// Logging
@@ -165,6 +166,7 @@ public:
 	// Running
 	void RunNextOpcode();
 	uint16_t GetPC();
+	int GetTotalNumInstrs();
 
 	// Debugging
 	void SetPC(uint16_t _PC);

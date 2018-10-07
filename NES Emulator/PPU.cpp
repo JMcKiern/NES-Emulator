@@ -55,6 +55,10 @@ uint8_t PPU::Read(uint16_t offset) {
 	}
 }
 
+bool PPU::IsOddFrame() {
+	return isOddFrame;
+}
+
 void PPU::WriteReg(uint16_t offset, uint8_t data) {
 	regLatch = data;
 	switch (offset) {

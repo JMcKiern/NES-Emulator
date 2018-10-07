@@ -735,13 +735,14 @@ void CPU_6502::RunNextOpcode() {
 		(*log) << "\n";
 	#endif
 
-	PrintDebugInfo();
+	//PrintDebugInfo();
 
 	// Update values for logging
 	prevPC = PC;
 	prevOp = op;
 	prevArgOffset = argOffset;
 
+	totalNumInstrs++;
 	PC += argLen + 1;
 	(this->*op.Run)(argOffset, op.addrMode);
 	if (!((op.numCycles >> currentOpNumCycles) & 0x1)) {
@@ -750,6 +751,9 @@ void CPU_6502::RunNextOpcode() {
 }
 uint16_t CPU_6502::GetPC() {
 	return PC;
+}
+int CPU_6502::GetTotalNumInstrs() {
+	return totalNumInstrs;
 }
 
 // Debugging

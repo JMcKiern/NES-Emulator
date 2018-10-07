@@ -14,13 +14,28 @@
 class Console {
 	CPU_NES cpu;
 	PPU ppu;
+	GamePak gp;
+
+	Log log;
+
+	// Window
+	GLFWwindow* window;
+	const std::string windowTitle = "Window Title";
+	int w_width = 512, w_height = 480;
+	void CreateWindow();
+	void SetCallbacks();
+	void ResizeWinCB(GLFWwindow* _window, int w, int h);
+	void KeyCB(GLFWwindow* _window, int key, int scancode, int action, int mods);
+
+	// OpenGL
 	const int RES_X = 256;
 	const int RES_Y = 240;
+	GLScene2D gls;
+
+	// Peripherals
+	Controller controller;
 	std::vector<std::unique_ptr<Peripheral>> peripherals;
 	void UpdatePeripherals();
-	GamePak gp;
-	Log log;
-	Controller controller;
 	// TODO: Replace with map?
 	int keyMap[8] = {
 		GLFW_KEY_J, // A
@@ -46,21 +61,14 @@ class Console {
 		GLFW_JOYSTICK_11, // Right
 	};*/
 
-	// Window
-	GLFWwindow* window;
-	const std::string windowTitle = "Window Title";
-	int w_width = 512, w_height = 480;
-	void CreateWindow();
-	void SetCallbacks();
-	void ResizeWinCB(GLFWwindow* _window, int w, int h);
-	void KeyCB(GLFWwindow* _window, int key, int scancode, int action, int mods);
 	// Error checking
-	uint16_t lastPC; // Used to detect loop on single instruction
 	bool hasSuccessPC;
 	uint16_t successPC;
-	GLScene2D gls;
+
+	const static int CLOCK_SPEED = 1790000; // 1.79 MHz
 public:
-	int Run();
+	void RunFrame();
+	void Run();
 	void RunInstrs(int numInstrs);
 	void PrintHash();
 	std::string GetFrameHash();
