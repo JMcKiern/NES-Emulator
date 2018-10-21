@@ -29,6 +29,7 @@
     <ClCompile Include="Display\maths_funcs.cpp" />
     <ClCompile Include="Display\stb_image.c" />
     <ClCompile Include="GamePak.cpp" />
+    <ClCompile Include="Palette.cpp" />
     <ClCompile Include="Peripheral.cpp" />
     <ClCompile Include="PeripheralConnection.cpp" />
     <ClCompile Include="PeripheralLine.cpp" />

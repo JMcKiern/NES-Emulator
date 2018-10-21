@@ -490,7 +490,7 @@ void PPU::RenderPixel(uint8_t outPxl, uint8_t outAttr, bool isSprite) {
 	}
 
 	uint8_t palColour = Read(colourLoc);
-	Colour colour = palette.palette[palColour];
+	Colour colour = palette.GetColour(palColour, colourEmphasis);
 
 	gls->SetPixel(cycle - 1, scanline, colour.red, colour.green, colour.blue);
 }
@@ -794,7 +794,8 @@ PPU::PPU(CPU_NES* _CPUPtr, GamePak* _gp, GLScene2D* _gls) :
 		0x00, 0x04, 0x00, 0x14,
 		0x08, 0x3A, 0x00, 0x02,
 		0x00, 0x20, 0x2C, 0x08
-	}
+	},
+	palette("ntscpalette.pal")
 {
 	CPUPtr = _CPUPtr;
 	PowerUp();

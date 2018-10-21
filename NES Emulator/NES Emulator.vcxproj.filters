@@ -99,6 +99,9 @@
     <ClCompile Include="Display\GLUtils.cpp">
       <Filter>Source Files\OpenGL</Filter>
     </ClCompile>
+    <ClCompile Include="Palette.cpp">
+      <Filter>Source Files\PPU</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PeripheralConnection.h">
