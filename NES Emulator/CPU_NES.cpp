@@ -27,7 +27,7 @@ uint8_t CPU_NES::Read(uint16_t offset, bool shouldTick/*= true*/) {
 	}
 	else if (offset >= 0x4000 && offset <= 0x4013 || offset == 0x4015) {
 		// Audio
-		value = 0;
+		value = 0xFF;
 	}
 	else if (offset >= 0x4016 && offset <= 0x4017) {
 		// Controllers

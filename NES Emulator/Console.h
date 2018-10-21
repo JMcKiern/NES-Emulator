@@ -69,10 +69,18 @@ class Console {
 	using cycles = std::chrono::duration<int64_t, std::ratio<1, CLOCK_SPEED>>;
 	std::chrono::time_point<std::chrono::system_clock, std::chrono::duration<std::common_type_t<std::chrono::system_clock::rep, std::chrono::system_clock::rep>, std::ratio<1i64, CLOCK_SPEED*1000i64>>> nextFrame;
 	int prevCycles = cpu.GetTotalCycles();
+
+	// Console::Run() variables
+	std::string desiredHash = "";
+	int numInstrsToRun = 0;
+	bool shouldPrintHash = false;
+	std::string prevHash;
+
 public:
 	void RunFrame();
 	void Run(std::string filename);
-	void RunInstrs(std::string filename, int numInstrs);
+	void RunInstrs(std::string filename, int _numInstrs);
+	void Test(std::string filename, std::string _desiredHash);
 	void PrintHash(std::string filename);
 	std::string GetFrameHash();
 	void LoadINES(std::string filename);

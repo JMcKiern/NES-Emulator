@@ -4,6 +4,7 @@
 #include <GL\glew.h>
 #include <GLFW\glfw3.h>
 #include <thread>
+#include <string>
 #include "Console.h"
 #include "RegisterInterrupt.h"
 
@@ -104,52 +105,33 @@ void Console::Run(std::string filename) {
 		if (usingGamePad) CheckJoystick();
 		UpdatePeripherals(); // Only needed for Register Interrupts
 		gls.DrawGLScene(window, w_width, w_height);
-	}
-}
-void Console::RunInstrs(std::string filename, int numInstrsToRun) {
-	LoadINES(filename);
-	log.SetState(false);
-	UpdatePeripherals(); // Only needed for Register Interrupts
-	
-	CreateWindow();
-	SetCallbacks();
-	gls.InitGL();
 
-	int currInstrNum = 0;
-	nextFrame = std::chrono::system_clock::now() + cycles{ 0 };
-	while (!glfwWindowShouldClose(window) && currInstrNum <= numInstrsToRun) {
-		RunFrame();
-		glfwPollEvents();
-		if (usingGamePad) CheckJoystick();
-		UpdatePeripherals(); // Only needed for Register Interrupts
-		gls.DrawGLScene(window, w_width, w_height);
-		currInstrNum = cpu.GetTotalNumInstrs();
-	}
-}
-void Console::PrintHash(std::string filename) {
-	LoadINES(filename);
-	log.SetState(false);
-	UpdatePeripherals(); // Only needed for Register Interrupts
-	
-	CreateWindow();
-	SetCallbacks();
-	gls.InitGL();
-
-	std::string prevHash = GetFrameHash();
-	nextFrame = std::chrono::system_clock::now() + cycles{ 0 };
-	while (!glfwWindowShouldClose(window)) {
-		RunFrame();
-		glfwPollEvents();
-		if (usingGamePad) CheckJoystick();
-		UpdatePeripherals(); // Only needed for Register Interrupts
-		gls.DrawGLScene(window, w_width, w_height);
-
-		std::string currHash = GetFrameHash();
-		if (prevHash != currHash) {
-			std::cout << cpu.GetTotalNumInstrs() << ", \"" << currHash << "\"\n";
-			prevHash = currHash;
+		if (desiredHash != "" && desiredHash == ppu.GetDispHash()) break;
+		if (numInstrsToRun != 0 && numInstrsToRun < cpu.GetTotalNumInstrs()) break;
+		if (shouldPrintHash) {
+			std::string currHash = GetFrameHash();
+			if (prevHash != currHash) {
+				std::cout << cpu.GetTotalNumInstrs() << ", \"" << currHash << "\"\n";
+				prevHash = currHash;
+			}
 		}
 	}
+}
+void Console::Test(std::string filename, std::string _desiredHash) {
+	log.SetState(false);
+	desiredHash = _desiredHash;
+	Run(filename);
+}
+void Console::RunInstrs(std::string filename, int _numInstrsToRun) {
+	log.SetState(false);
+	numInstrsToRun = _numInstrsToRun;
+	Run(filename);
+}
+void Console::PrintHash(std::string filename) {
+	log.SetState(false);
+	shouldPrintHash = true;
+	std::string prevHash = GetFrameHash();
+	Run(filename);
 }
 std::string Console::GetFrameHash() {
 	return ppu.GetDispHash();
