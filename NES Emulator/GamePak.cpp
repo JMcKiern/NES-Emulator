@@ -143,18 +143,25 @@ void GamePak::RegisterUpdate(uint16_t addr, uint8_t data) {
 }
 uint8_t GamePak::Read(uint16_t addr) {
 	if (0x6000 <= addr && addr < 0x8000) {
-		return PRGRAM[addr - 0x6000];
+		if (PRGRAM != NULL)
+			return PRGRAM[addr - 0x6000];
+		else
+			return 0;
 	}
 	else if (0x8000 <= addr && addr < 0xC000) {
-		return PRGROML[addr - 0x8000];
+		if (PRGROML != NULL)
+			return PRGROML[addr - 0x8000];
+		else
+			return 0;
 	}
 	else if (0xC000 <= addr && addr < 0x10000) {
-		return PRGROMU[addr - 0xC000];
+		if (PRGROMU != NULL)
+			return PRGROMU[addr - 0xC000];
+		else
+			return 0;
 	}
 	else {
-		// TODO: This should point to Expansion ROM
-		// Taking from instruction 0xf3c5 = BIT 0x58a9
-		// of Ice Climbers and its operation on Mesen
+		// From Ice Climbers it looks like returning any value here is ok
 		return 0;
 	}
 	//throw MemoryAddressNotValidException();

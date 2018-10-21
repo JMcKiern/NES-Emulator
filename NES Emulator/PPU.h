@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <chrono>
 #include "CPU_NES.h"
 #include "GamePak.h"
 #include "PeripheralConnection.h"
@@ -56,7 +57,8 @@ private:
 	uint8_t ppudataReadBuffer;
 
 	// PPU Registers - Used to communicate with CPU
-	uint8_t regLatch = 0;
+	uint8_t openBus = 0;
+	std::chrono::time_point<std::chrono::system_clock> openBusLastRefresh = std::chrono::system_clock::now();
 	void PPUCTRL(uint8_t data);
 	void PPUMASK(uint8_t data);
 	uint8_t PPUSTATUS();

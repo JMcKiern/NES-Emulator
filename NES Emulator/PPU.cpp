@@ -81,7 +81,8 @@ bool PPU::IsOddFrame() {
 }
 
 void PPU::WriteReg(uint16_t offset, uint8_t data) {
-	regLatch = data;
+	openBus = data;
+	openBusLastRefresh = std::chrono::system_clock::now();
 	switch (offset) {
 		case 0x2000: PPUCTRL(data); break;
 		case 0x2001: PPUMASK(data); break;
@@ -95,13 +96,15 @@ void PPU::WriteReg(uint16_t offset, uint8_t data) {
 	}
 }
 uint8_t PPU::ReadReg(uint16_t offset) {
+	auto msSinceLastRefresh = std::chrono::duration_cast<std::chrono::milliseconds>((std::chrono::system_clock::now() - openBusLastRefresh)).count();
+	if (msSinceLastRefresh > 600) openBus = 0;
 	switch (offset) {
 		case 0x2002: return PPUSTATUS();
 		case 0x2004: return OAMDATA();
 		case 0x2007: return PPUDATA();
 		default:
 			w = 0; // Reset data bus
-			return regLatch;
+			return openBus;
 	}
 }
 void PPU::PPUCTRL(uint8_t data) {
@@ -132,7 +135,7 @@ void PPU::PPUMASK(uint8_t data) {
 uint8_t PPU::PPUSTATUS() { // Potential Error: 5 LSB should not be zero
 	w = 0; // Reset data bus
 	uint8_t status = 0;
-	status |= (regLatch & 0x1F);
+	status |= (openBus & 0x1F);
 	status |= ((isSpriteOverflow & 0x1) << 5);
 	status |= ((isSprite0Hit & 0x1) << 6);
 	status |= ((isInVBlank & 0x1) << 7);
@@ -158,8 +161,9 @@ void PPU::OAMDATA(uint8_t data) {
 	oamAddr++;
 }
 uint8_t PPU::OAMDATA() {
-	regLatch = OAM[oamAddr];
-	return OAM[oamAddr];
+	uint8_t returnValue = (OAM[oamAddr] & ~(0x1c));
+	openBus = returnValue;
+	return returnValue;
 }
 void PPU::PPUSCROLL(uint8_t data) {
 	if (w == 0) { // isNextScrollX = true
@@ -198,18 +202,15 @@ void PPU::PPUDATA(uint8_t data) {
 uint8_t PPU::PPUDATA() {
 	uint8_t returnValue;
 	if (0x3F00 <= v && v <= 0x3FFF) { // Palette RAM
-		// TODO: I don't understand this
-		//		The data placed in [the buffer] is the mirrored 
-		//		nametable data that would appear "underneath" the palette.
-		uint8_t data = Read(v);
-		ppudataReadBuffer = data;
-		returnValue = data;
+		ppudataReadBuffer = Read(v - 0x1000);
+		returnValue = Read(v);
+		returnValue |= (openBus & 0xc0);
 	}
 	else {
 		returnValue = ppudataReadBuffer;
 		ppudataReadBuffer = Read(v);
 	}
-	regLatch = returnValue;
+	openBus = returnValue;
 	if (-1 <= scanline && scanline <= 239 && (shouldShowBackground || shouldShowSprites)) {
 		ScrlCoarseXInc();
 		ScrlYInc();
@@ -242,7 +243,7 @@ void PPU::SpriteEvaluation() {
 	else if (1 <= cycle && cycle <= 64) {
 		bool isOddCycle = cycle % 2 == 1;
 		if (isOddCycle) {
-			// It is unclear whether OAMDATA() should return 0xFF
+			// TODO: It is unclear whether OAMDATA() should return 0xFF
 			// (as in Sprite Evaluation page on wiki) or if there
 			// should be no OAMDATA() call and just set it to 0xFF
 			// In order to make sprite_ram.nes work the 2nd option
@@ -258,6 +259,7 @@ void PPU::SpriteEvaluation() {
 		bool isOddCycle = cycle % 2 == 1;
 		if (isOddCycle) {
 			// Read
+			// TODO: Use oamAddr (Check PPU Registers wiki page)
 			spriteEvalTemp = OAM[n * 4 + m];
 		}
 		else {
