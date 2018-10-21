@@ -714,8 +714,8 @@ void CPU_6502::RunNextOpcode() {
 		case AM_ZPX: {		argLen = 1;	argOffset = ((Read(PC + 1) + X) & 0xFF);	Tick();																					break; }
 		case AM_ZPY: {		argLen = 1;	argOffset = ((Read(PC + 1) + Y) & 0xFF);	Tick();																					break; }
 		case AM_ABS: {		argLen = 2;	argOffset = (Read(PC + 1)) + ((Read(PC + 2)) << 8);																					break; }
-		case AM_ABSX: {		argLen = 2;	argOffset = ((Read(PC + 2) << 8)) + AddAndCheckForPageCrossing(Read(PC + 1), X); 													break; }
-		case AM_ABSY: {		argLen = 2;	argOffset = ((Read(PC + 2) << 8)) + AddAndCheckForPageCrossing(Read(PC + 1), Y);													break; }
+		case AM_ABSX: {		argLen = 2;	argOffset = AddAndCheckForPageCrossing(Read(PC + 1), X) + ((Read(PC + 2) << 8)); 													break; }
+		case AM_ABSY: {		argLen = 2;	argOffset = AddAndCheckForPageCrossing(Read(PC + 1), Y) + ((Read(PC + 2) << 8));													break; }
 		case AM_IDXIND: {	argLen = 1;	uint8_t BAL = Read(PC + 1); Tick(); argOffset = Read(((BAL + X) & 0xFF)) + (Read(((BAL + X + 1) & 0xFF)) << 8);						break; }
 		case AM_INDIDX: {	argLen = 1;	uint8_t IAL = Read(PC + 1); argOffset = (Read((IAL + 1) & 0xFF) << 8) + AddAndCheckForPageCrossing(Read((IAL)), Y); 						break; }
 		case AM_REL: {		argLen = 1;	argOffset = PC + 1;																													break; }

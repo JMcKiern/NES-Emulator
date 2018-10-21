@@ -47,19 +47,21 @@ class Console {
 		GLFW_KEY_A, // Left
 		GLFW_KEY_D  // Right
 	};
+	int joynum = GLFW_JOYSTICK_1;
+	void CheckJoystick();
 	// TODO: Add gamepad support
-	/*
+	
 	bool usingGamePad = true;
 	int gamePadKeyMap[8] = {
-		GLFW_JOYSTICK_1, // A
-		GLFW_JOYSTICK_2, // B
-		GLFW_JOYSTICK_7, // Select
-		GLFW_JOYSTICK_8, // Start
-		GLFW_JOYSTICK_10, // Up
-		GLFW_JOYSTICK_12, // Down
-		GLFW_JOYSTICK_13, // Left
-		GLFW_JOYSTICK_11, // Right
-	};*/
+		0, // A
+		1, // B
+		6, // Select
+		7, // Start
+		10, // Up
+		12, // Down
+		13, // Left
+		11 // Right
+	};
 
 	// Error checking
 	bool hasSuccessPC;

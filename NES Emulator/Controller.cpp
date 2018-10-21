@@ -9,17 +9,20 @@ void Controller::IncCycle() {
 void Controller::SetKey(int keyNum, bool isPressed) {
 	keys[keyNum] = isPressed;
 }
+void Controller::SetJoyKey(int keyNum, bool isPressed) {
+	joykeys[keyNum] = isPressed;
+}
 
 uint8_t Controller::Read() {
 	if (isStrobeOn) {
 		// Return state of A when Strobe high
-		return keys[1] & 1;
+		return (keys[1] & 1) | (joykeys[1] & 1);
 	}
 
 	uint8_t val;
 	if (cycle < 8) {
 		// Return state of keys
-		val = keys[cycle] & 1;
+		val = (keys[cycle] & 1) | (joykeys[cycle] & 1);
 	}
 	else {
 		// Return 1 after all keys have been exhausted

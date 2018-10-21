@@ -56,10 +56,31 @@ void Console::KeyCB(GLFWwindow* _window, int key, int scancode, int action, int 
 		}
 	}
 }
+void Console::CheckJoystick() {
+	int count;
+	const unsigned char* buttons = glfwGetJoystickButtons(joynum, &count);
+	if (buttons != NULL) {
+		for (int i = 0; i < 8; i++) {
+			int action = buttons[gamePadKeyMap[i]];
+			if (action == GLFW_PRESS) {
+				controller.SetJoyKey(i, true);
+			}
+			else if (action == GLFW_RELEASE) {
+				controller.SetJoyKey(i, false);
+			}
+			//std::cout << (int)buttons[key] << ", ";
+		}
+		//std::cout << '\n';
+	}
+	else {
+		//std::cout << "Err\n";
+	}
+}
 void Console::RunFrame() {
 	using cycles = std::chrono::duration<int64_t, std::ratio<1, CLOCK_SPEED>>;
 	static int prevCycles = cpu.GetTotalCycles();
 	static auto nextFrame = std::chrono::system_clock::now() + cycles{ 0 };
+	//std::cout << "Sleeping for " <<  std::chrono::duration_cast<std::chrono::milliseconds>(nextFrame - std::chrono::system_clock::now()).count() << " ms\n";
 	std::this_thread::sleep_until(nextFrame);
 
 	bool isOddFrame = ppu.IsOddFrame();
@@ -80,6 +101,7 @@ void Console::Run() {
 	while (!glfwWindowShouldClose(window)) {
 		RunFrame();
 		glfwPollEvents();
+		if (usingGamePad) CheckJoystick();
 		UpdatePeripherals(); // Only needed for Register Interrupts
 		gls.DrawGLScene(window, w_width, w_height);
 	}
@@ -96,6 +118,7 @@ void Console::RunInstrs(int numInstrsToRun) {
 	while (!glfwWindowShouldClose(window) && currInstrNum <= numInstrsToRun) {
 		RunFrame();
 		glfwPollEvents();
+		if (usingGamePad) CheckJoystick();
 		UpdatePeripherals(); // Only needed for Register Interrupts
 		gls.DrawGLScene(window, w_width, w_height);
 		currInstrNum = cpu.GetTotalNumInstrs();
@@ -113,6 +136,7 @@ void Console::PrintHash() {
 	while (!glfwWindowShouldClose(window)) {
 		RunFrame();
 		glfwPollEvents();
+		if (usingGamePad) CheckJoystick();
 		UpdatePeripherals(); // Only needed for Register Interrupts
 		gls.DrawGLScene(window, w_width, w_height);
 

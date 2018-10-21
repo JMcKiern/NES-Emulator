@@ -36,8 +36,7 @@ uint8_t CPU_NES::Read(uint16_t offset, bool shouldTick/*= true*/) {
 		}
 		// TODO: Add other controllers
 		else {
-			value = controller->Read();
-			//value = 0;
+			value = 0;
 		}
 		value |= (openBus & 0xe0);
 	}
