@@ -130,7 +130,7 @@ void GamePak::RegisterUpdate(uint16_t addr, uint8_t data) {
 		}
 		case 3: {
 			if (0x8000 <= addr && addr < 0x10000) {
-				uint8_t bankNum = data & 0x3; // TODO: check if 0x3 is correct
+				uint8_t bankNum = data & 0x3;
 				CHRROM = GetPtrCHR(bankNum);
 			}
 			break;
@@ -170,7 +170,6 @@ void GamePak::Write(uint16_t addr, uint8_t data) {
 	RegisterUpdate(addr, data);
 }
 bool GamePak::isVRAM(uint16_t addr) {
-	// TODO: not sure if universally correct
 	switch (mapperNum)
 	{
 		case 0:

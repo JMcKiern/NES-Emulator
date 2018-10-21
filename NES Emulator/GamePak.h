@@ -4,10 +4,6 @@
 #include <fstream>
 #include "Exceptions.h"
 
-
-// TODO:
-//		Implement Read and Write
-
 class GamePak {
 	uint8_t* PRGROMU;
 	uint8_t* PRGROML;

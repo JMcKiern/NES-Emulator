@@ -4,6 +4,8 @@
 #include "GamePak.h"
 #include "Controller.h"
 
+class PPU;
+
 class CPU_NES : public CPU_6502 {
 	// Memory
 	uint16_t UnMirror(uint16_t offset);

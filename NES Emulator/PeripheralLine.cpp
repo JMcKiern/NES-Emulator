@@ -11,7 +11,6 @@ void PeripheralLine::RemoveConnection(PeripheralConnection* _peripheralConnectio
 		connections.end());
 }
 DigitalState PeripheralLine::GetState() {
-	// TODO: Check if this is correct (one low connection pulling line low)
 	DigitalState lineState = HIGH;
 	for (std::vector<PeripheralConnection*>::iterator it = connections.begin();
 		it != connections.end();

@@ -49,8 +49,6 @@ class Console {
 	};
 	int joynum = GLFW_JOYSTICK_1;
 	void CheckJoystick();
-	// TODO: Add gamepad support
-	
 	bool usingGamePad = true;
 	int gamePadKeyMap[8] = {
 		0, // A

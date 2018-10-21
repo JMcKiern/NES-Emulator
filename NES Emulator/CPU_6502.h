@@ -8,11 +8,6 @@
 #include "Log.h"
 #include "PeripheralLine.h"
 
-// TODO:
-//		Check for proper cycle count
-
-class PPU;
-
 class CPU_6502 {
 private:
 	// CPU Registers

@@ -97,7 +97,7 @@ void CPU_6502::BPL(uint16_t offset, AddrMode addrMode) {
 		BranchAndCheckForPageCrossing(value);
 	}
 }
-void CPU_6502::BRK(uint16_t offset, AddrMode addrMode) { // TODO: Check if correct
+void CPU_6502::BRK(uint16_t offset, AddrMode addrMode) {
 	PC += 1;
 	StackPush((PC >> 8) & 0xFF);
 	StackPush(PC & 0xFF);

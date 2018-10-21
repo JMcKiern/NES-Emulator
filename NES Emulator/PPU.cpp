@@ -41,7 +41,6 @@ uint16_t PPU::UnMirror(uint16_t offset) {
 	}
 	return offset;
 }
-// TODO: What about vram ptr
 void PPU::Write(uint16_t offset, uint8_t data) {
 	offset = UnMirror(offset);
 	if (0x3f00 <= offset && offset <= 0x3f20) {
@@ -522,7 +521,6 @@ void PPU::LoadBGTile(int x, int y, int stepNum) {
 			nextTileLow = Read(tileAddr);
 		}
 		else {
-			// TODO: Fix vram
 			nextTileHigh = Read(tileAddr + 8); // http://wiki.nesdev.com/w/index.php/PPU_pattern_tables
 		}
 	}
@@ -565,7 +563,6 @@ void PPU::LoadSpritesForScanline() {
 	uint8_t spriteY = OAMSL[4 * spriteNum + 0];
 	bool shouldFlipHori = (OAMSL[4 * spriteNum + 2] >> 6) & 1;
 	bool shouldFlipVert = (OAMSL[4 * spriteNum + 2] >> 7) & 1;
-	// TODO: Reorder below using isSpriteOnCurrScanline
 	bool isSpriteOnCurrScanline = spriteY <= scanline && scanline < (spriteY + spriteHeight);
 	if (stepNum == 2) {
 		// Load Attr byte
