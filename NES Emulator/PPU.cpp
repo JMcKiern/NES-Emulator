@@ -1,3 +1,5 @@
+#include <iomanip>
+#include <sstream>
 #include <exception>
 #include "PPU.h"
 #include "Colour.h"
@@ -97,7 +99,8 @@ void PPU::WriteReg(uint16_t offset, uint8_t data) {
 }
 uint8_t PPU::ReadReg(uint16_t offset) {
 	auto msSinceLastRefresh = std::chrono::duration_cast<std::chrono::milliseconds>((std::chrono::system_clock::now() - openBusLastRefresh)).count();
-	if (msSinceLastRefresh > 600) openBus = 0;
+	if (msSinceLastRefresh > 600) 
+		openBus = 0;
 	switch (offset) {
 		case 0x2002: return PPUSTATUS();
 		case 0x2004: return OAMDATA();
@@ -492,6 +495,7 @@ void PPU::RenderPixel(uint8_t outPxl, uint8_t outAttr, bool isSprite) {
 	uint8_t palColour = Read(colourLoc);
 	Colour colour = palette.GetColour(palColour, colourEmphasis);
 
+	disp[cycle - 1][scanline] = palColour;
 	gls->SetPixel(cycle - 1, scanline, colour.red, colour.green, colour.blue);
 }
 
@@ -735,6 +739,20 @@ void PPU::ShiftSprShifters() {
 			}
 		}
 	}
+}
+
+std::string PPU::GetDispHash() {
+	// https://gist.github.com/nitrix/34196ff0c93fdfb01d51
+	uint32_t magic = 5381;
+	for (int y = 0; y < dispHeight; y++) {
+		for (int x = 0; x < dispWidth; x++) {
+			uint8_t c = disp[x][y];
+			magic = ((magic << 5) + magic) + c; // magic * 33 + c
+		}
+	}
+	std::stringstream ss;
+	ss << std::hex << std::setw(8) << std::setfill('0') << magic;
+	return ss.str();
 }
 void PPU::Tick() {
 	// Update scanline and cycle counters

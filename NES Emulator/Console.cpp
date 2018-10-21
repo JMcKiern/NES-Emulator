@@ -76,10 +76,8 @@ void Console::CheckJoystick() {
 		//std::cout << "Err\n";
 	}
 }
-void Console::RunFrame() {
-	using cycles = std::chrono::duration<int64_t, std::ratio<1, CLOCK_SPEED>>;
-	static int prevCycles = cpu.GetTotalCycles();
-	static auto nextFrame = std::chrono::system_clock::now() + cycles{ 0 };
+void Console::RunFrame() {;
+	// A frame should take 16ms (and sleep for 16 - run_time = ~9)
 	//std::cout << "Sleeping for " <<  std::chrono::duration_cast<std::chrono::milliseconds>(nextFrame - std::chrono::system_clock::now()).count() << " ms\n";
 	std::this_thread::sleep_until(nextFrame);
 
@@ -92,12 +90,14 @@ void Console::RunFrame() {
 	prevCycles = cpu.GetTotalCycles();
 	nextFrame += cycles{ cyclesRun };
 }
-void Console::Run() {
+void Console::Run(std::string filename) {
+	LoadINES(filename);
 	UpdatePeripherals(); // Only needed for Register Interrupts
 	CreateWindow();
 	SetCallbacks();
 	gls.InitGL();
 
+	nextFrame = std::chrono::system_clock::now() + cycles{ 0 };
 	while (!glfwWindowShouldClose(window)) {
 		RunFrame();
 		glfwPollEvents();
@@ -106,7 +106,8 @@ void Console::Run() {
 		gls.DrawGLScene(window, w_width, w_height);
 	}
 }
-void Console::RunInstrs(int numInstrsToRun) {
+void Console::RunInstrs(std::string filename, int numInstrsToRun) {
+	LoadINES(filename);
 	log.SetState(false);
 	UpdatePeripherals(); // Only needed for Register Interrupts
 	
@@ -115,6 +116,7 @@ void Console::RunInstrs(int numInstrsToRun) {
 	gls.InitGL();
 
 	int currInstrNum = 0;
+	nextFrame = std::chrono::system_clock::now() + cycles{ 0 };
 	while (!glfwWindowShouldClose(window) && currInstrNum <= numInstrsToRun) {
 		RunFrame();
 		glfwPollEvents();
@@ -124,7 +126,8 @@ void Console::RunInstrs(int numInstrsToRun) {
 		currInstrNum = cpu.GetTotalNumInstrs();
 	}
 }
-void Console::PrintHash() {
+void Console::PrintHash(std::string filename) {
+	LoadINES(filename);
 	log.SetState(false);
 	UpdatePeripherals(); // Only needed for Register Interrupts
 	
@@ -133,6 +136,7 @@ void Console::PrintHash() {
 	gls.InitGL();
 
 	std::string prevHash = GetFrameHash();
+	nextFrame = std::chrono::system_clock::now() + cycles{ 0 };
 	while (!glfwWindowShouldClose(window)) {
 		RunFrame();
 		glfwPollEvents();
@@ -148,7 +152,7 @@ void Console::PrintHash() {
 	}
 }
 std::string Console::GetFrameHash() {
-	return gls.GetScreenHash();
+	return ppu.GetDispHash();
 }
 void Console::LoadINES(std::string filename) {
 	gp.LoadINes(filename);

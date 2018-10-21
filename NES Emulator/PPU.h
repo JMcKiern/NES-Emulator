@@ -58,7 +58,7 @@ private:
 
 	// PPU Registers - Used to communicate with CPU
 	uint8_t openBus = 0;
-	std::chrono::time_point<std::chrono::system_clock> openBusLastRefresh = std::chrono::system_clock::now();
+	std::chrono::time_point<std::chrono::system_clock> openBusLastRefresh;
 	void PPUCTRL(uint8_t data);
 	void PPUMASK(uint8_t data);
 	uint8_t PPUSTATUS();
@@ -72,9 +72,9 @@ private:
 	CPU_NES* CPUPtr;
 
 	// Rendering
-	int dispHeight = 256;
-	int dispWidth = 240;
-	int disp[256][240];
+	static const int dispHeight = 240;
+	static const int dispWidth = 256;
+	uint8_t disp[dispWidth][dispHeight]; // Used for hashing
 	bool isOddFrame = false;
 	int cycle = 0;		// going across 0 <= x <= 340 (x = cycle - 1, due to idle cycle)
 	int scanline = -1;	// going down -1 <= y <= 260  (y = scanline)
@@ -134,6 +134,8 @@ public:
 	// PPU Registers Access Functions for the CPU
 	void WriteReg(uint16_t offset, uint8_t data);
 	uint8_t ReadReg(uint16_t offset);
+
+	std::string GetDispHash();
 
 	void Tick();
 	void PowerUp();

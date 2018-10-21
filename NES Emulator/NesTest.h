@@ -3,8 +3,7 @@
 
 bool Test(std::string filename, int numInstrs, std::string desiredHash) {
 	Console console;
-	console.LoadINES(filename);
-	console.RunInstrs(numInstrs);
+	console.RunInstrs(filename, numInstrs);
 	std::string actualHash = console.GetFrameHash();
 
 	bool success = actualHash == desiredHash;
@@ -22,6 +21,5 @@ bool Test(std::string filename, int numInstrs, std::string desiredHash) {
 void PrintHash(std::string filename) {
 	std::cout << "Printing hashes for " << filename << '\n';
 	Console console;
-	console.LoadINES(filename);
-	console.PrintHash();
+	console.PrintHash(filename);
 }

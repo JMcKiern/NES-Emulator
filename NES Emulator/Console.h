@@ -68,11 +68,14 @@ class Console {
 	uint16_t successPC;
 
 	const static int CLOCK_SPEED = 1790000; // 1.79 MHz
+	using cycles = std::chrono::duration<int64_t, std::ratio<1, CLOCK_SPEED>>;
+	std::chrono::time_point<std::chrono::system_clock, std::chrono::duration<std::common_type_t<std::chrono::system_clock::rep, std::chrono::system_clock::rep>, std::ratio<1i64, CLOCK_SPEED*1000i64>>> nextFrame;
+	int prevCycles = cpu.GetTotalCycles();
 public:
 	void RunFrame();
-	void Run();
-	void RunInstrs(int numInstrs);
-	void PrintHash();
+	void Run(std::string filename);
+	void RunInstrs(std::string filename, int numInstrs);
+	void PrintHash(std::string filename);
 	std::string GetFrameHash();
 	void LoadINES(std::string filename);
 	Console(std::string logFile = "");
