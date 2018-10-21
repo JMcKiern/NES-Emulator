@@ -45,17 +45,15 @@ private:
 	bool shouldSuppressSettingVBL = false;
 	bool shouldSuppressNMI = false;
 
-	// PPUSCROLL Variables
-	uint8_t fineX, fineY;
-	bool isNextScrollX = true;
-
 	// OAMADDR Variables
 	uint8_t oamAddr;
 
 	// PPUADDR Variables
 	uint16_t VRAMPtr;
-	bool isNextByteUpper = true;
 	uint8_t PPUADDRUpper;
+
+	// PPUDATA Variables
+	uint8_t ppudataReadBuffer;
 
 	// PPU Registers - Used to communicate with CPU
 	uint8_t regLatch = 0;
@@ -95,6 +93,12 @@ private:
 	void LoadBGTile(int x, int y, int stepNum);
 	void FlushBGShifters();
 	void ShiftBGShifters();
+	//		Scrolling registers
+	uint16_t v, t;
+	uint8_t x, w;
+	void ScrlCoarseXInc();
+	void ScrlYInc();
+
 
 	// Rendering - Sprites
 	//	OAM (also known as Sprite Ram or SPR-RAM)

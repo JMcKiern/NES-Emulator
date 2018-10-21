@@ -46,6 +46,7 @@ public:
 	uint16_t GetVRAMAddr();
 	uint8_t PPURead(uint16_t addr);
 	void PPUWrite(uint16_t addr, uint8_t data);
+	bool UsingVerticalMirroring();
 
 	void LoadINes(std::string filename);
 

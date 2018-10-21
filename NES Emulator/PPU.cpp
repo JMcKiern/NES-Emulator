@@ -7,6 +7,27 @@ uint16_t PPU::UnMirror(uint16_t offset) {
 	if (0x4000 <= offset && offset < 0x10000) {
 		offset = offset % 0x4000;
 	}
+	if (0x2400 <= offset && offset <= 0x2FFF) { // Nametable 1, 2 or 3
+		bool usingVerticalMirroring = gp->UsingVerticalMirroring();
+		if (0x2400 <= offset && offset <= 0x27FF) { // NT 1
+			if (!usingVerticalMirroring) {
+				offset -= 0x400;
+			}
+		}
+		else if (0x2800 <= offset && offset <= 0x2BFF) { // NT 2
+			if (usingVerticalMirroring) {
+				offset -= 0x800;
+			}
+		}
+		else if (0x2C00 <= offset && offset <= 0x2FFF) { // NT 3
+			if (usingVerticalMirroring) {
+				offset -= 0x800;
+			}
+			else {
+				offset -= 0x400;
+			}
+		}
+	}
 	if (0x3f00 <= offset && offset < 0x4000) {
 		offset = offset % 0x20 + 0x3f00;
 		// $3F10/$3F14/$3F18/$3F1C are mirrors of $3F00/$3F04/$3F08/$3F0C
@@ -79,16 +100,18 @@ uint8_t PPU::ReadReg(uint16_t offset) {
 		case 0x2004: return OAMDATA();
 		case 0x2007: return PPUDATA();
 		default:
-			isNextByteUpper = true;
+			w = 0; // Reset data bus
 			return regLatch;
 	}
 }
 void PPU::PPUCTRL(uint8_t data) {
-	uint8_t nameTable = (data & 0x11);
+	uint8_t nameTable = (data & 0x3);
 	if (nameTable == 0) nameTableAddr = 0x2000;
 	else if (nameTable == 1) nameTableAddr = 0x2400;
 	else if (nameTable == 2) nameTableAddr = 0x2800;
 	else if (nameTable == 3) nameTableAddr = 0x2C00;
+
+	t = (t & ~(0x3 << 10)) | ((data & 0x3) << 10); // t: ...BA.. ........ = d: ......BA
 
 	addrInc = ((data >> 2) & 0x1) ? 32 : 1;
 	patternTableAddrSprite = ((data >> 3) & 0x1) ? 0x1000 : 0x0;
@@ -104,10 +127,10 @@ void PPU::PPUMASK(uint8_t data) {
 	shouldClipSprites = !((data >> 2) & 0x1);
 	shouldShowBackground = ((data >> 3) & 0x1);
 	shouldShowSprites = ((data >> 4) & 0x1);
-	colourEmphasis = ((data >> 5) & 0x111);
+	colourEmphasis = ((data >> 5) & 0x7);
 }
 uint8_t PPU::PPUSTATUS() { // Potential Error: 5 LSB should not be zero
-	isNextByteUpper = true; // Reset data bus
+	w = 0; // Reset data bus
 	uint8_t status = 0;
 	status |= (regLatch & 0x1F);
 	status |= ((isSpriteOverflow & 0x1) << 5);
@@ -139,32 +162,62 @@ uint8_t PPU::OAMDATA() {
 	return OAM[oamAddr];
 }
 void PPU::PPUSCROLL(uint8_t data) {
-	if (isNextScrollX) {
-		fineX = data;
+	if (w == 0) { // isNextScrollX = true
+		t = (t & ~0x1F) | ((data >> 3) & 0x1F); // t: ....... ...HGFED = d: HGFED...
+		x = data & 0x7;   						// x:              CBA = d: .....CBA
+		w = 1;
 	}
-	else {
-		fineY = data;
+	else { // w == 1
+		t = (t & ~(0x7 << 12)) | ((data & 0x7) << 12); // t: CBA.... ........ = d: .....CBA
+		t = (t & ~(0x1F << 5)) | (((data >> 3) & 0x1F) << 5); // t: .....HG FED..... = d: HGFED...
+		w = 0;
 	}
-	isNextScrollX = !isNextScrollX;
 }
 void PPU::PPUADDR(uint8_t data) {
-	if (isNextByteUpper) {
-		PPUADDRUpper = data;
+	if (w == 0) { // isNextByteUpper = true
+		t = (t & ~(0x3F << 8)) | ((data & 0x3F) << 8); // t: .FEDCBA ........ = d: ..FEDCBA
+		t = (t & ~(0x1 << 14)); // t: X...... ........ = 0
+		w = 1;
 	}
 	else {
-		VRAMPtr = (PPUADDRUpper << 8) + data;
+		t = (t & ~0xFF) | data; // t: ....... HGFEDCBA = d: HGFEDCBA
+		v = t;
+		w = 0;
 	}
-	isNextByteUpper = !isNextByteUpper;
 }
 void PPU::PPUDATA(uint8_t data) {
-	Write(VRAMPtr, data);
-	VRAMPtr += addrInc;
+	Write(v, data);
+	if (-1 <= scanline && scanline <= 239 && (shouldShowBackground || shouldShowSprites)) {
+		ScrlCoarseXInc();
+		ScrlYInc();
+	}
+	else {
+		v += addrInc;
+	}
 }
 uint8_t PPU::PPUDATA() {
-	uint8_t data = Read(VRAMPtr);
-	regLatch = data;
-	VRAMPtr += addrInc;
-	return data;
+	uint8_t returnValue;
+	if (0x3F00 <= v && v <= 0x3FFF) { // Palette RAM
+		// TODO: I don't understand this
+		//		The data placed in [the buffer] is the mirrored 
+		//		nametable data that would appear "underneath" the palette.
+		uint8_t data = Read(v);
+		ppudataReadBuffer = data;
+		returnValue = data;
+	}
+	else {
+		returnValue = ppudataReadBuffer;
+		ppudataReadBuffer = Read(v);
+	}
+	regLatch = returnValue;
+	if (-1 <= scanline && scanline <= 239 && (shouldShowBackground || shouldShowSprites)) {
+		ScrlCoarseXInc();
+		ScrlYInc();
+	}
+	else {
+		v += addrInc;
+	}
+	return returnValue;
 }
 void PPU::OAMDMA(uint8_t data) {
 	for (int i = 0; i < 0x100; i++) {
@@ -318,8 +371,8 @@ void PPU::ChoosePixel() {
 		uint8_t bgPxl = 0, sprPxl = 0;
 		uint8_t bgAttr = 0, sprAttr = 0;
 		if (shouldShowBackground) {
-			bgPxl = ((((bsr16Bg[1] & 0x8000) != 0) & 1) << 1) | (((bsr16Bg[0] & 0x8000) != 0) & 1);
-			bgAttr = ((((bsr8Bg[1] & 0x80) != 0) & 1) << 1) | (((bsr8Bg[0] & 0x80) != 0) & 1);
+			bgPxl = ((((bsr16Bg[1] & (0x8000 >> x)) != 0) & 1) << 1) | (((bsr16Bg[0] & (0x8000 >> x)) != 0) & 1);
+			bgAttr = ((((bsr8Bg[1] & (0x80 >> x)) != 0) & 1) << 1) | (((bsr8Bg[0] & (0x80 >> x)) != 0) & 1);
 
 			// Clip background in leftmost 8 pixels of screen
 			if (shouldClipBackground && 1 <= cycle && cycle <= 8) {
@@ -444,29 +497,21 @@ void PPU::LoadBGTile(int x, int y, int stepNum) {
 	// TODO: No alternating between read and write cycles?
 	if (stepNum == 1) {
 		// Nametable table byte write (and read?)
-		bgNTTemp = Read(nameTableAddr + 32 * (y/8) + (x / 8));
+		uint16_t addr = 0x2000 | (v & 0x0FFF);
+		bgNTTemp = Read(addr);
 	}
 	else if (stepNum == 3) {
 		// Attribute table byte write (and read?)
-		uint8_t temp = Read(nameTableAddr + 0x3c0 + 8 * (y / 32) + (x / 32));
-		bool isLeft = (x % 32 < 16);
-		bool isTop = (y % 32 < 16);
-		// Quadrant Number
-		//		01
-		//		23
-		uint8_t quadrantNum = 0;
-		if (!isLeft) quadrantNum++;
-		if (!isTop) quadrantNum += 2;
-		// TODO: non-zero palette
-		nextAttrByte = (temp >> (2 * quadrantNum)) & 3;
+		uint16_t tempAddr = 0x23C0 | (v & 0x0C00) | ((v >> 4) & 0x38) | ((v >> 2) & 0x07);
+		uint8_t temp = Read(tempAddr);
+		uint8_t shift = ((v >> 4) & 0x04) | (v & 0x02);
+		nextAttrByte = ((temp >> shift) & 0x03);
 	}
 	else if (stepNum == 5 || stepNum == 7) {
 		// Tile bitmap low and high write (and read?)
 		bool isTileLow = stepNum == 5;
 		uint8_t tileIndexNum = bgNTTemp;
-		uint8_t TileFromTop = (y / 8);
-		uint8_t YInTile = y - TileFromTop * 8;
-		uint16_t tileAddr = patternTableAddrBackground + (tileIndexNum << 4) + YInTile;
+		uint16_t tileAddr = patternTableAddrBackground | (tileIndexNum << 4) | (v >> 12);
 		if (isTileLow) {
 			nextTileLow = Read(tileAddr);
 		}
@@ -616,6 +661,60 @@ void PPU::RenderTick() {
 			}
 			shouldSuppressSettingVBL = false;
 		}
+	}
+	// Scrolling behaviour
+	if ((-1 <= scanline && scanline <= 239) && (shouldShowBackground || shouldShowSprites)) {
+		if (cycle == 256) { // dot 256
+			// Increment vertical position in v
+			ScrlYInc();
+		}
+		if (cycle == 257) { // dot 257
+			v = (v & ~(0x1F)) | ((t & 0x1F));    // v: ....... ...EDCBA = t : ....... ...EDCBA
+			v = (v & ~(0x1 << 10)) | (t & (0x1 << 10)); // v: ....F.. ........ = t : ....F.. ........
+		}
+		if (scanline == -1) {
+			if (280 <= cycle && cycle <= 304) { // dot 280-304
+				v = (v & ~(0xF << 11)) | ((t & (0xF << 11))); // v: IHGF... ........ = t: IHGF... ........
+				v = (v & ~(0x1F << 5)) | ((t & (0x1F << 5))); // v: .....ED CBA..... = t: .....ED CBA.....
+			}
+		}
+		if (cycle <= 256 || cycle >= 328) {
+			// it begins at dots 328 and 336, and will continue through the next scanline at 
+			// 8, 16, 24... 240, 248, 256 (every 8 dots across the scanline until 256).
+			if (cycle % 8 == 0 && cycle != 0)
+				ScrlCoarseXInc();
+		}
+	}
+}
+void PPU::ScrlCoarseXInc() {
+	// https://wiki.nesdev.com/w/index.php/PPU_scrolling#Coarse_X_increment
+	if ((v & 0x001F) == 31) { // if coarse X == 31
+		v &= ~0x001F;          // coarse X = 0
+		v ^= 0x0400;           // switch horizontal nametable
+	}
+	else {
+		v += 1;                // increment coarse X
+	}
+}
+void PPU::ScrlYInc() {
+	// https://wiki.nesdev.com/w/index.php/PPU_scrolling#Y_increment
+	if ((v & 0x7000) != 0x7000) {       // if fine Y < 7
+		v += 0x1000;                      // increment fine Y
+	}
+	else {
+		v &= ~0x7000;                     // fine Y = 0
+		int y = (v & 0x03E0) >> 5;        // let y = coarse Y
+		if (y == 29) {
+			y = 0;                          // coarse Y = 0
+			v ^= 0x0800;                    // switch vertical nametable
+		}
+		else if (y == 31) {
+			y = 0;                          // coarse Y = 0, nametable not switched
+		}
+		else {
+			y += 1;                         // increment coarse Y
+		}
+		v = (v & ~0x03E0) | (y << 5);     // put coarse Y back into v
 	}
 }
 void PPU::ShiftSprShifters() {

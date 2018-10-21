@@ -221,7 +221,9 @@ void GamePak::PPUWrite(uint16_t addr, uint8_t data) {
 		}
 	}
 }
-
+bool GamePak::UsingVerticalMirroring() {
+	return usingVerticalMirroring;
+}
 
 GamePak::~GamePak() {
 	if (size != -1) delete[] cartridge;
