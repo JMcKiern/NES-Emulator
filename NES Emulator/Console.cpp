@@ -44,18 +44,7 @@ void Console::ResizeWinCB(GLFWwindow* _window, int w, int h) {
 }
 void Console::KeyCB(GLFWwindow* _window, int key, int scancode, int action, int mods) {
 	if (window != _window) return;
-	for (int i = 0; i < 8; i++) {
-		if (key == keyMap[i]) {
-			//controller.SetKey(i, action); 
-			if (action == GLFW_PRESS) {
-				controller.SetKey(i, true);
-			}
-			else if (action == GLFW_RELEASE) {
-				controller.SetKey(i, false);
-			}
-			break;
-		}
-	}
+	controller.SetKey(keyMap[key], action); 
 }
 void Console::CheckJoystick() {
 	int count;
@@ -63,18 +52,8 @@ void Console::CheckJoystick() {
 	if (buttons != NULL) {
 		for (int i = 0; i < 8; i++) {
 			int action = buttons[gamePadKeyMap[i]];
-			if (action == GLFW_PRESS) {
-				controller.SetJoyKey(i, true);
-			}
-			else if (action == GLFW_RELEASE) {
-				controller.SetJoyKey(i, false);
-			}
-			//std::cout << (int)buttons[key] << ", ";
+			controller.SetJoyKey(i, action); 
 		}
-		//std::cout << '\n';
-	}
-	else {
-		//std::cout << "Err\n";
 	}
 }
 void Console::RunFrame() {;

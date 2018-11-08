@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <memory>
+#include <map>
 #include "CPU_NES.h"
 #include "Peripheral.h"
 #include "Log.h"
@@ -36,16 +37,15 @@ class Console {
 	Controller controller;
 	std::vector<std::unique_ptr<Peripheral>> peripherals;
 	void UpdatePeripherals();
-	// TODO: Replace with map?
-	int keyMap[8] = {
-		GLFW_KEY_J, // A
-		GLFW_KEY_K, // B
-		GLFW_KEY_G, // Select
-		GLFW_KEY_H, // Start
-		GLFW_KEY_W, // Up
-		GLFW_KEY_S, // Down
-		GLFW_KEY_A, // Left
-		GLFW_KEY_D  // Right
+	std::map<int, int> keyMap = {
+		{ GLFW_KEY_J, 0 }, // A
+		{ GLFW_KEY_K, 1 }, // B
+		{ GLFW_KEY_G, 2 }, // Select
+		{ GLFW_KEY_H, 3 }, // Start
+		{ GLFW_KEY_W, 4 }, // Up
+		{ GLFW_KEY_S, 5 }, // Down
+		{ GLFW_KEY_A, 6 }, // Left
+		{ GLFW_KEY_D, 7 }  // Right
 	};
 	int joynum = GLFW_JOYSTICK_1;
 	void CheckJoystick();
