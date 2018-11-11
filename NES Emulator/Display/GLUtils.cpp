@@ -29,7 +29,8 @@ mat4 rotateAboutAxis(double ang_deg, vec3 axis) {
 unsigned char* load_texture(const char *file_name, int& _width, int& _height) {
 	int x, y, n;
 	int force_channels = 4;
-	unsigned char *image_data = stbi_load(file_name, &x, &y, &n, force_channels);
+	unsigned char *image_data = stbi_load(file_name, &x, &y, &n,
+	                                      force_channels);
 	if (!image_data) {
 		fprintf(stderr, "ERROR: could not load %s\n", file_name);
 		return false;
@@ -37,7 +38,7 @@ unsigned char* load_texture(const char *file_name, int& _width, int& _height) {
 	// NPOT check
 	if ((x & (x - 1)) != 0 || (y & (y - 1)) != 0) {
 		fprintf(stderr, "WARNING: texture %s is not power-of-2 dimensions\n",
-			file_name);
+		        file_name);
 	}
 	int width_in_bytes = x * 4;
 	unsigned char *top = NULL;
@@ -73,7 +74,8 @@ std::string readShaderFile(std::string fileName) {
 	f.close();
 	return sstr.str();
 }
-GLuint loadShaderProg(std::string vertexShaderFile, std::string fragmentShaderFile) {
+GLuint loadShaderProg(std::string vertexShaderFile,
+                      std::string fragmentShaderFile) {
 	GLuint sProg;
 	std::string vs = readShaderFile(vertexShaderFile);
 	const char *vertex_shader = vs.c_str();

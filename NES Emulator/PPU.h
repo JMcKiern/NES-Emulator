@@ -13,7 +13,6 @@ class CPU_NES;
 
 class PPU {
 private:
-
 	// PPU Memory
 	uint8_t vram[0x4000];
 	uint8_t PaletteRAM[0x20];
@@ -76,8 +75,8 @@ private:
 	static const int dispWidth = 256;
 	uint8_t disp[dispWidth][dispHeight]; // Used for hashing
 	bool isOddFrame = false;
-	int cycle = 0;		// going across 0 <= x <= 340 (x = cycle - 1, due to idle cycle)
-	int scanline = -1;	// going down -1 <= y <= 260  (y = scanline)
+	int cycle = 0;		// across 0 <= x <= 340 (x = cycle - 1 (idle cycle))
+	int scanline = -1;	// down -1 <= y <= 260  (y = scanline)
 	void RenderTick();
 	void ChoosePixel();
 	void RenderPixel(uint8_t outPxl, uint8_t outAttr, bool isSprite);
@@ -105,7 +104,7 @@ private:
 	// Rendering - Sprites
 	//	OAM (also known as Sprite Ram or SPR-RAM)
 	uint8_t OAM[0x100]; // 64 sprites with 4 bytes each
-	uint8_t OAMSL[0x20]; // sprites that are on current scanline 8 sprites with 4 bytes each
+	uint8_t OAMSL[0x20]; // Up to 8 sprites that are on current scanline
 	//	Other
 	void SpriteEvaluation();
 	uint8_t oamSLAddr;
@@ -129,6 +128,7 @@ private:
 	GamePak* gp;
 
 public:
+	// Frame Check
 	bool IsOddFrame();
 
 	// PPU Registers Access Functions for the CPU

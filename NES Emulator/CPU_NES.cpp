@@ -1,6 +1,7 @@
 #include <iomanip>
 #include "CPU_NES.h"
 
+// CPU Memory
 uint16_t CPU_NES::UnMirror(uint16_t offset) {
 	if (0x800 <= offset && offset < 0x2000) {
 		offset = offset % 0x800;
@@ -10,8 +11,6 @@ uint16_t CPU_NES::UnMirror(uint16_t offset) {
 	}
 	return offset;
 }
-
-// CPU Memory
 uint8_t CPU_NES::Read(uint16_t offset, bool shouldTick/*= true*/) {
 	uint8_t value;
 	if (shouldTick) Tick();
@@ -45,7 +44,6 @@ uint8_t CPU_NES::Read(uint16_t offset, bool shouldTick/*= true*/) {
 	openBus = value;
 	return value;
 }
-
 void CPU_NES::Write(uint16_t offset, uint8_t data, bool shouldTick/*= true*/) {
 	if (shouldTick) Tick();
 	offset = UnMirror(offset);
@@ -73,9 +71,11 @@ void CPU_NES::Write(uint16_t offset, uint8_t data, bool shouldTick/*= true*/) {
 // Logging
 void CPU_NES::PrintDebugInfoMesen() {
 	PrintDebugInfoMesenBasic();
+	/*
 	(*log) << std::hex << std::uppercase << std::setfill('0');
-	//(*log) << " CYC:" << std::setw(3) << (unsigned int)PPUPtr->GetPPUCycle();
-	//(*log) << " SL:" << std::setw(2) << (unsigned int)PPUPtr->GetPPUScanline();
+	(*log) << " CYC:" << std::setw(3) << (unsigned int)PPUPtr->GetPPUCycle();
+	(*log) << " SL:" << std::setw(2) << (unsigned int)PPUPtr->GetPPUScanline();
+	*/
 	(*log) << '\n';
 }
 
@@ -86,6 +86,16 @@ void CPU_NES::PPURequestingWrite(uint16_t offset, uint8_t data) {
 uint8_t CPU_NES::PPURequestingRead(uint16_t offset) {
 	return ReadNoTick(offset);
 }
+
+// Timing
+void CPU_NES::Tick() {
+	PPUPtr->Tick();
+	CPU_6502::Tick();
+	PPUPtr->Tick();
+	PPUPtr->Tick();
+}
+
+// Start Up
 void CPU_NES::StartCycle() {
 	Tick();
 	Tick();
@@ -95,6 +105,11 @@ void CPU_NES::StartCycle() {
 	SetPC(Read(0xFFFC) + (Read(0xFFFD) << 8)); // RESET VECTOR
 	SetI();
 }
+void CPU_NES::Reset() {
+	SetI();
+	SetSP(GetSP() - 3);
+	SetPC(Read(0xFFFC) + (Read(0xFFFD) << 8)); // RESET VECTOR
+}
 void CPU_NES::PowerUp() {
 	SetP(0x34);
 	SetA(0);
@@ -103,21 +118,10 @@ void CPU_NES::PowerUp() {
 	SetSP(0xFD);
 	SetPC(Read(0xFFFC) + (Read(0xFFFD) << 8)); // RESET VECTOR
 }
-void CPU_NES::Reset() {
-	SetI();
-	SetSP(GetSP() - 3);
-	SetPC(Read(0xFFFC) + (Read(0xFFFD) << 8)); // RESET VECTOR
-}
-
-void CPU_NES::Tick() {
-	PPUPtr->Tick();
-	CPU_6502::Tick();
-	PPUPtr->Tick();
-	PPUPtr->Tick();
-}
 
 // Constructor
-CPU_NES::CPU_NES(Log* _log, PPU* _PPUPtr, GamePak* _gp, Controller* _controller) :
+CPU_NES::CPU_NES(Log* _log, PPU* _PPUPtr, GamePak* _gp,
+                 Controller* _controller) :
 	CPU_6502(_log, 0x800)
 {
 	PPUPtr = _PPUPtr;

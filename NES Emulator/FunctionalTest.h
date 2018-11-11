@@ -48,9 +48,8 @@ bool FunctionalTest(std::string filename, uint16_t memOffset, uint16_t startPC, 
 
 	std::chrono::duration<double> elapsed_seconds = finishTimer - startTimer;
 
-	if (currPC == successPC) std::cout << "Passed " << filename << '\n';
-
 	if (shouldPrint && currPC == successPC) {
+		std::cout << "Passed " << filename << '\n';
 		std::cout << "Finished with: " << cpu.GetTotalCycles() << " cycles\n";
 		std::cout << "               " << elapsed_seconds.count() << " second\n";
 		std::cout << "               " << cpu.GetTotalCycles() / (1.0 * elapsed_seconds.count())
@@ -59,7 +58,7 @@ bool FunctionalTest(std::string filename, uint16_t memOffset, uint16_t startPC, 
 		std::cout << "Final PC: " << currPC << "\n";
 		std::cout << "Success!\n\n";
 	}
-	else if (currPC != successPC) {
+	else if (currPC != successPC) { // 
 		std::cout << "Ran " << filename << '\n';
 		std::cout << "Finished with: " << cpu.GetTotalCycles() << " cycles\n";
 		std::cout << "               " << elapsed_seconds.count() << " second\n";

@@ -77,38 +77,7 @@ uint8_t PPU::Read(uint16_t offset) {
 	}
 }
 
-bool PPU::IsOddFrame() {
-	return isOddFrame;
-}
-
-void PPU::WriteReg(uint16_t offset, uint8_t data) {
-	openBus = data;
-	openBusLastRefresh = std::chrono::system_clock::now();
-	switch (offset) {
-		case 0x2000: PPUCTRL(data); break;
-		case 0x2001: PPUMASK(data); break;
-		case 0x2003: OAMADDR(data); break;
-		case 0x2004: OAMDATA(data); break;
-		case 0x2005: PPUSCROLL(data); break;
-		case 0x2006: PPUADDR(data); break;
-		case 0x2007: PPUDATA(data); break;
-		case 0x4014: OAMDMA(data); break;
-		default: break;
-	}
-}
-uint8_t PPU::ReadReg(uint16_t offset) {
-	auto msSinceLastRefresh = std::chrono::duration_cast<std::chrono::milliseconds>((std::chrono::system_clock::now() - openBusLastRefresh)).count();
-	if (msSinceLastRefresh > 600) 
-		openBus = 0;
-	switch (offset) {
-		case 0x2002: return PPUSTATUS();
-		case 0x2004: return OAMDATA();
-		case 0x2007: return PPUDATA();
-		default:
-			w = 0; // Reset data bus
-			return openBus;
-	}
-}
+// PPU Registers
 void PPU::PPUCTRL(uint8_t data) {
 	uint8_t nameTable = (data & 0x3);
 	if (nameTable == 0) nameTableAddr = 0x2000;
@@ -116,7 +85,8 @@ void PPU::PPUCTRL(uint8_t data) {
 	else if (nameTable == 2) nameTableAddr = 0x2800;
 	else if (nameTable == 3) nameTableAddr = 0x2C00;
 
-	t = (t & ~(0x3 << 10)) | ((data & 0x3) << 10); // t: ...BA.. ........ = d: ......BA
+	// t: ...BA.. ........ = d: ......BA
+	t = (t & ~(0x3 << 10)) | ((data & 0x3) << 10);
 
 	addrInc = ((data >> 2) & 0x1) ? 32 : 1;
 	patternTableAddrSprite = ((data >> 3) & 0x1) ? 0x1000 : 0x0;
@@ -169,31 +139,46 @@ uint8_t PPU::OAMDATA() {
 }
 void PPU::PPUSCROLL(uint8_t data) {
 	if (w == 0) { // isNextScrollX = true
-		t = (t & ~0x1F) | ((data >> 3) & 0x1F); // t: ....... ...HGFED = d: HGFED...
-		x = data & 0x7;   						// x:              CBA = d: .....CBA
+		// t: ....... ...HGFED = d: HGFED...
+		t = (t & ~0x1F) | ((data >> 3) & 0x1F);
+
+		// x:              CBA = d: .....CBA
+		x = data & 0x7;
+
 		w = 1;
 	}
 	else { // w == 1
-		t = (t & ~(0x7 << 12)) | ((data & 0x7) << 12); // t: CBA.... ........ = d: .....CBA
-		t = (t & ~(0x1F << 5)) | (((data >> 3) & 0x1F) << 5); // t: .....HG FED..... = d: HGFED...
+		// t: CBA.... ........ = d: .....CBA
+		t = (t & ~(0x7 << 12)) | ((data & 0x7) << 12);
+
+		// t: .....HG FED..... = d: HGFED...
+		t = (t & ~(0x1F << 5)) | (((data >> 3) & 0x1F) << 5);
+
 		w = 0;
 	}
 }
 void PPU::PPUADDR(uint8_t data) {
 	if (w == 0) { // isNextByteUpper = true
-		t = (t & ~(0x3F << 8)) | ((data & 0x3F) << 8); // t: .FEDCBA ........ = d: ..FEDCBA
-		t = (t & ~(0x1 << 14)); // t: X...... ........ = 0
+		// t: .FEDCBA ........ = d: ..FEDCBA
+		t = (t & ~(0x3F << 8)) | ((data & 0x3F) << 8);
+
+		// t: X...... ........ = 0
+		t = (t & ~(0x1 << 14));
+
 		w = 1;
 	}
 	else {
-		t = (t & ~0xFF) | data; // t: ....... HGFEDCBA = d: HGFEDCBA
+		// t: ....... HGFEDCBA = d: HGFEDCBA
+		t = (t & ~0xFF) | data;
+
 		v = t;
 		w = 0;
 	}
 }
 void PPU::PPUDATA(uint8_t data) {
 	Write(v, data);
-	if (-1 <= scanline && scanline <= 239 && (shouldShowBackground || shouldShowSprites)) {
+	if (-1 <= scanline && scanline <= 239
+	    && (shouldShowBackground || shouldShowSprites)) {
 		ScrlCoarseXInc();
 		ScrlYInc();
 	}
@@ -213,7 +198,8 @@ uint8_t PPU::PPUDATA() {
 		ppudataReadBuffer = Read(v);
 	}
 	openBus = returnValue;
-	if (-1 <= scanline && scanline <= 239 && (shouldShowBackground || shouldShowSprites)) {
+	if (-1 <= scanline && scanline <= 239
+	    && (shouldShowBackground || shouldShowSprites)) {
 		ScrlCoarseXInc();
 		ScrlYInc();
 	}
@@ -224,7 +210,8 @@ uint8_t PPU::PPUDATA() {
 }
 void PPU::OAMDMA(uint8_t data) {
 	for (int i = 0; i < 0x100; i++) {
-		OAM[(oamAddr + i) % 0x100] = CPUPtr->PPURequestingRead((data * 0x100) + i);
+		OAM[(oamAddr + i) % 0x100]
+			= CPUPtr->PPURequestingRead((data * 0x100) + i);
 	}
 }
 
@@ -313,7 +300,8 @@ void PPU::SpriteEvaluation() {
 						isSpriteOverflow = true;
 					}
 					else {
-						// Step 2.3b - https://forums.nesdev.com/viewtopic.php?f=3&t=13226
+						// Step 2.3b
+						// https://forums.nesdev.com/viewtopic.php?f=3&t=13226
 						n++;
 						if (n == 65) {
 							n = 0;
@@ -365,8 +353,10 @@ void PPU::ChoosePixel() {
 	// decrement all 8 sprite x
 	// if sprite x == 0 -> activate
 	// if sprite active -> shift shift registers (2 of them)
-	//		this output accompanies the data in the sprite's latch to form a pixel
-	// Check current pixel for each active sprite (from highest to lowest priority)
+	//		this output accompanies the data in the sprite's latch to form
+	//		 a pixel
+	// Check current pixel for each active sprite (from highest to lowest
+	//	priority)
 	//		First non-transparent pixel moves to multiplexer to join bg pixel
 	// Chose pixel
 	bool hasSpriteBeenFound = false;
@@ -375,8 +365,10 @@ void PPU::ChoosePixel() {
 		uint8_t bgPxl = 0, sprPxl = 0;
 		uint8_t bgAttr = 0, sprAttr = 0;
 		if (shouldShowBackground) {
-			bgPxl = ((((bsr16Bg[1] & (0x8000 >> x)) != 0) & 1) << 1) | (((bsr16Bg[0] & (0x8000 >> x)) != 0) & 1);
-			bgAttr = ((((bsr8Bg[1] & (0x80 >> x)) != 0) & 1) << 1) | (((bsr8Bg[0] & (0x80 >> x)) != 0) & 1);
+			bgPxl = ((((bsr16Bg[1] & (0x8000 >> x)) != 0) & 1) << 1)
+			        | (((bsr16Bg[0] & (0x8000 >> x)) != 0) & 1);
+			bgAttr = ((((bsr8Bg[1] & (0x80 >> x)) != 0) & 1) << 1)
+			         | (((bsr8Bg[0] & (0x80 >> x)) != 0) & 1);
 
 			// Clip background in leftmost 8 pixels of screen
 			if (shouldClipBackground && 1 <= cycle && cycle <= 8) {
@@ -388,12 +380,14 @@ void PPU::ChoosePixel() {
 			for (int i = 0; i < 8; i++) { // Loop through sprites
 				if (ctrSpr[i] == 0) { // Sprite active
 					if (!hasSpriteBeenFound) {
-						sprPxl = ((bsrSpr[i][1] & 0x80) >> 6) | ((bsrSpr[i][0] & 0x80) >> 7);
+						sprPxl = ((bsrSpr[i][1] & 0x80) >> 6)
+						         | ((bsrSpr[i][0] & 0x80) >> 7);
 						sprAttr = lchSpr[i];
 						
 						// if pixel not transparent
 						// if not (color = 0 on palette = 0)
-						if (spritePixelsLeft[i] > 0 && !(sprPxl == 0 && ((sprAttr & 0x3) == 0))) {
+						if (spritePixelsLeft[i] > 0
+						    && !(sprPxl == 0 && ((sprAttr & 0x3) == 0))) {
 							hasSpriteBeenFound = true;
 							if (i == 0)
 								isSpriteZero = true;
@@ -488,7 +482,8 @@ void PPU::RenderPixel(uint8_t outPxl, uint8_t outAttr, bool isSprite) {
 	uint16_t colourLoc = 0x3F00;
 
 	if (outPxl != 0) {
-		colourLoc += ((isSprite & 1) << 4) + ((outAttr & 3) << 2) + (outPxl & 3);
+		colourLoc += ((isSprite & 1) << 4) + ((outAttr & 3) << 2)
+		             + (outPxl & 3);
 	}
 
 	uint8_t palColour = Read(colourLoc);
@@ -507,7 +502,8 @@ void PPU::LoadBGTile(int x, int y, int stepNum) {
 	}
 	else if (stepNum == 3) {
 		// Attribute table byte write (and read?)
-		uint16_t tempAddr = 0x23C0 | (v & 0x0C00) | ((v >> 4) & 0x38) | ((v >> 2) & 0x07);
+		uint16_t tempAddr = 0x23C0 | (v & 0x0C00) | ((v >> 4) & 0x38)
+		                    | ((v >> 2) & 0x07);
 		uint8_t temp = Read(tempAddr);
 		uint8_t shift = ((v >> 4) & 0x04) | (v & 0x02);
 		nextAttrByte = ((temp >> shift) & 0x03);
@@ -516,19 +512,22 @@ void PPU::LoadBGTile(int x, int y, int stepNum) {
 		// Tile bitmap low and high write (and read?)
 		bool isTileLow = stepNum == 5;
 		uint8_t tileIndexNum = bgNTTemp;
-		uint16_t tileAddr = patternTableAddrBackground | (tileIndexNum << 4) | (v >> 12);
+		uint16_t tileAddr = patternTableAddrBackground | (tileIndexNum << 4)
+		                    | (v >> 12);
 		if (isTileLow) {
 			nextTileLow = Read(tileAddr);
 		}
 		else {
-			nextTileHigh = Read(tileAddr + 8); // http://wiki.nesdev.com/w/index.php/PPU_pattern_tables
+			// http://wiki.nesdev.com/w/index.php/PPU_pattern_tables
+			nextTileHigh = Read(tileAddr + 8);
 		}
 	}
 }
 void PPU::FlushBGShifters() {
 	// cycle = 9, 17, 25, ..., 257 and 329, 337
 	// Source: NTSC Frame Timing Diagram
-	if ((shouldShowBackground || shouldShowSprites) && -1 <= scanline && scanline <= 239) {
+	if ((shouldShowBackground || shouldShowSprites)
+	    && -1 <= scanline && scanline <= 239) {
 		if (((1 < cycle && cycle <= 257) || (321 < cycle && cycle <= 337))
 			&& ((cycle - 1) % 8 == 0)) {
 			bsr16Bg[0] = (bsr16Bg[0] & 0xFF00) | nextTileLow;
@@ -540,7 +539,8 @@ void PPU::FlushBGShifters() {
 void PPU::ShiftBGShifters() {
 	// cycle = 2 ... 257 and 322 ... 337
 	// Source: NTSC Frame Timing Diagram
-	if ((shouldShowBackground || shouldShowSprites) && -1 <= scanline && scanline <= 239) {
+	if ((shouldShowBackground || shouldShowSprites)
+	    && -1 <= scanline && scanline <= 239) {
 		if ((1 < cycle && cycle <= 257) || (321 < cycle && cycle <= 337)) {
 			bsr16Bg[0] = (bsr16Bg[0] << 1);
 			bsr16Bg[1] = (bsr16Bg[1] << 1);
@@ -563,7 +563,8 @@ void PPU::LoadSpritesForScanline() {
 	uint8_t spriteY = OAMSL[4 * spriteNum + 0];
 	bool shouldFlipHori = (OAMSL[4 * spriteNum + 2] >> 6) & 1;
 	bool shouldFlipVert = (OAMSL[4 * spriteNum + 2] >> 7) & 1;
-	bool isSpriteOnCurrScanline = spriteY <= scanline && scanline < (spriteY + spriteHeight);
+	bool isSpriteOnCurrScanline = spriteY <= scanline
+	                              && scanline < (spriteY + spriteHeight);
 	if (stepNum == 2) {
 		// Load Attr byte
 		if (isSpriteOnCurrScanline)
@@ -584,7 +585,9 @@ void PPU::LoadSpritesForScanline() {
 		// TODO: No alternating between read and write cycles?
 		bool isTileLow = stepNum == 5;
 		uint8_t tileIndexNum = OAMSL[4 * spriteNum + 1];
-		uint16_t YInTile = shouldFlipVert ? spriteHeight - (scanline - spriteY) - 1 : scanline - spriteY;
+		uint16_t YInTile = shouldFlipVert
+		                   ? spriteHeight - (scanline - spriteY) - 1
+		                   : scanline - spriteY;
 		uint16_t tileAddr;
 		if (spriteHeight == 8) {
 			uint16_t patTabAddr = patternTableAddrSprite;
@@ -606,10 +609,11 @@ void PPU::LoadSpritesForScanline() {
 		}
 		else {
 			if (isSpriteOnCurrScanline) {
+				// http://wiki.nesdev.com/w/index.php/PPU_pattern_tables
 				if (!shouldFlipHori)
-					bsrSpr[spriteNum][1] = Read(tileAddr + 8); // http://wiki.nesdev.com/w/index.php/PPU_pattern_tables
+					bsrSpr[spriteNum][1] = Read(tileAddr + 8);
 				else
-					bsrSpr[spriteNum][1] = ReverseByte(Read(tileAddr + 8)); // http://wiki.nesdev.com/w/index.php/PPU_pattern_tables
+					bsrSpr[spriteNum][1] = ReverseByte(Read(tileAddr + 8));
 			}
 			else
 				bsrSpr[spriteNum][1] = 0;
@@ -624,7 +628,9 @@ void PPU::RenderTick() {
 		// Pre-render scanline
 		if (cycle == 1) {
 			isInVBlank = false;
-			isSprite0Hit = false; // Bit 6 of PPUSTATUS ($2002) is cleared to 0 at dot 1 of the pre-render line.
+			// Bit 6 of PPUSTATUS ($2002) is cleared to 0 at dot 1 of the
+			// pre-render line.
+			isSprite0Hit = false; 
 		}
 		else if (321 <= cycle && cycle <= 336) {
 			// Load first 2 background tiles for next scanline into registers
@@ -632,7 +638,8 @@ void PPU::RenderTick() {
 			LoadBGTile(cycle - 321, scanline + 1, stepNum);
 		}
 	}
-	else if ((shouldShowBackground || shouldShowSprites) && 0 <= scanline && scanline <= 239) {
+	else if ((shouldShowBackground || shouldShowSprites)
+	         && 0 <= scanline && scanline <= 239) {
 		// Visible scanlines
 		if (cycle == 0) {
 			// Idle
@@ -666,24 +673,32 @@ void PPU::RenderTick() {
 		}
 	}
 	// Scrolling behaviour
-	if ((-1 <= scanline && scanline <= 239) && (shouldShowBackground || shouldShowSprites)) {
+	if ((-1 <= scanline && scanline <= 239)
+	    && (shouldShowBackground || shouldShowSprites)) {
 		if (cycle == 256) { // dot 256
 			// Increment vertical position in v
 			ScrlYInc();
 		}
 		if (cycle == 257) { // dot 257
-			v = (v & ~(0x1F)) | ((t & 0x1F));    // v: ....... ...EDCBA = t : ....... ...EDCBA
-			v = (v & ~(0x1 << 10)) | (t & (0x1 << 10)); // v: ....F.. ........ = t : ....F.. ........
+			// v: ....... ...EDCBA = t : ....... ...EDCBA
+			v = (v & ~(0x1F)) | ((t & 0x1F));    
+
+			// v: ....F.. ........ = t : ....F.. ........
+			v = (v & ~(0x1 << 10)) | (t & (0x1 << 10)); 
 		}
 		if (scanline == -1) {
 			if (280 <= cycle && cycle <= 304) { // dot 280-304
-				v = (v & ~(0xF << 11)) | ((t & (0xF << 11))); // v: IHGF... ........ = t: IHGF... ........
-				v = (v & ~(0x1F << 5)) | ((t & (0x1F << 5))); // v: .....ED CBA..... = t: .....ED CBA.....
+				// v: IHGF... ........ = t: IHGF... ........
+				v = (v & ~(0xF << 11)) | ((t & (0xF << 11))); 
+
+				// v: .....ED CBA..... = t: .....ED CBA.....
+				v = (v & ~(0x1F << 5)) | ((t & (0x1F << 5))); 
 			}
 		}
 		if (cycle <= 256 || cycle >= 328) {
-			// it begins at dots 328 and 336, and will continue through the next scanline at 
-			// 8, 16, 24... 240, 248, 256 (every 8 dots across the scanline until 256).
+			// it begins at dots 328 and 336, and will continue through the
+			// next scanline at 8, 16, 24... 240, 248, 256 (every 8 dots
+			// accross the scanline until 256).
 			if (cycle % 8 == 0 && cycle != 0)
 				ScrlCoarseXInc();
 		}
@@ -692,36 +707,37 @@ void PPU::RenderTick() {
 void PPU::ScrlCoarseXInc() {
 	// https://wiki.nesdev.com/w/index.php/PPU_scrolling#Coarse_X_increment
 	if ((v & 0x001F) == 31) { // if coarse X == 31
-		v &= ~0x001F;          // coarse X = 0
-		v ^= 0x0400;           // switch horizontal nametable
+		v &= ~0x001F;         // coarse X = 0
+		v ^= 0x0400;          // switch horizontal nametable
 	}
 	else {
-		v += 1;                // increment coarse X
+		v += 1;               // increment coarse X
 	}
 }
 void PPU::ScrlYInc() {
 	// https://wiki.nesdev.com/w/index.php/PPU_scrolling#Y_increment
 	if ((v & 0x7000) != 0x7000) {       // if fine Y < 7
-		v += 0x1000;                      // increment fine Y
+		v += 0x1000;                    // increment fine Y
 	}
 	else {
-		v &= ~0x7000;                     // fine Y = 0
-		int y = (v & 0x03E0) >> 5;        // let y = coarse Y
+		v &= ~0x7000;                   // fine Y = 0
+		int y = (v & 0x03E0) >> 5;      // let y = coarse Y
 		if (y == 29) {
-			y = 0;                          // coarse Y = 0
-			v ^= 0x0800;                    // switch vertical nametable
+			y = 0;                      // coarse Y = 0
+			v ^= 0x0800;                // switch vertical nametable
 		}
 		else if (y == 31) {
-			y = 0;                          // coarse Y = 0, nametable not switched
+			y = 0;                      // coarse Y = 0, nametable not switched
 		}
 		else {
-			y += 1;                         // increment coarse Y
+			y += 1;                     // increment coarse Y
 		}
-		v = (v & ~0x03E0) | (y << 5);     // put coarse Y back into v
+		v = (v & ~0x03E0) | (y << 5);   // put coarse Y back into v
 	}
 }
 void PPU::ShiftSprShifters() {
-	// TODO: Are the sprite bsr's shifted even when not in visible pixels or when shouldShowSprites is off?
+	// TODO: Are the sprite bsr's shifted even when not in visible pixels
+	// or when shouldShowSprites is off?
 	if (1 <= cycle && cycle <= 256 && 0 <= scanline && scanline <= 239) {
 		if (shouldShowSprites) {
 			for (int i = 0; i < 8; i++) {
@@ -753,7 +769,8 @@ std::string PPU::GetDispHash() {
 }
 void PPU::Tick() {
 	// Update scanline and cycle counters
-	if (scanline == -1 && isOddFrame && cycle == 339 && (shouldShowBackground || shouldShowSprites)) {
+	if (scanline == -1 && isOddFrame && cycle == 339
+	    && (shouldShowBackground || shouldShowSprites)) {
 		cycle = 0;
 	}
 	else {
@@ -772,7 +789,8 @@ void PPU::Tick() {
 	RenderTick();
 	ShiftBGShifters();
 	FlushBGShifters();
-	if ((shouldShowBackground || shouldShowSprites) && (0 <= scanline && scanline <= 239)) {
+	if ((shouldShowBackground || shouldShowSprites)
+	    && (0 <= scanline && scanline <= 239)) {
 		if (shouldShowSprites)
 			SpriteEvaluation();
 		if (1 <= cycle && cycle <= 256)
@@ -781,7 +799,8 @@ void PPU::Tick() {
 	ShiftSprShifters();
 
 	bool isInVBlankNextCycle = false; // scanline == 241 && cycle == 0;
-	if (VBlankShouldNMI && (isInVBlank || isInVBlankNextCycle) && !shouldSuppressNMI) {
+	if (VBlankShouldNMI && (isInVBlank || isInVBlankNextCycle)
+	    && !shouldSuppressNMI) {
 		cpuNMIConnection.SetState(LOW);
 	}
 	else {
@@ -817,4 +836,42 @@ PPU::PPU(CPU_NES* _CPUPtr, GamePak* _gp, GLScene2D* _gls) :
 	CPUPtr->AddNMIConnection(&cpuNMIConnection);
 	gp = _gp;
 	gls = _gls;
+}
+
+// Frame Check
+bool PPU::IsOddFrame() {
+	return isOddFrame;
+}
+
+// PPU Registers Access Functions for the CPU
+void PPU::WriteReg(uint16_t offset, uint8_t data) {
+	openBus = data;
+	openBusLastRefresh = std::chrono::system_clock::now();
+	switch (offset) {
+		case 0x2000: PPUCTRL(data); break;
+		case 0x2001: PPUMASK(data); break;
+		case 0x2003: OAMADDR(data); break;
+		case 0x2004: OAMDATA(data); break;
+		case 0x2005: PPUSCROLL(data); break;
+		case 0x2006: PPUADDR(data); break;
+		case 0x2007: PPUDATA(data); break;
+		case 0x4014: OAMDMA(data); break;
+		default: break;
+	}
+}
+uint8_t PPU::ReadReg(uint16_t offset) {
+	auto msSinceLastRefresh
+		= std::chrono::duration_cast<std::chrono::milliseconds>(
+		          std::chrono::system_clock::now() - openBusLastRefresh
+		      ).count();
+	if (msSinceLastRefresh > 600) 
+		openBus = 0;
+	switch (offset) {
+		case 0x2002: return PPUSTATUS();
+		case 0x2004: return OAMDATA();
+		case 0x2007: return PPUDATA();
+		default:
+			w = 0; // Reset data bus
+			return openBus;
+	}
 }

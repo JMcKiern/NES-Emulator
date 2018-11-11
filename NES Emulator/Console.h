@@ -1,14 +1,14 @@
 #pragma once
 
-#include <iostream>
 #include <fstream>
-#include <memory>
 #include <map>
+#include <memory>
+#include <iostream>
 #include "CPU_NES.h"
-#include "Peripheral.h"
-#include "Log.h"
-#include "Display\GLScene2D.h"
 #include "Controller.h"
+#include "Display\GLScene2D.h"
+#include "Log.h"
+#include "Peripheral.h"
 
 // Contains everything to do with everything
 // i.e. CPU, PPU, APU, Peripherals, Screen 
@@ -26,7 +26,8 @@ class Console {
 	void CreateWindow();
 	void SetCallbacks();
 	void ResizeWinCB(GLFWwindow* _window, int w, int h);
-	void KeyCB(GLFWwindow* _window, int key, int scancode, int action, int mods);
+	void KeyCB(GLFWwindow* _window, int key, int scancode, int action,
+	           int mods);
 
 	// OpenGL
 	const int RES_X = 256;
@@ -38,41 +39,46 @@ class Console {
 	std::vector<std::unique_ptr<Peripheral>> peripherals;
 	void UpdatePeripherals();
 	std::map<int, int> keyMap = {
-		{ GLFW_KEY_J, 0 }, // A
-		{ GLFW_KEY_K, 1 }, // B
-		{ GLFW_KEY_G, 2 }, // Select
-		{ GLFW_KEY_H, 3 }, // Start
-		{ GLFW_KEY_W, 4 }, // Up
-		{ GLFW_KEY_S, 5 }, // Down
-		{ GLFW_KEY_A, 6 }, // Left
-		{ GLFW_KEY_D, 7 }  // Right
+		{GLFW_KEY_J, 0}, // A
+		{GLFW_KEY_K, 1}, // B
+		{GLFW_KEY_G, 2}, // Select
+		{GLFW_KEY_H, 3}, // Start
+		{GLFW_KEY_W, 4}, // Up
+		{GLFW_KEY_S, 5}, // Down
+		{GLFW_KEY_A, 6}, // Left
+		{GLFW_KEY_D, 7}  // Right
 	};
 	int joynum = GLFW_JOYSTICK_1;
 	void CheckJoystick();
 	bool usingGamePad = true;
 	int gamePadKeyMap[8] = {
-		0, // A
-		1, // B
-		6, // Select
-		7, // Start
+		0,  // A
+		1,  // B
+		6,  // Select
+		7,  // Start
 		10, // Up
 		12, // Down
 		13, // Left
-		11 // Right
+		11  // Right
 	};
-
-	// Error checking
-	bool hasSuccessPC;
-	uint16_t successPC;
 
 	const static int CLOCK_SPEED = 1790000; // 1.79 MHz
 	using cycles = std::chrono::duration<int64_t, std::ratio<1, CLOCK_SPEED>>;
-	std::chrono::time_point<std::chrono::system_clock, std::chrono::duration<std::common_type_t<std::chrono::system_clock::rep, std::chrono::system_clock::rep>, std::ratio<1i64, CLOCK_SPEED*1000i64>>> nextFrame;
+	std::chrono::time_point<
+		std::chrono::system_clock, 
+		std::chrono::duration<
+			std::common_type_t<std::chrono::system_clock::rep,
+				std::chrono::system_clock::rep
+			>,
+			std::ratio<1i64, CLOCK_SPEED * 1000i64>
+		>
+	> nextFrame;
+
 	int prevCycles = cpu.GetTotalCycles();
 
 	// Console::Run() variables
-	std::string desiredHash = "";
 	int numInstrsToRun = 0;
+	std::string desiredHash = "";
 	bool shouldPrintHash = false;
 	std::string prevHash;
 
@@ -84,6 +90,7 @@ public:
 	void PrintHash(std::string filename);
 	std::string GetFrameHash();
 	void LoadINES(std::string filename);
+
 	Console(std::string logFile = "");
 	~Console();
 };

@@ -27,7 +27,8 @@ void GamePak::LoadINes(std::string filename) {
 	}
 }
 bool GamePak::CheckINes() {
-	if (!(cartridge[0] == 'N' && cartridge[1] == 'E' && cartridge[2] == 'S' && cartridge[3] == 0x1A)) {
+	if (!(cartridge[0] == 'N' && cartridge[1] == 'E' && cartridge[2] == 'S'
+	    && cartridge[3] == 0x1A)) {
 		delete[] cartridge;
 		size = -1;
 		return false;
@@ -36,7 +37,8 @@ bool GamePak::CheckINes() {
 }
 uint32_t GamePak::GetOffsetPRG(uint8_t bankNum) {
 	if (bankNum < 0 || bankNum >= num16kPRGBanks) {
-		std::out_of_range::out_of_range("Attempted to access nonexistant bank number.");
+		std::out_of_range::out_of_range(
+			"Attempted to access nonexistant bank number.");
 	}
 	uint32_t offset = 0x10; // Header
 	if (isTrainer) offset += 0x200; // Trainer
@@ -45,7 +47,8 @@ uint32_t GamePak::GetOffsetPRG(uint8_t bankNum) {
 }
 uint32_t GamePak::GetOffsetCHR(uint8_t bankNum) {
 	if (bankNum < 0 || bankNum >= num8kCHRBanks) {
-		std::out_of_range::out_of_range("Attempted to access nonexistant bank number.");
+		std::out_of_range::out_of_range(
+			"Attempted to access nonexistant bank number.");
 	}
 	uint32_t offset = 0x10; // Header
 	if (isTrainer) offset += 0x200; // Trainer
@@ -233,6 +236,5 @@ bool GamePak::UsingVerticalMirroring() {
 
 GamePak::~GamePak() {
 	if (size != -1) delete[] cartridge;
-	if (num8kCHRBanks == 0 && mapperNum == 0)
-		delete[] CHRRAM;
+	if (num8kCHRBanks == 0 && mapperNum == 0) delete[] CHRRAM;
 }

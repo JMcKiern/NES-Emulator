@@ -19,17 +19,18 @@ void GLEntityHandler::SetVAO() {
 		glEnableVertexAttribArray(i);
 	}
 }
-void GLEntityHandler::LoadTexture(unsigned char* pixels, int width, int height, int texNum) {
+void GLEntityHandler::LoadTexture(unsigned char* pixels, int width, int height,
+                                  int texNum) {
 	glGenTextures(1, &texture);
 	//glActiveTexture(GL_TEXTURE0 + texNum);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	if (hasAlpha) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-			pixels);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
+		             GL_UNSIGNED_BYTE, pixels);
 	}
 	else {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE,
-			pixels);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+		             GL_UNSIGNED_BYTE, pixels);
 	}
 
 	//glUniform1i(glGetUniformLocation(shader_programme, name), num);
@@ -39,14 +40,16 @@ void GLEntityHandler::LoadTexture(unsigned char* pixels, int width, int height, 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+	                GL_LINEAR_MIPMAP_LINEAR);
 	GLfloat max_aniso = 0.0f;
 	glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &max_aniso);
 	// set the maximum!
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, max_aniso);
 }
 
-void GLEntityHandler::BindAndDraw(GLuint shaderProg, mat4 viewMat, mat4 projMat, int viewMatLoc, int projMatLoc) {
+void GLEntityHandler::BindAndDraw(GLuint shaderProg, mat4 viewMat, mat4 projMat,
+                                  int viewMatLoc, int projMatLoc) {
 	glUseProgram(shaderProg);
 	glBindVertexArray(vao);
 	glBindTexture(GL_TEXTURE_2D, texture);

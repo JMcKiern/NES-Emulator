@@ -7,12 +7,20 @@
 #include "GLScene2D.h"
 #include "../Log.h"
 
-void GLScene2D::SetPixel(int x, int y, uint8_t r, uint8_t g, uint8_t b) {
-	int offset = 3 * (x + RES_X * (RES_Y - y - 1));
-	pixels[offset]     = r;
-	pixels[offset + 1] = g;
-	pixels[offset + 2] = b;
-	shouldScreenUpdate = true;
+void GLScene2D::SetupPixels() {
+	for (int y = 0; y < RES_Y; y++) {
+		for (int x = 0; x < RES_X; x++) {
+			uint8_t r, g, b;
+			bool isGrey = y % 2 == 0 ? x % 2 == 0 : (x - 1) % 2 == 0;
+			if (isGrey) {
+				r = g = b = 0xFF;
+			}
+			else {
+				r = g = b = 0xAA;
+			}
+			SetPixel(x, y, r, g, b);
+		}
+	}
 }
 
 bool GLScene2D::InitGL() {
@@ -32,9 +40,9 @@ bool GLScene2D::InitGL() {
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
-	//glShadeModel(GL_SMOOTH);                            // Enable Smooth Shading
-	//glClearColor(0.0f, 0.0f, 0.0f, 0.5f);               // Black Background
-	//glClearDepth(1.0f);                                 // Depth Buffer Setup
+	//glShadeModel(GL_SMOOTH);                        // Enable Smooth Shading
+	//glClearColor(0.0f, 0.0f, 0.0f, 0.5f);           // Black Background
+	//glClearDepth(1.0f);                             // Depth Buffer Setup
 
 	GLfloat points[] = {
 		-1.0,  -1.0f,  0.0f,
@@ -66,7 +74,13 @@ bool GLScene2D::InitGL() {
 
 	return true;
 }
-
+void GLScene2D::SetPixel(int x, int y, uint8_t r, uint8_t g, uint8_t b) {
+	int offset = 3 * (x + RES_X * (RES_Y - y - 1));
+	pixels[offset]     = r;
+	pixels[offset + 1] = g;
+	pixels[offset + 2] = b;
+	shouldScreenUpdate = true;
+}
 bool GLScene2D::DrawGLScene(GLFWwindow* window, int w_width, int w_height) {
 	if (shouldScreenUpdate) {
 		shouldScreenUpdate = false;
@@ -89,21 +103,6 @@ bool GLScene2D::DrawGLScene(GLFWwindow* window, int w_width, int w_height) {
 		return true;
 	}
 	return false;
-}
-void GLScene2D::SetupPixels() {
-	for (int y = 0; y < RES_Y; y++) {
-		for (int x = 0; x < RES_X; x++) {
-			uint8_t r, g, b;
-			bool isGrey = y % 2 == 0 ? x % 2 == 0 : (x - 1) % 2 == 0;
-			if (isGrey) {
-				r = g = b = 0xFF;
-			}
-			else {
-				r = g = b = 0xAA;
-			}
-			SetPixel(x, y, r, g, b);
-		}
-	}
 }
 std::string GLScene2D::GetScreenHash() {
 	// https://gist.github.com/nitrix/34196ff0c93fdfb01d51

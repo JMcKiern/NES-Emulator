@@ -1,26 +1,9 @@
-#include <iomanip>
 #include <fstream>
+#include <iomanip>
 #include <stdexcept>
 #include "CPU_6502.h"
 #include "enums.h"
 #include "Exceptions.h"
-
-
-// CPU Memory
-uint8_t CPU_6502::Read(uint16_t offset, bool shouldTick/*= true*/) { 
-	if (shouldTick) Tick();
-	return *(RAM + offset);
-}
-void CPU_6502::Write(uint16_t offset, uint8_t data, bool shouldTick/*= true*/) {
-	if (shouldTick) Tick();
-	*(RAM + offset) = data;
-}
-uint8_t CPU_6502::ReadNoTick(uint16_t offset) {
-	return Read(offset, false);
-}
-void CPU_6502::WriteNoTick(uint16_t offset, uint8_t data) {
-	Write(offset, data, false);
-}
 
 // Instructions
 void CPU_6502::ADC(uint16_t offset, AddrMode addrMode) {
@@ -193,7 +176,7 @@ void CPU_6502::JMP(uint16_t offset, AddrMode addrMode) {
 	PC = offset;
 }
 void CPU_6502::JSR(uint16_t offset, AddrMode addrMode) { 
-	// Potential Error: ADH should only be fetched on cycle 6
+	// TODO: Potential Error: ADH should only be fetched on cycle 6
 	PC -= 1;
 	StackPush((PC >> 8) & 0xFF);
 	StackPush(PC & 0xFF);
@@ -334,11 +317,14 @@ void CPU_6502::SEI(uint16_t offset, AddrMode addrMode) {
 	I = 1;
 }
 void CPU_6502::STA(uint16_t offset, AddrMode addrMode) {
-	if (!hasPageCrossed && (addrMode == AM_ABSX || addrMode == AM_ABSY || addrMode == AM_INDIDX)) Tick();
+	if (!hasPageCrossed
+	    && (addrMode == AM_ABSX || addrMode == AM_ABSY
+	        || addrMode == AM_INDIDX))
+		Tick();
 	Write(offset, A);
 }
 void CPU_6502::STX(uint16_t offset, AddrMode addrMode) {
-	if (!hasPageCrossed && (addrMode == AM_ABSX || addrMode == AM_ABSY)) Tick();
+	if ((addrMode == AM_ABSX || addrMode == AM_ABSY) && !hasPageCrossed) Tick();
 	Write(offset, X);
 }
 void CPU_6502::STY(uint16_t offset, AddrMode addrMode) {
@@ -376,17 +362,12 @@ void CPU_6502::TYA(uint16_t offset, AddrMode addrMode) {
 
 // Stack Management
 void CPU_6502::StackPush(uint8_t data) {
-#ifdef _DEBUG_MODE 
-	(*log) << "Pushing: " << (int)data << '\n';
-#endif
 	Write(0x100 + SP, data);
 	SP = (SP - 1) & 0xFF;
 }
 uint8_t CPU_6502::StackPop() {
-	uint8_t data = Read(0x100 + ((SP + 1) & 0xFF)); // +1 since SP points to next free location
-#ifdef _DEBUG_MODE
-	(*log) << "Popping: " << (int)data << '\n';
-#endif
+	// Below is SP+1 since SP points to next free location
+	uint8_t data = Read(0x100 + ((SP + 1) & 0xFF));
 	SP = (SP + 1) & 0xFF;
 	return data;
 }
@@ -396,8 +377,7 @@ void CPU_6502::PopToP() {
 	uint8_t temp = StackPop();
 	N = ((temp >> N.GetBitNum()) & 0x1);
 	V = ((temp >> V.GetBitNum()) & 0x1);
-	// Bit 4 and 5 are ignored 
-	// for PLP and RTI
+	// Bit 4 and 5 are ignored for PLP and RTI
 	D = ((temp >> D.GetBitNum()) & 0x1);
 	I = ((temp >> I.GetBitNum()) & 0x1);
 	Z = ((temp >> Z.GetBitNum()) & 0x1);
@@ -416,15 +396,79 @@ void CPU_6502::PushP(bool shouldSetBit4) {
 	temp = temp | ((C & 0x1) << C.GetBitNum());
 	StackPush(temp);
 }
-void CPU_6502::SetP(uint8_t val/*, bool shouldSetBit4*/) {
-	N = ((val >> N.GetBitNum()) & 0x1);
-	V = ((val >> V.GetBitNum()) & 0x1);
-	// Bit 5 is ignored 
-	//if (shouldSetBit4) B = ((val >> B.GetBitNum()) & 0x1);
-	D = ((val >> D.GetBitNum()) & 0x1);
-	I = ((val >> I.GetBitNum()) & 0x1);
-	Z = ((val >> Z.GetBitNum()) & 0x1);
-	C = ((val >> C.GetBitNum()) & 0x1);
+
+// Page Crossing
+void CPU_6502::BranchAndCheckForPageCrossing(int8_t relVal) {
+	uint16_t newPC = PC + relVal;
+	Tick();
+	if ((newPC & 0xFF00) != (PC & 0xFF00)) {
+		Tick();
+	}
+	PC = newPC;
+}
+uint16_t CPU_6502::AddAndCheckForPageCrossing(uint8_t lowVal, uint16_t regVal) {
+	isPageCrossPossible = true;
+	uint16_t addition = lowVal + regVal;
+	if (addition & 0x100) {
+		Tick(); // Page Boundary crossed so must waste cycle
+		hasPageCrossed = true;
+	}
+	return addition;
+}
+
+// Interrupts
+void CPU_6502::CheckForInterrupt() {
+	while (IRQ || nmiFlipFlop) {
+		if (nmiFlipFlop) {
+			RespondToInterrupt(false);
+			break;
+		}
+		else if (IRQ) {
+			RespondToInterrupt(true); // BRK ??
+		}
+	}
+}
+void CPU_6502::RespondToInterrupt(bool isIRQ) {
+	//PC += 1;
+	StackPush((PC >> 8) & 0xFF);                 // 3
+	StackPush(PC & 0xFF);                        // 4
+	PushP(false); // ??                          // 5
+	if (isIRQ) {
+		PC = Read(0xFFFE) + (Read(0xFFFF) << 8); // 6, 7
+	}
+	else { // is _NMI
+		PC = Read(0xFFFA) + (Read(0xFFFB) << 8); // 6, 7
+		nmiFlipFlop = false;
+	}
+	I = 1;
+}
+
+// CPU Memory
+uint8_t CPU_6502::Read(uint16_t offset, bool shouldTick/*= true*/) { 
+	if (shouldTick) Tick();
+	return *(RAM + offset);
+}
+void CPU_6502::Write(uint16_t offset, uint8_t data, bool shouldTick/*= true*/) {
+	if (shouldTick) Tick();
+	*(RAM + offset) = data;
+}
+uint8_t CPU_6502::ReadNoTick(uint16_t offset) {
+	return Read(offset, false);
+}
+void CPU_6502::WriteNoTick(uint16_t offset, uint8_t data) {
+	Write(offset, data, false);
+}
+
+// Timing
+void CPU_6502::Tick() {
+	currentOpNumCycles++;
+	totalCycles++;
+
+	IRQ = irqLine.GetState() == LOW && I == 0;
+	NMI = nmiLine.GetState() == LOW && prevNMIState == HIGH;
+	prevNMIState = nmiLine.GetState();
+	if (NMI)
+		nmiFlipFlop = true;
 }
 
 // Operation Table
@@ -582,35 +626,6 @@ void CPU_6502::SetupOperationTable() {
 	operationTable[0x98] = Operation(INSTR_TYA, "TYA", AM_IMP, "IMPLIED ( INS )", &CPU_6502::TYA, 1 << 2);
 }
 
-
-
-// Interrupts
-void CPU_6502::CheckForInterrupt() {
-	while (IRQ || nmiFlipFlop) {
-		if (nmiFlipFlop) {
-			RespondToInterrupt(false);
-			break;
-		}
-		else if (IRQ) {
-			RespondToInterrupt(true); // BRK ??
-		}
-	}
-}
-void CPU_6502::RespondToInterrupt(bool isIRQ) {
-	//PC += 1;
-	StackPush((PC >> 8) & 0xFF);					// 3
-	StackPush(PC & 0xFF);							// 4
-	PushP(false); // ??								// 5
-	if (isIRQ) {
-		PC = Read(0xFFFE) + (Read(0xFFFF) << 8);	// 6, 7
-	}
-	else { // is _NMI
-		PC = Read(0xFFFA) + (Read(0xFFFB) << 8);	// 6, 7
-		nmiFlipFlop = false;
-	}
-	I = 1;
-}
-
 // Peripheral
 uint8_t CPU_6502::PeripheralRead(uint16_t addr) {
 	return ReadNoTick(addr);
@@ -631,18 +646,7 @@ void CPU_6502::RemoveNMIConnection(PeripheralConnection* nmiConnection) {
 	nmiLine.RemoveConnection(nmiConnection);
 }
 
-// Timing
-void CPU_6502::Tick() {
-	currentOpNumCycles++;
-	totalCycles++;
-
-	IRQ = irqLine.GetState() == LOW && I == 0;
-	NMI = nmiLine.GetState() == LOW && prevNMIState == HIGH;
-	prevNMIState = nmiLine.GetState();
-	if (NMI)
-		nmiFlipFlop = true;
-}
-
+// Initialization
 void CPU_6502::EASY6502STARTUP() {
 	SetP(0x30);
 	A = 0;
@@ -676,23 +680,6 @@ void CPU_6502::LoadFromFile(std::string filename, uint16_t toOffset) {
 }
 
 // Running
-void CPU_6502::BranchAndCheckForPageCrossing(int8_t relVal) {
-	uint16_t newPC = PC + relVal;
-	Tick();
-	if ((newPC & 0xFF00) != (PC & 0xFF00)) {
-		Tick();
-	}
-	PC = newPC;
-}
-uint16_t CPU_6502::AddAndCheckForPageCrossing(uint8_t lowVal, uint16_t regVal) {
-	isPageCrossPossible = true;
-	uint16_t addition = lowVal + regVal;
-	if (addition & 0x100) {
-		Tick(); // Page Boundary crossed so must waste cycle
-		hasPageCrossed = true;
-	}
-	return addition;
-}
 void CPU_6502::RunNextOpcode() {
 	CheckForInterrupt();
 
@@ -707,35 +694,93 @@ void CPU_6502::RunNextOpcode() {
 	uint8_t argLen = 0;
 
 	switch (op.addrMode) {
-		case AM_IMP: {		argLen = 0;	argOffset = NULL;	Tick();	 																										break; }
-		case AM_ACC: {		argLen = 0;	argOffset = NULL;	Tick();																											break; }
-		case AM_IMM: {		argLen = 1;	argOffset = PC + 1;																													break; }
-		case AM_ZP: {		argLen = 1;	argOffset = Read(PC + 1);																											break; }
-		case AM_ZPX: {		argLen = 1;	argOffset = ((Read(PC + 1) + X) & 0xFF);	Tick();																					break; }
-		case AM_ZPY: {		argLen = 1;	argOffset = ((Read(PC + 1) + Y) & 0xFF);	Tick();																					break; }
-		case AM_ABS: {		argLen = 2;	argOffset = (Read(PC + 1)) + ((Read(PC + 2)) << 8);																					break; }
-		case AM_ABSX: {		argLen = 2;	argOffset = AddAndCheckForPageCrossing(Read(PC + 1), X) + ((Read(PC + 2) << 8)); 													break; }
-		case AM_ABSY: {		argLen = 2;	argOffset = AddAndCheckForPageCrossing(Read(PC + 1), Y) + ((Read(PC + 2) << 8));													break; }
-		case AM_IDXIND: {	argLen = 1;	uint8_t BAL = Read(PC + 1); Tick(); argOffset = Read(((BAL + X) & 0xFF)) + (Read(((BAL + X + 1) & 0xFF)) << 8);						break; }
-		case AM_INDIDX: {	argLen = 1;	uint8_t IAL = Read(PC + 1); argOffset = (Read((IAL + 1) & 0xFF) << 8) + AddAndCheckForPageCrossing(Read((IAL)), Y); 						break; }
-		case AM_REL: {		argLen = 1;	argOffset = PC + 1;																													break; }
-					 // http://forums.nesdev.com/viewtopic.php?t=5388
-		case AM_IND: {		argLen = 2;	uint8_t IAL = Read(PC + 1); uint8_t IAH = Read(PC + 2); argOffset = Read(((IAH << 8) + IAL)) + (Read((IAH << 8) + ((IAL + 1) & 0xFF)) << 8);	break; }
-		default: {			throw std::invalid_argument("Invalid AddrMode: " + std::to_string(op.addrMode) + "(" + op.addrModeStr + ")");									break; }
-	}
-
-	#ifdef _DEBUG_MODE
-		(*log) << "Opcode: 0x" << std::hex << (unsigned int)opcode;
-		(*log) << " | Instruction: " << op.instrStr;
-		(*log) << " | AddrMode: " << op.addrModeStr;
-		if (op.addrMode != AM_IMP) {
-			(*log) << "\nargOffset: " << std::hex << (uintptr_t)argOffset;
-			(*log) << " | Value at argOffset: " << std::hex << (unsigned int)ReadNoTick(argOffset);
+		case AM_IMP: {
+			argLen = 0;
+			argOffset = NULL;
+			Tick();
+			break;
 		}
-		(*log) << "\n";
-	#endif
-
-	//PrintDebugInfo();
+		case AM_ACC: {
+			argLen = 0;
+			argOffset = NULL;
+			Tick();
+			break;
+		}
+		case AM_IMM: {
+			argLen = 1;
+			argOffset = PC + 1;
+			break;
+		}
+		case AM_ZP: {
+			argLen = 1;
+			argOffset = Read(PC + 1);
+			break;
+		}
+		case AM_ZPX: {
+			argLen = 1;
+			argOffset = ((Read(PC + 1) + X) & 0xFF);
+			Tick();
+			break;
+		}
+		case AM_ZPY: {
+			argLen = 1;
+			argOffset = ((Read(PC + 1) + Y) & 0xFF);
+			Tick();
+			break;
+		}
+		case AM_ABS: {
+			argLen = 2;
+			argOffset = (Read(PC + 1)) + ((Read(PC + 2)) << 8);
+			break;
+		}
+		case AM_ABSX: {
+			argLen = 2;
+			argOffset = AddAndCheckForPageCrossing(Read(PC + 1), X) 
+			                                       + ((Read(PC + 2) << 8));
+			break;
+		}
+		case AM_ABSY: {
+			argLen = 2;
+			argOffset = AddAndCheckForPageCrossing(Read(PC + 1), Y)
+			                                       + ((Read(PC + 2) << 8));
+			break;
+		}
+		case AM_IDXIND: {
+			argLen = 1;
+			uint8_t BAL = Read(PC + 1);
+			Tick();
+			argOffset = Read(((BAL + X) & 0xFF))
+			            + (Read(((BAL + X + 1) & 0xFF)) << 8);
+			break;
+		}
+		case AM_INDIDX: {
+			argLen = 1;
+			uint8_t IAL = Read(PC + 1);
+			argOffset = (Read((IAL + 1) & 0xFF) << 8)
+			             + AddAndCheckForPageCrossing(Read((IAL)), Y);
+ 			break;
+		}
+		case AM_REL: {
+			argLen = 1;
+			argOffset = PC + 1;
+			break;
+		}
+		// http://forums.nesdev.com/viewtopic.php?t=5388
+		case AM_IND: {
+			argLen = 2;
+			uint8_t IAL = Read(PC + 1);
+			uint8_t IAH = Read(PC + 2);
+			argOffset = Read(((IAH << 8) + IAL)) 
+			            + (Read((IAH << 8) + ((IAL + 1) & 0xFF)) << 8);
+			break;
+		 }
+		default: {
+			throw std::invalid_argument("Invalid AddrMode: "
+			                            + std::to_string(op.addrMode)
+			                            + "(" + op.addrModeStr + ")");
+			break;
+		 }
+	}
 
 	// Update values for logging
 	prevPC = PC;
@@ -757,6 +802,16 @@ int CPU_6502::GetTotalNumInstrs() {
 }
 
 // Debugging
+void CPU_6502::SetP(uint8_t val) {
+	N = ((val >> N.GetBitNum()) & 0x1);
+	V = ((val >> V.GetBitNum()) & 0x1);
+	// Bit 4 and 5 are ignored 
+	D = ((val >> D.GetBitNum()) & 0x1);
+	I = ((val >> I.GetBitNum()) & 0x1);
+	Z = ((val >> Z.GetBitNum()) & 0x1);
+	C = ((val >> C.GetBitNum()) & 0x1);
+}
+
 void CPU_6502::SetPC(uint16_t _PC) {
 	PC = _PC;
 }

@@ -17,6 +17,7 @@ private:
 	const int TEXCOORDS = 1;
 	const int numVBOs = 2;
 	bool hasAlpha;
+
 public:
 	GLuint vao;
 	GLuint texture;
@@ -24,7 +25,8 @@ public:
 	void SetVBO(GLfloat* array, int size, int vboNum, int dim);
 	void SetVAO();
 	void LoadTexture(unsigned char* pixels, int width, int height, int texNum);
-	void BindAndDraw(GLuint shaderProg, mat4 viewMat, mat4 projMat, int viewMatLoc, int projMatLoc);
+	void BindAndDraw(GLuint shaderProg, mat4 viewMat, mat4 projMat,
+	                 int viewMatLoc, int projMatLoc);
 	void BindAndDraw(GLuint shaderProg);
 	
 	bool inWorldSpace;

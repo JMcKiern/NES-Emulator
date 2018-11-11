@@ -9,4 +9,5 @@
 mat4 rotateAboutAxis(double ang_deg, vec3 axis);
 unsigned char* load_texture(const char *file_name, int& _width, int& _height);
 std::string readShaderFile(std::string fileName);
-GLuint loadShaderProg(std::string vertexShaderFile, std::string fragmentShaderFile);
+GLuint loadShaderProg(std::string vertexShaderFile,
+                      std::string fragmentShaderFile);

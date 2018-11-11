@@ -1,24 +1,20 @@
-#include <memory>
 #include <chrono>
-#include <iostream>
 #include <GL\glew.h>
 #include <GLFW\glfw3.h>
-#include <thread>
+#include <iostream>
+#include <memory>
 #include <string>
+#include <thread>
 #include "Console.h"
 #include "RegisterInterrupt.h"
 
-void Console::UpdatePeripherals() {
-	for (std::vector<std::unique_ptr<Peripheral>>::iterator it = peripherals.begin(); it != peripherals.end(); it++) {
-		(*it)->UpdatePeripheral();
-	}
-}
 void Console::CreateWindow() {
 	if (!glfwInit()) {
 		throw std::exception("Error: GLFW failed to initialise");
 	}
 
-	window = glfwCreateWindow(w_width, w_height, windowTitle.c_str(), NULL, NULL);
+	window = glfwCreateWindow(w_width, w_height, windowTitle.c_str(), NULL,
+	                          NULL);
 	if (!window) {
 		throw std::exception("Error: GLFW failed to create window");
 	}
@@ -26,12 +22,16 @@ void Console::CreateWindow() {
 }
 void Console::SetCallbacks() {
 	glfwSetWindowUserPointer(window, this);
+
 	auto sizeCB = [](GLFWwindow* w, int a, int b) {
-		static_cast<Console*>(glfwGetWindowUserPointer(w))->ResizeWinCB(w, a, b);
+		static_cast<Console*>(glfwGetWindowUserPointer(w))->
+			ResizeWinCB(w, a, b);
 	};
 	glfwSetWindowSizeCallback(window, sizeCB);
+
 	auto keyCB = [](GLFWwindow* w, int a, int b, int c, int d) {
-		static_cast<Console*>(glfwGetWindowUserPointer(w))->KeyCB(w, a, b, c, d);
+		static_cast<Console*>(glfwGetWindowUserPointer(w))->
+			KeyCB(w, a, b, c, d);
 	};
 	glfwSetKeyCallback(window, keyCB);
 }
@@ -42,9 +42,18 @@ void Console::ResizeWinCB(GLFWwindow* _window, int w, int h) {
 	w_width = w;
 	w_height = h;
 }
-void Console::KeyCB(GLFWwindow* _window, int key, int scancode, int action, int mods) {
+void Console::KeyCB(GLFWwindow* _window, int key, int scancode, int action,
+                    int mods) {
 	if (window != _window) return;
 	controller.SetKey(keyMap[key], action); 
+}
+void Console::UpdatePeripherals() {
+	for (std::vector<std::unique_ptr<Peripheral>>::iterator it
+	         = peripherals.begin();
+	     it != peripherals.end();
+	     it++) {
+		(*it)->UpdatePeripheral();
+	}
 }
 void Console::CheckJoystick() {
 	int count;
@@ -56,9 +65,14 @@ void Console::CheckJoystick() {
 		}
 	}
 }
-void Console::RunFrame() {;
+void Console::RunFrame() {
 	// A frame should take 16ms (and sleep for 16 - run_time = ~9)
-	//std::cout << "Sleeping for " <<  std::chrono::duration_cast<std::chrono::milliseconds>(nextFrame - std::chrono::system_clock::now()).count() << " ms\n";
+	//std::cout << "Sleeping for "
+	//	<< std::chrono::duration_cast<
+	//	       std::chrono::milliseconds>(
+	//	           nextFrame - std::chrono::system_clock::now()
+	//	       ).count()
+	//	<< " ms\n";
 	std::this_thread::sleep_until(nextFrame);
 
 	bool isOddFrame = ppu.IsOddFrame();
@@ -68,7 +82,7 @@ void Console::RunFrame() {;
 
 	int cyclesRun = cpu.GetTotalCycles() - prevCycles;
 	prevCycles = cpu.GetTotalCycles();
-	nextFrame += cycles{ cyclesRun };
+	nextFrame += cycles{cyclesRun};
 }
 void Console::Run(std::string filename) {
 	LoadINES(filename);
@@ -77,7 +91,7 @@ void Console::Run(std::string filename) {
 	SetCallbacks();
 	gls.InitGL();
 
-	nextFrame = std::chrono::system_clock::now() + cycles{ 0 };
+	nextFrame = std::chrono::system_clock::now() + cycles{0};
 	while (!glfwWindowShouldClose(window)) {
 		RunFrame();
 		glfwPollEvents();
@@ -86,24 +100,26 @@ void Console::Run(std::string filename) {
 		gls.DrawGLScene(window, w_width, w_height);
 
 		if (desiredHash != "" && desiredHash == ppu.GetDispHash()) break;
-		if (numInstrsToRun != 0 && numInstrsToRun < cpu.GetTotalNumInstrs()) break;
+		if (numInstrsToRun != 0
+		    && numInstrsToRun < cpu.GetTotalNumInstrs()) break;
 		if (shouldPrintHash) {
 			std::string currHash = GetFrameHash();
 			if (prevHash != currHash) {
-				std::cout << cpu.GetTotalNumInstrs() << ", \"" << currHash << "\"\n";
+				std::cout << cpu.GetTotalNumInstrs() << ", \"" << currHash
+					<< "\"\n";
 				prevHash = currHash;
 			}
 		}
 	}
 }
-void Console::Test(std::string filename, std::string _desiredHash) {
-	log.SetState(false);
-	desiredHash = _desiredHash;
-	Run(filename);
-}
 void Console::RunInstrs(std::string filename, int _numInstrsToRun) {
 	log.SetState(false);
 	numInstrsToRun = _numInstrsToRun;
+	Run(filename);
+}
+void Console::Test(std::string filename, std::string _desiredHash) {
+	log.SetState(false);
+	desiredHash = _desiredHash;
 	Run(filename);
 }
 void Console::PrintHash(std::string filename) {

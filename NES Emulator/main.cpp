@@ -4,7 +4,7 @@
 #include "Console.h"
 
 int main() {
-	if (false) {
+	if (true) {
 		// 6502
 		FunctionalTest("Tests/6502_functional_test.bin", 0x0, 0x400, 0x336d, false, false);
 		FunctionalTest("Tests/6502_interrupt_test.bin", 0x0, 0x400, 0x06f5, true, false);
@@ -21,7 +21,7 @@ int main() {
 		//PrintHash("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Tests\\CPU\\cpu_interrupts_v2\\rom_singles\\1-cli_latency.nes");
 
 		// PPU
-		//console.LoadINES("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Tests\\PPU\\ppu_vbl_nmi\\ppu_vbl_nmi.nes");
+		//PrintHash("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Tests\\PPU\\ppu_vbl_nmi\\ppu_vbl_nmi.nes");
 		Test("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Tests\\PPU\\ppu_vbl_nmi\\rom_singles\\01-vbl_basics.nes", 1666560, "a069cf23");
 		Test("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Tests\\PPU\\ppu_vbl_nmi\\rom_singles\\02-vbl_set_time.nes", 1798437, "a05dbed9");
 		Test("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Tests\\PPU\\ppu_vbl_nmi\\rom_singles\\03-vbl_clear_time.nes", 1707366, "c909c505");
@@ -43,7 +43,8 @@ int main() {
 
 		Test("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Tests\\PPU\\blargg_ppu_tests_2005.09.15b\\palette_ram.nes", 178166, "a028c0ca");
 		Test("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Tests\\PPU\\blargg_ppu_tests_2005.09.15b\\power_up_palette.nes", 178299, "a028c0ca");
-		Test("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Tests\\PPU\\blargg_ppu_tests_2005.09.15b\\sprite_ram.nes", 169720, "6f4afa73"); // Fails because test is bad
+		//Test("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Tests\\PPU\\blargg_ppu_tests_2005.09.15b\\sprite_ram.nes", 169720, "6f4afa73"); // Fails because test is bad
+		PrintHash("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Tests\\PPU\\blargg_ppu_tests_2005.09.15b\\sprite_ram.nes");
 		//PrintHash("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Tests\\PPU\\blargg_ppu_tests_2005.09.15b\\vbl_clear_time.nes");
 		Test("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Tests\\PPU\\blargg_ppu_tests_2005.09.15b\\vram_access.nes", 186572, "a028c0ca");
 
@@ -61,15 +62,24 @@ int main() {
 		//PrintHash("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Tests\\PPU\\ppu_sprite_hit\\rom_singles\\10-timing_order.nes");
 
 		Test("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Tests\\PPU\\ppu_open_bus\\ppu_open_bus.nes", 3046392, "6bcc0f25");
+
+		// Mappers
+		//Test("C:\\Users\\Jack\\Downloads\\holydriverbatman-bin-0.01\\testroms\\M0_P32K_C8K_V.nes", 859728, "56dfded7");
+		//PrintHash("C:\\Users\\Jack\\Downloads\\holydriverbatman-bin-0.01\\testroms\\M1_P128K.nes");
+		//PrintHash("C:\\Users\\Jack\\Downloads\\holydriverbatman-bin-0.01\\testroms\\M1_P128K_C32K.nes");
+		//PrintHash("C:\\Users\\Jack\\Downloads\\holydriverbatman-bin-0.01\\testroms\\M1_P128K_C32K_S8K.nes");
+		//PrintHash("C:\\Users\\Jack\\Downloads\\holydriverbatman-bin-0.01\\testroms\\M1_P128K_C32K_W8K.nes");
+		//Test("C:\\Users\\Jack\\Downloads\\holydriverbatman-bin-0.01\\testroms\\M2_P128K_V.nes", 859756, "38f478c3");
+		//Test("C:\\Users\\Jack\\Downloads\\holydriverbatman-bin-0.01\\testroms\\M3_P32K_C32K_H.nes", 3220777, "7859454d");
 	}
 	{
 		const std::string logFileName = "logfile.log";
 		Console console(logFileName);
 		// GAMES
-		console.Run("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Games\\Donkey Kong Classics (U).nes");
+		//console.Run("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Games\\Donkey Kong Classics (U).nes");
 		//console.Run("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Games\\Mega Man (U).nes");
 		//console.Run("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Games\\Super Mario Bros. 3 (U) (PRG1) [!].nes");
-		//console.Run("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Games\\Super Mario Bros. (JU) (PRG0) [!].nes");
+		console.Run("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Games\\Super Mario Bros. (JU) (PRG0) [!].nes");
 		//console.Run("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Games\\Ice Climber (USA, Europe).nes");
 		//console.Run("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Games\\Mario Bros. (JU) [!].nes");
 		//console.Run("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Games\\Spelunker (USA).nes");

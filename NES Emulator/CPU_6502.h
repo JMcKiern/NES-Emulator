@@ -3,9 +3,9 @@
 #include <cstdint>
 #include <string>
 #include "BitFlag.h"
-#include "Operation.h"
 #include "enums.h"
 #include "Log.h"
+#include "Operation.h"
 #include "PeripheralLine.h"
 
 class CPU_6502 {
@@ -129,19 +129,10 @@ protected:
 	uint16_t prevPC;
 	Operation prevOp;
 	uint16_t prevArgOffset;
-	void PrintDebugInfoMesenBasic();
 
 	// Operation Table
 	Operation operationTable[0xFF];
 	void SetupOperationTable();
-
-	// StartUp
-	void SetP(uint8_t val/*, bool shouldSetBit4*/);
-	void SetSP(uint8_t val);
-	uint8_t GetSP();
-	void SetA(uint8_t val);
-	void SetX(uint8_t val);
-	void SetY(uint8_t val);
 
 public:
 	// Peripherals
@@ -153,7 +144,6 @@ public:
 	void RemoveNMIConnection(PeripheralConnection* nmiConnection);
 
 	// Initialization
-	void PowerUp();
 	void EASY6502STARTUP();
 	void LOADTEST(uint8_t* arr, unsigned int len);
 	void LoadFromFile(std::string filename, uint16_t toOffset);
@@ -164,11 +154,18 @@ public:
 	int GetTotalNumInstrs();
 
 	// Debugging
+	void SetP(uint8_t val);
 	void SetPC(uint16_t _PC);
 	void SetI();
+	void SetSP(uint8_t val);
+	uint8_t GetSP();
+	void SetA(uint8_t val);
+	void SetX(uint8_t val);
+	void SetY(uint8_t val);
 	int GetTotalCycles();
 
 	// Logging
+	void PrintDebugInfoMesenBasic();
 	void PrintDebugInfo();
 
 	// Constructor

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string>
 #include <cstdint>
+#include <string>
 #include "enums.h"
 
 class CPU_6502;
@@ -15,7 +15,8 @@ struct Operation {
 	OpFnPtr Run;
 	uint8_t numCycles;
 
-	Operation(Instr _instr, std::string _instrStr, AddrMode _addrMode, std::string _addrModeStr, OpFnPtr _Run, uint8_t _numCycles) :
+	Operation(Instr _instr, std::string _instrStr, AddrMode _addrMode,
+	          std::string _addrModeStr, OpFnPtr _Run, uint8_t _numCycles) :
 		instr(_instr),
 		instrStr(_instrStr),
 		addrMode(_addrMode),
