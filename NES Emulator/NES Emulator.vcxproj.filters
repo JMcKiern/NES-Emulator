@@ -84,9 +84,6 @@
     <ClCompile Include="Controller.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Display\stb_image.c">
-      <Filter>Source Files\Other</Filter>
-    </ClCompile>
     <ClCompile Include="Display\maths_funcs.cpp">
       <Filter>Source Files\Other</Filter>
     </ClCompile>
@@ -117,9 +114,6 @@
       <Filter>Header Files\Peripherals</Filter>
     </ClInclude>
     <ClInclude Include="Operation.h">
-      <Filter>Header Files\CPU\Instructions</Filter>
-    </ClInclude>
-    <ClInclude Include="enums.h">
       <Filter>Header Files\CPU\Instructions</Filter>
     </ClInclude>
     <ClInclude Include="PPU.h">
@@ -161,9 +155,6 @@
     <ClInclude Include="Display\maths_funcs.h">
       <Filter>Header Files\Other</Filter>
     </ClInclude>
-    <ClInclude Include="Display\stb_image.h">
-      <Filter>Header Files\Other</Filter>
-    </ClInclude>
     <ClInclude Include="Display\GLEntityHandler.h">
       <Filter>Header Files\OpenGL</Filter>
     </ClInclude>
@@ -175,6 +166,9 @@
     </ClInclude>
     <ClInclude Include="NesTest.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="enums.h">
+      <Filter>Header Files\CPU\Instructions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

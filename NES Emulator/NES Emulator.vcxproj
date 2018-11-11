@@ -27,7 +27,6 @@
     <ClCompile Include="Display\GLScene2D.cpp" />
     <ClCompile Include="Display\GLUtils.cpp" />
     <ClCompile Include="Display\maths_funcs.cpp" />
-    <ClCompile Include="Display\stb_image.c" />
     <ClCompile Include="GamePak.cpp" />
     <ClCompile Include="Palette.cpp" />
     <ClCompile Include="Peripheral.cpp" />
@@ -47,7 +46,6 @@
     <ClInclude Include="Display\GLScene2D.h" />
     <ClInclude Include="Display\GLUtils.h" />
     <ClInclude Include="Display\maths_funcs.h" />
-    <ClInclude Include="Display\stb_image.h" />
     <ClInclude Include="enums.h" />
     <ClInclude Include="Exceptions.h" />
     <ClInclude Include="Console.h" />
@@ -129,6 +127,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetName>$(ProjectName)</TargetName>
+    <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -159,6 +159,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>C:\OpenGL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

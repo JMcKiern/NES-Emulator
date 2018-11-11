@@ -96,7 +96,7 @@ void Palette::LoadPal(std::string palFile) {
 		f.close();
 
 		Transfer(reinterpret_cast<uint8_t*>(paletteChar), size);
-		delete paletteChar;
+		delete[] paletteChar;
 
 		loadedFromFile = true;
 	}

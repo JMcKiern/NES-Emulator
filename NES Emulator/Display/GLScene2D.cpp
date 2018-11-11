@@ -3,7 +3,6 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
-#include "stb_image.h"
 #include "GLScene2D.h"
 #include "../Log.h"
 
