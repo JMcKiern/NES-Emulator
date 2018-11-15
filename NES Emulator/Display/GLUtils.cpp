@@ -1,4 +1,4 @@
-#include <GL\glew.h>
+#include <GL/glew.h>
 #include <math.h>
 #include <cstdio>
 #include <string>
@@ -29,7 +29,7 @@ std::string readShaderFile(std::string fileName) {
 	std::ifstream f;
 	f.open(fileName);
 	if (!f.is_open()) {
-		throw std::exception("Could not open shader file");
+		throw std::runtime_error("Could not open shader file");
 	}
 
 	// https://stackoverflow.com/questions/116038/what-is-the-best-way-to-read-an-entire-file-into-a-stdstring-in-c

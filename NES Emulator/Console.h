@@ -4,9 +4,10 @@
 #include <map>
 #include <memory>
 #include <iostream>
+#include <stdint.h>
 #include "CPU_NES.h"
 #include "Controller.h"
-#include "Display\GLScene2D.h"
+#include "Display/GLScene2D.h"
 #include "Log.h"
 #include "Peripheral.h"
 
@@ -70,7 +71,7 @@ class Console {
 			std::common_type_t<std::chrono::system_clock::rep,
 				std::chrono::system_clock::rep
 			>,
-			std::ratio<1i64, CLOCK_SPEED * 1000i64>
+			std::ratio<INT64_C(1), INT64_C(CLOCK_SPEED * 1000000)>
 		>
 	> nextFrame;
 

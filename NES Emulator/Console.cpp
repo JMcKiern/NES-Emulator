@@ -1,6 +1,6 @@
 #include <chrono>
-#include <GL\glew.h>
-#include <GLFW\glfw3.h>
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -10,13 +10,13 @@
 
 void Console::CreateWindow() {
 	if (!glfwInit()) {
-		throw std::exception("Error: GLFW failed to initialise");
+		throw std::runtime_error("Error: GLFW failed to initialise");
 	}
 
 	window = glfwCreateWindow(w_width, w_height, windowTitle.c_str(), NULL,
 	                          NULL);
 	if (!window) {
-		throw std::exception("Error: GLFW failed to create window");
+		throw std::runtime_error("Error: GLFW failed to create window");
 	}
 	glfwMakeContextCurrent(window);
 }
@@ -37,7 +37,7 @@ void Console::SetCallbacks() {
 }
 void Console::ResizeWinCB(GLFWwindow* _window, int w, int h) {
 	if (window != _window) {
-		throw std::exception("Incorrect window");
+		throw std::runtime_error("Incorrect window");
 	}
 	w_width = w;
 	w_height = h;

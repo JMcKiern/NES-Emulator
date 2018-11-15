@@ -7,7 +7,7 @@
 #include "GamePak.h"
 #include "PeripheralConnection.h"
 #include "Palette.h"
-#include "Display\GLScene2D.h"
+#include "Display/GLScene2D.h"
 
 class CPU_NES;
 

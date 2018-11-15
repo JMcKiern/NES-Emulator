@@ -1,6 +1,6 @@
 #pragma once
 
-#include <GL\glew.h>
+#include <GL/glew.h>
 #include "maths_funcs.h"
 
 // Handles a GL Entity - an object that will be rendered

@@ -4,7 +4,7 @@
 #include "Console.h"
 
 int main() {
-	if (true) {
+	if (false) {
 		// 6502
 		FunctionalTest("Tests/6502_functional_test.bin", 0x0, 0x400, 0x336d, false, false);
 		FunctionalTest("Tests/6502_interrupt_test.bin", 0x0, 0x400, 0x06f5, true, false);
@@ -79,7 +79,7 @@ int main() {
 		//console.Run("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Games\\Donkey Kong Classics (U).nes");
 		//console.Run("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Games\\Mega Man (U).nes");
 		//console.Run("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Games\\Super Mario Bros. 3 (U) (PRG1) [!].nes");
-		console.Run("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Games\\Super Mario Bros. (JU) (PRG0) [!].nes");
+		console.Run("/home/jack/Downloads/Super Mario Bros. (JU) (PRG0) [!].nes");
 		//console.Run("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Games\\Ice Climber (USA, Europe).nes");
 		//console.Run("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Games\\Mario Bros. (JU) [!].nes");
 		//console.Run("C:\\Users\\Jack\\Desktop\\Projects\\NESEM\\Games\\Spelunker (USA).nes");

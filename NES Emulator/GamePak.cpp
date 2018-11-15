@@ -1,9 +1,10 @@
 #include <cstdint>
+#include <iostream>
 #include "GamePak.h"
 
 void GamePak::LoadINes(std::string filename) {
 	if (isGameLoaded) {
-		throw std::exception("Game already loaded");
+		throw std::runtime_error("Game already loaded");
 	}
 	std::ifstream f;
 	std::streampos sizef;
@@ -13,7 +14,9 @@ void GamePak::LoadINes(std::string filename) {
 	sizef = f.tellg();
 	f.seekg(0, std::ios::beg);
 
+
 	size = static_cast<int>(sizef);
+	std::cout << size << '\n';
 	cartridge = new char[size];
 
 	f.read(cartridge, sizef);
@@ -37,7 +40,7 @@ bool GamePak::CheckINes() {
 }
 uint32_t GamePak::GetOffsetPRG(uint8_t bankNum) {
 	if (bankNum < 0 || bankNum >= num16kPRGBanks) {
-		std::out_of_range::out_of_range(
+		std::out_of_range(
 			"Attempted to access nonexistant bank number.");
 	}
 	uint32_t offset = 0x10; // Header
@@ -47,7 +50,7 @@ uint32_t GamePak::GetOffsetPRG(uint8_t bankNum) {
 }
 uint32_t GamePak::GetOffsetCHR(uint8_t bankNum) {
 	if (bankNum < 0 || bankNum >= num8kCHRBanks) {
-		std::out_of_range::out_of_range(
+		std::out_of_range(
 			"Attempted to access nonexistant bank number.");
 	}
 	uint32_t offset = 0x10; // Header

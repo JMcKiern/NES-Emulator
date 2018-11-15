@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <GL\glew.h>
+#include <GL/glew.h>
 #include "maths_funcs.h"
 
 // Collection of general functions to help with OpenGL

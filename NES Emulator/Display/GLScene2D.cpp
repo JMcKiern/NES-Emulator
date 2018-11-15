@@ -1,5 +1,5 @@
-#include <GL\glew.h>
-#include <GLFW\glfw3.h>
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 #include <string>
 #include <sstream>
 #include <iomanip>
@@ -67,9 +67,9 @@ bool GLScene2D::InitGL() {
 
 	glUseProgram(shader_programme);
 
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-	glFrontFace(GL_CCW);
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_BACK);
+	//glFrontFace(GL_CCW);
 
 	return true;
 }
