@@ -888,5 +888,5 @@ CPU_6502::CPU_6502(Log* _log, int sizeOfRam/*= 0x10000*/) {
 	RAM = new uint8_t[sizeOfRam];
 }
 CPU_6502::~CPU_6502() {
-	delete RAM;
+	delete[] RAM;
 }

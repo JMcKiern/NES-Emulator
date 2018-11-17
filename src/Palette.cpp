@@ -131,5 +131,5 @@ Palette::Palette() {
 	LoadDefault();
 }
 Palette::~Palette() {
-	delete palette;
+	delete[] palette;
 }

@@ -128,5 +128,5 @@ GLScene2D::GLScene2D(Log* _log, int _RES_X, int _RES_Y) {
 	SetupPixels();
 }
 GLScene2D::~GLScene2D() {
-	delete pixels;
+	delete[] pixels;
 }
