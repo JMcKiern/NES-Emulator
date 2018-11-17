@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include "GLUtils.h"
 #include "maths_funcs.h"
 
 
@@ -43,67 +44,53 @@ std::string readShaderFile(std::string fileName) {
 GLuint loadShaderProg(std::string vertexShaderFile,
                       std::string fragmentShaderFile) {
 	GLuint sProg;
+
 	std::string vs = readShaderFile(vertexShaderFile);
 	const char *vertex_shader = vs.c_str();
+
 	std::string fs = readShaderFile(fragmentShaderFile);
 	const char *fragment_shader = fs.c_str();
+
 	GLuint vert_shader, frag_shader;
+
 	vert_shader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vert_shader, 1, &vertex_shader, NULL);
 	glCompileShader(vert_shader);
+	checkForShaderCompilationErrors(vertexShaderFile, vert_shader);
+	
 	frag_shader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(frag_shader, 1, &fragment_shader, NULL);
 	glCompileShader(frag_shader);
+	checkForShaderCompilationErrors(fragmentShaderFile, frag_shader);
+
 	sProg = glCreateProgram();
 	glAttachShader(sProg, frag_shader);
 	glAttachShader(sProg, vert_shader);
 	glLinkProgram(sProg);
-	{
-
-		GLint isCompiled = 0;
-		glGetShaderiv(vert_shader, GL_COMPILE_STATUS, &isCompiled);
-		if(isCompiled == GL_FALSE)
-		{
-			GLint maxLength = 0;
-			glGetShaderiv(vert_shader, GL_INFO_LOG_LENGTH, &maxLength);
-
-			// The maxLength includes the NULL character
-			std::vector<GLchar> errorLog(maxLength);
-			glGetShaderInfoLog(vert_shader, maxLength, &maxLength, &errorLog[0]);
-
-			std::cout << "Compilation ERROR: " << vertexShaderFile << '\n';
-			for (auto it = errorLog.begin(); it != errorLog.end(); ++it) {
-				std::cout << (*it);
-			}
-
-			// Provide the infolog in whatever manor you deem best.
-			// Exit with failure.
-			glDeleteShader(vert_shader); // Don't leak the vert_shader.
-			return NULL;
-		}
-	}
-	{
-		GLint isCompiled = 0;
-		glGetShaderiv(frag_shader, GL_COMPILE_STATUS, &isCompiled);
-		if(isCompiled == GL_FALSE)
-		{
-			GLint maxLength = 0;
-			glGetShaderiv(frag_shader, GL_INFO_LOG_LENGTH, &maxLength);
-
-			// The maxLength includes the NULL character
-			std::vector<GLchar> errorLog(maxLength);
-			glGetShaderInfoLog(frag_shader, maxLength, &maxLength, &errorLog[0]);
-
-			std::cout << "Compilation ERROR: " << fragmentShaderFile << '\n';
-			for (auto it = errorLog.begin(); it != errorLog.end(); ++it) {
-				std::cout << (*it);
-			}
-			// Provide the infolog in whatever manor you deem best.
-			// Exit with failure.
-			glDeleteShader(frag_shader); // Don't leak the frag_shader.
-			return NULL;
-		}
-	}
 
 	return sProg;
+}
+
+void checkForShaderCompilationErrors(std::string filename, GLuint shader) {
+	GLint isCompiled = 0;
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &isCompiled);
+	if(isCompiled == GL_FALSE)
+	{
+		GLint maxLength = 0;
+		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
+
+		// The maxLength includes the NULL character
+		std::vector<GLchar> errorLog(maxLength);
+		glGetShaderInfoLog(shader, maxLength, &maxLength, &errorLog[0]);
+
+		std::cout << "ShaderCompilation ERROR: " << filename << '\n';
+		for (auto it = errorLog.begin(); it != errorLog.end(); ++it) {
+			std::cout << (*it);
+		}
+
+		// Provide the infolog in whatever manor you deem best.
+		// Exit with failure.
+		glDeleteShader(shader); // Don't leak the vert_shader.
+		throw std::runtime_error("Shader did not compile");
+	}
 }
