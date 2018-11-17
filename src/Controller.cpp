@@ -39,3 +39,10 @@ void Controller::Write(uint8_t data) {
 	}
 	isStrobeOn = shouldTurnStrobeOn;
 }
+
+Controller::Controller() {
+	for (int i = 0; i < 8; i++) {
+		keys[i] = 0;
+		joykeys[i] = 0;
+	}
+}

@@ -19,5 +19,7 @@ public:
 	void SetJoyKey(int keyNum, bool isPressed);
 	uint8_t Read();
 	void Write(uint8_t data);
+
+	Controller();
 };
 
