@@ -45,7 +45,8 @@ void Console::ResizeWinCB(GLFWwindow* _window, int w, int h) {
 void Console::KeyCB(GLFWwindow* _window, int key, int scancode, int action,
                     int mods) {
 	if (window != _window) return;
-	controller.SetKey(keyMap[key], action); 
+	if (keyMap.count(key) > 0)
+		controller.SetKey(keyMap[key], action); 
 }
 void Console::UpdatePeripherals() {
 	for (std::vector<std::unique_ptr<Peripheral>>::iterator it

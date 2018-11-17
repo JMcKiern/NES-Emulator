@@ -1,5 +1,5 @@
-#include "Controller.h"
 #include <iostream>
+#include "Controller.h"
 
 void Controller::IncCycle() {
 	cycle = (cycle + 1) % 24; 
