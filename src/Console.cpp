@@ -132,6 +132,7 @@ std::string Console::GetFrameHash() {
 	return ppu.GetDispHash();
 }
 void Console::LoadINES(std::string filename) {
+	std::cout << "Loading " << filename << '\n';
 	gp.LoadINes(filename);
 	cpu.PowerUp();
 }

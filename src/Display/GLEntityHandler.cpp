@@ -1,5 +1,4 @@
 #include "GLEntityHandler.h"
-#define NULL 0
 
 void GLEntityHandler::SetVBO(GLfloat* data, int size, int vboNum, int dim) {
 	if (vboNum == 0) {

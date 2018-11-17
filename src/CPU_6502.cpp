@@ -690,19 +690,19 @@ void CPU_6502::RunNextOpcode() {
 
 	Operation& op = operationTable[opcode];
 
-	uint16_t argOffset = NULL;
+	uint16_t argOffset = 0;
 	uint8_t argLen = 0;
 
 	switch (op.addrMode) {
 		case AM_IMP: {
 			argLen = 0;
-			argOffset = NULL;
+			argOffset = 0;
 			Tick();
 			break;
 		}
 		case AM_ACC: {
 			argLen = 0;
-			argOffset = NULL;
+			argOffset = 0;
 			Tick();
 			break;
 		}
