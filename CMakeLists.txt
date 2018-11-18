@@ -48,9 +48,3 @@ target_link_libraries(
 	${GLEW_LIBRARIES}
 	${GLFW_LIBRARY}
 	)
-
-configure_file(
-	${PROJECT_SOURCE_DIR}/src/ntscpalette.pal
-	${PROJECT_BINARY_DIR}/ntscpalette.pal
-	COPYONLY
-	)
