@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "GLEntityHandler.h"
 
 void GLEntityHandler::SetVBO(GLfloat* data, int size, int vboNum, int dim) {

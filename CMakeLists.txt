@@ -2,49 +2,60 @@ cmake_minimum_required(VERSION 3.1)
 set (CMAKE_CXX_STANDARD 14)
 project(NES-Emulator)
 
-file(GLOB_RECURSE SOURCES "${CMAKE_SOURCE_DIR}/src/*.cpp")
-file(GLOB_RECURSE HEADERS "${CMAKE_SOURCE_DIR}/src/*.h")
+file(GLOB_RECURSE SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
+file(GLOB_RECURSE HEADERS "${PROJECT_SOURCE_DIR}/src/*.h")
 
 add_executable(NES-Emulator ${SOURCES} ${HEADERS})
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-trigraphs")
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-trigraphs")
+endif()
 
-include_directories(src/)
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
+
+#include_directories(src/)
 
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
+find_package(GLFW REQUIRED)
 foreach(file_path ${GLEW_LIBRARIES})
 	message(${file_path})
 endforeach()
 foreach(file_path ${GLEW_INCLUDE_DIRS})
 	message(${file_path})
 endforeach()
+foreach(file_path ${GLFW_LIBRARY})
+	message(${file_path})
+endforeach()
+foreach(file_path ${GLFW_INCLUDE_DIR})
+	message(${file_path})
+endforeach()
 
 include_directories(
 	${OPENGL_INCLUDE_DIRS}
 	${GLEW_INCLUDE_DIRS}
+	${GLFW_INCLUDE_DIR}
 	)
 target_link_libraries(
 	NES-Emulator 
 	${OPENGL_LIBRARIES}
 	${OPENGL_gl_LIBRARY}
 	${GLEW_LIBRARIES}
-	glfw
-	GLEW
+	${GLFW_LIBRARY}
 	)
 
 configure_file(
-	${CMAKE_SOURCE_DIR}/src/ntscpalette.pal
-	${CMAKE_SOURCE_DIR}/build/ntscpalette.pal
+	${PROJECT_SOURCE_DIR}/src/ntscpalette.pal
+	${PROJECT_BINARY_DIR}/ntscpalette.pal
 	COPYONLY
 	)
 configure_file(
-	${CMAKE_SOURCE_DIR}/src/GLScene2D_fs.glsl
-	${CMAKE_SOURCE_DIR}/build/GLScene2D_fs.glsl
+	${PROJECT_SOURCE_DIR}/src/GLScene2D_fs.glsl
+	${PROJECT_BINARY_DIR}/GLScene2D_fs.glsl
 	COPYONLY
 	)
 configure_file(
-	${CMAKE_SOURCE_DIR}/src/GLScene2D_vs.glsl
-	${CMAKE_SOURCE_DIR}/build/GLScene2D_vs.glsl
+	${PROJECT_SOURCE_DIR}/src/GLScene2D_vs.glsl
+	${PROJECT_BINARY_DIR}/GLScene2D_vs.glsl
 	COPYONLY
 	)
