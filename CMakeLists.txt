@@ -3,17 +3,14 @@ set (CMAKE_CXX_STANDARD 14)
 project(NES-Emulator)
 
 file(GLOB_RECURSE SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
-file(GLOB_RECURSE HEADERS "${PROJECT_SOURCE_DIR}/src/*.h")
 
-add_executable(NES-Emulator ${SOURCES} ${HEADERS})
+add_executable(NES-Emulator ${SOURCES})
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-trigraphs")
 endif()
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
-
-#include_directories(src/)
 
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
