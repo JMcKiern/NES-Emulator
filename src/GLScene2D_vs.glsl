@@ -1,7 +1,7 @@
-#version 430
+#version 140
 
-layout(location = 0) in vec3 vertex_position;
-layout(location = 1) in vec2 tex_coords;
+in vec3 vertex_position;
+in vec2 tex_coords;
 
 out vec2 texture_coordinates;
 
