@@ -1,4 +1,4 @@
-#version 140
+R"(#version 140
 
 in vec2 texture_coordinates;
 
@@ -10,3 +10,4 @@ void main () {
 	vec4 texel = texture(basic_texture, texture_coordinates);
 	frag_colour = texel;
 }
+)"

@@ -54,13 +54,3 @@ configure_file(
 	${PROJECT_BINARY_DIR}/ntscpalette.pal
 	COPYONLY
 	)
-configure_file(
-	${PROJECT_SOURCE_DIR}/src/GLScene2D_fs.glsl
-	${PROJECT_BINARY_DIR}/GLScene2D_fs.glsl
-	COPYONLY
-	)
-configure_file(
-	${PROJECT_SOURCE_DIR}/src/GLScene2D_vs.glsl
-	${PROJECT_BINARY_DIR}/GLScene2D_vs.glsl
-	COPYONLY
-	)

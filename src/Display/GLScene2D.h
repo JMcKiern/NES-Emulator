@@ -11,8 +11,12 @@
 // GLScene2D - allows an array of RGB pixels to be displayed
 class GLScene2D {
 private:
-	const std::string vertexShaderFile = "GLScene2D_vs.glsl";
-	const std::string fragmentShaderFile = "GLScene2D_fs.glsl";
+	const std::string vertexShaderCode = 
+		#include "GLScene2D_vs.glsl"
+		;
+	const std::string fragmentShaderCode = 
+		#include "GLScene2D_fs.glsl"
+		;
 
 	GLuint shader_programme;
 

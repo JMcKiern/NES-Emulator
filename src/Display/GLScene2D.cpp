@@ -63,7 +63,8 @@ bool GLScene2D::InitGL() {
 	glhScreen.SetVBO(texcoords, 12, 1, 2);
 	glhScreen.SetVAO();
 
-	shader_programme = loadShaderProg(vertexShaderFile, fragmentShaderFile);
+	shader_programme = GLUtils::loadShaderProg(vertexShaderCode,
+	                                           fragmentShaderCode);
 
 	glUseProgram(shader_programme);
 
