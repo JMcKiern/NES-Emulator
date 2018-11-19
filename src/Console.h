@@ -87,7 +87,8 @@ public:
 	void RunFrame();
 	void Run(std::string filename);
 	void RunInstrs(std::string filename, int _numInstrs);
-	void Test(std::string filename, std::string _desiredHash);
+	bool Test(std::string filename, int _numInstrsToRun,
+	          std::string _desiredHash);
 	void PrintHash(std::string filename);
 	std::string GetFrameHash();
 	void LoadINES(std::string filename);

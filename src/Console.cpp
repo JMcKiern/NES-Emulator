@@ -118,10 +118,13 @@ void Console::RunInstrs(std::string filename, int _numInstrsToRun) {
 	numInstrsToRun = _numInstrsToRun;
 	Run(filename);
 }
-void Console::Test(std::string filename, std::string _desiredHash) {
+bool Console::Test(std::string filename, int _numInstrsToRun,
+                   std::string _desiredHash) {
 	log.SetState(false);
 	desiredHash = _desiredHash;
+	numInstrsToRun = _numInstrsToRun;
 	Run(filename);
+	return desiredHash == ppu.GetDispHash();
 }
 void Console::PrintHash(std::string filename) {
 	log.SetState(false);
