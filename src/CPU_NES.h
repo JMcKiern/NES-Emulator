@@ -19,7 +19,8 @@ private:
 
 	// Other Processors
 	PPU* PPUPtr;
-	Controller* controller;
+	Controller* controller0 = nullptr;
+	Controller* controller1 = nullptr;
 	GamePak* gamePak;
 
 	// Timing
@@ -37,5 +38,7 @@ public:
 	// Start Up
 	void PowerUp();
 
-	CPU_NES(Log* _log, PPU* _PPUPtr, GamePak* _gp, Controller* _controller);
+	CPU_NES(Log* _log, PPU* _PPUPtr, GamePak* _gp, Controller* _controller0);
+	CPU_NES(Log* _log, PPU* _PPUPtr, GamePak* _gp, Controller* _controller0,
+	        Controller* _controller1);
 };

@@ -31,10 +31,13 @@ uint8_t CPU_NES::Read(uint16_t offset, bool shouldTick/*= true*/) {
 	else if (offset >= 0x4016 && offset <= 0x4017) {
 		// Controllers
 		if (offset == 0x4016) {
-			value = controller->Read();
+			value = controller0->Read();
 		}
 		else {
-			value = 0;
+			if (controller1 != nullptr)
+				value = controller1->Read();
+			else
+				value = 0;
 		}
 		value |= (openBus & 0xe0);
 	}
@@ -59,9 +62,13 @@ void CPU_NES::Write(uint16_t offset, uint8_t data, bool shouldTick/*= true*/) {
 	else if (offset >= 0x4000 && offset <= 0x4013 || offset == 0x4015) {
 		// Audio
 	}
-	else if (offset >= 0x4016) {
+	else if (offset >= 0x4016 && offset <= 0x4017) {
 		// Controllers
-		controller->Write(data);
+		if (offset == 0x4016) {
+			controller0->Write(data);
+			if (controller1 != nullptr)
+				controller1->Write(data);
+		}
 	}
 	else {
 		throw MemoryAddressNotValidException();
@@ -121,10 +128,20 @@ void CPU_NES::PowerUp() {
 
 // Constructor
 CPU_NES::CPU_NES(Log* _log, PPU* _PPUPtr, GamePak* _gp,
-                 Controller* _controller) :
+				 Controller* _controller0) :
 	CPU_6502(_log, 0x800)
 {
 	PPUPtr = _PPUPtr;
-	controller = _controller;
+	controller0 = _controller0;
+	gamePak = _gp;
+}
+CPU_NES::CPU_NES(Log* _log, PPU* _PPUPtr, GamePak* _gp,
+				 Controller* _controller0,
+				 Controller* _controller1) :
+	CPU_6502(_log, 0x800)
+{
+	PPUPtr = _PPUPtr;
+	controller0 = _controller0;
+	controller1 = _controller1;
 	gamePak = _gp;
 }

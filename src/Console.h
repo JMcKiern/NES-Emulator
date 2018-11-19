@@ -36,18 +36,28 @@ class Console {
 	GLScene2D gls;
 
 	// Peripherals
-	Controller controller;
+	Controller controller0, controller1;
 	std::vector<std::unique_ptr<Peripheral>> peripherals;
 	void UpdatePeripherals();
-	std::map<int, int> keyMap = {
-		{GLFW_KEY_J, 0}, // A
-		{GLFW_KEY_K, 1}, // B
+	std::map<int, int> controller0KeyMap = {
+		{GLFW_KEY_K, 0}, // A
+		{GLFW_KEY_J, 1}, // B
 		{GLFW_KEY_G, 2}, // Select
 		{GLFW_KEY_H, 3}, // Start
 		{GLFW_KEY_W, 4}, // Up
 		{GLFW_KEY_S, 5}, // Down
 		{GLFW_KEY_A, 6}, // Left
 		{GLFW_KEY_D, 7}  // Right
+	};
+	std::map<int, int> controller1KeyMap = {
+		{GLFW_KEY_KP_3, 0}, // A
+		{GLFW_KEY_KP_0, 1}, // B
+		{GLFW_KEY_KP_1, 2}, // Select
+		{GLFW_KEY_KP_2, 3}, // Start
+		{GLFW_KEY_UP, 4}, // Up
+		{GLFW_KEY_DOWN, 5}, // Down
+		{GLFW_KEY_LEFT, 6}, // Left
+		{GLFW_KEY_RIGHT, 7}  // Right
 	};
 	int joynum = GLFW_JOYSTICK_1;
 	void CheckJoystick();

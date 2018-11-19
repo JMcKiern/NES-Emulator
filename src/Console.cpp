@@ -45,8 +45,10 @@ void Console::ResizeWinCB(GLFWwindow* _window, int w, int h) {
 void Console::KeyCB(GLFWwindow* _window, int key, int scancode, int action,
                     int mods) {
 	if (window != _window) return;
-	if (keyMap.count(key) > 0)
-		controller.SetKey(keyMap[key], action); 
+	if (controller0KeyMap.count(key) > 0)
+		controller0.SetKey(controller0KeyMap[key], action); 
+	if (controller1KeyMap.count(key) > 0)
+		controller1.SetKey(controller1KeyMap[key], action); 
 }
 void Console::UpdatePeripherals() {
 	for (std::vector<std::unique_ptr<Peripheral>>::iterator it
@@ -62,7 +64,7 @@ void Console::CheckJoystick() {
 	if (buttons != NULL) {
 		for (int i = 0; i < 8; i++) {
 			int action = buttons[gamePadKeyMap[i]];
-			controller.SetJoyKey(i, action); 
+			controller0.SetJoyKey(i, action); 
 		}
 	}
 }
@@ -143,7 +145,7 @@ void Console::LoadINES(std::string filename) {
 
 Console::Console(std::string logFile/*= ""*/) :
 	log(logFile),
-	cpu(&log, &ppu, &gp, &controller),
+	cpu(&log, &ppu, &gp, &controller0, &controller1),
 	ppu(&cpu, &gp, &gls),
 	gls(&log, RES_X, RES_Y)
 {} 

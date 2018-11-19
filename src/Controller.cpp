@@ -3,7 +3,6 @@
 
 void Controller::IncCycle() {
 	cycle = (cycle + 1) % 24; 
-	// Taken from NESDoc.pdf, not sure if correct
 }
 
 void Controller::SetKey(int keyNum, bool isPressed) {
