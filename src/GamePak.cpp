@@ -16,7 +16,6 @@ void GamePak::LoadINes(std::string filename) {
 
 
 	size = static_cast<int>(sizef);
-	std::cout << size << '\n';
 	cartridge = new char[size];
 
 	f.read(cartridge, sizef);
