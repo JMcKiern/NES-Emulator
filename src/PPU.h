@@ -95,7 +95,7 @@ private:
 	void FlushBGShifters();
 	void ShiftBGShifters();
 	//		Scrolling registers
-	uint16_t v, t;
+	uint16_t v = 0, t = 0;
 	uint8_t x, w;
 	void ScrlCoarseXInc();
 	void ScrlYInc();
