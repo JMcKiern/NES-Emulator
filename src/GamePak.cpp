@@ -211,7 +211,6 @@ uint8_t GamePak::PPURead(uint16_t addr) {
 				return CHRRAM[addr];
 		default: {
 			throw MemoryAddressNotValidException();
-			return -1;
 		}
 	}
 }

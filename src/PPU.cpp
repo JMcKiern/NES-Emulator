@@ -493,7 +493,7 @@ void PPU::RenderPixel(uint8_t outPxl, uint8_t outAttr, bool isSprite) {
 	gls->SetPixel(cycle - 1, scanline, colour.red, colour.green, colour.blue);
 }
 
-void PPU::LoadBGTile(int x, int y, int stepNum) {
+void PPU::LoadBGTile(int stepNum) {
 	// TODO: No alternating between read and write cycles?
 	if (stepNum == 1) {
 		// Nametable table byte write (and read?)
@@ -635,7 +635,7 @@ void PPU::RenderTick() {
 		else if (321 <= cycle && cycle <= 336) {
 			// Load first 2 background tiles for next scanline into registers
 			int stepNum = (cycle - 321) % 8;
-			LoadBGTile(cycle - 321, scanline + 1, stepNum);
+			LoadBGTile(stepNum);
 		}
 	}
 	else if ((shouldShowBackground || shouldShowSprites)
@@ -646,7 +646,7 @@ void PPU::RenderTick() {
 		}
 		else if (1 <= cycle && cycle <= 256) {
 			int stepNum = (cycle - 1) % 8;
-			LoadBGTile(cycle + 16, scanline, stepNum);
+			LoadBGTile(stepNum);
 		}
 		else if (257 <= cycle && cycle <= 320) {
 			// Load Sprites into registers
@@ -655,7 +655,7 @@ void PPU::RenderTick() {
 		else if (321 <= cycle && cycle <= 336) {
 			// Load Background tiles into registers
 			int stepNum = (cycle - 321) % 8;
-			LoadBGTile(cycle - 321, scanline + 1, stepNum);
+			LoadBGTile(stepNum);
 		}
 		else if (337 <= cycle && cycle <= 340) {
 			// Load 2 nametable bytes

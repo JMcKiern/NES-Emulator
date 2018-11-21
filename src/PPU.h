@@ -91,7 +91,7 @@ private:
 	uint8_t nextTileLow, nextTileHigh;
 	uint8_t nextAttrByte;
 	uint8_t bgNTTemp;
-	void LoadBGTile(int x, int y, int stepNum);
+	void LoadBGTile(int stepNum);
 	void FlushBGShifters();
 	void ShiftBGShifters();
 	//		Scrolling registers

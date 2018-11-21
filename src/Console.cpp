@@ -131,7 +131,7 @@ bool Console::Test(std::string filename, int _numInstrsToRun,
 void Console::PrintHash(std::string filename) {
 	log.SetState(false);
 	shouldPrintHash = true;
-	std::string prevHash = GetFrameHash();
+	prevHash = GetFrameHash();
 	Run(filename);
 }
 std::string Console::GetFrameHash() {
