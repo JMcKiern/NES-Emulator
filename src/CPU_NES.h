@@ -1,7 +1,7 @@
 #pragma once
 #include "CPU_6502.h"
 #include "PPU.h"
-#include "GamePak.h"
+#include "Mapper.h"
 #include "Controller.h"
 
 class PPU;
@@ -21,7 +21,7 @@ private:
 	PPU* PPUPtr;
 	Controller* controller0 = nullptr;
 	Controller* controller1 = nullptr;
-	GamePak* gamePak;
+	Mapper** mapperPtrPtr;
 
 	// Timing
 	void Tick();
@@ -38,7 +38,8 @@ public:
 	// Start Up
 	void PowerUp();
 
-	CPU_NES(Log* _log, PPU* _PPUPtr, GamePak* _gp, Controller* _controller0);
-	CPU_NES(Log* _log, PPU* _PPUPtr, GamePak* _gp, Controller* _controller0,
-	        Controller* _controller1);
+	CPU_NES(Log* _log, PPU* _PPUPtr, Mapper** _mapperPtr,
+	        Controller* _controller0);
+	CPU_NES(Log* _log, PPU* _PPUPtr, Mapper** _mapperPtr,
+	        Controller* _controller0, Controller* _controller1);
 };

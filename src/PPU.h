@@ -4,7 +4,7 @@
 #include <memory>
 #include <chrono>
 #include "CPU_NES.h"
-#include "GamePak.h"
+#include "Mapper.h"
 #include "PeripheralConnection.h"
 #include "Palette.h"
 #include "Display/GLScene2D.h"
@@ -124,9 +124,8 @@ private:
 
 	Palette palette;
 
-	// GamePak
-	GamePak* gp;
-
+	Mapper** mapperPtrPtr;
+	
 public:
 	// Frame Check
 	bool IsOddFrame();
@@ -140,5 +139,5 @@ public:
 	void Tick();
 	void PowerUp();
 
-	PPU(CPU_NES* _CPUPtr, GamePak* _gp, GLScene2D* _gls);
+	PPU(CPU_NES* _CPUPtr, Mapper** mapperPtrPtr, GLScene2D* _gls);
 };

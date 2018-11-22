@@ -1,4 +1,5 @@
 #include <iomanip>
+#include "Exceptions.h"
 #include "CPU_NES.h"
 
 // CPU Memory
@@ -22,7 +23,7 @@ uint8_t CPU_NES::Read(uint16_t offset, bool shouldTick/*= true*/) {
 		value = PPUPtr->ReadReg(offset);
 	}
 	else if (offset >= 0x4020 && offset <= 0xFFFF) {
-		value = gamePak->Read(offset);
+		value = (*mapperPtrPtr)->Read(offset);
 	}
 	else if (offset >= 0x4000 && offset <= 0x4013 || offset == 0x4015) {
 		// Audio
@@ -57,7 +58,7 @@ void CPU_NES::Write(uint16_t offset, uint8_t data, bool shouldTick/*= true*/) {
 		PPUPtr->WriteReg(offset, data);
 	}
 	else if (offset >= 0x4020 && offset <= 0xFFFF) {
-		gamePak->Write(offset, data);
+		(*mapperPtrPtr)->Write(offset, data);
 	}
 	else if (offset >= 0x4000 && offset <= 0x4013 || offset == 0x4015) {
 		// Audio
@@ -127,15 +128,15 @@ void CPU_NES::PowerUp() {
 }
 
 // Constructor
-CPU_NES::CPU_NES(Log* _log, PPU* _PPUPtr, GamePak* _gp,
+CPU_NES::CPU_NES(Log* _log, PPU* _PPUPtr, Mapper** _mapperPtrPtr,
 				 Controller* _controller0) :
 	CPU_6502(_log, 0x800)
 {
 	PPUPtr = _PPUPtr;
 	controller0 = _controller0;
-	gamePak = _gp;
+	mapperPtrPtr = _mapperPtrPtr;
 }
-CPU_NES::CPU_NES(Log* _log, PPU* _PPUPtr, GamePak* _gp,
+CPU_NES::CPU_NES(Log* _log, PPU* _PPUPtr, Mapper** _mapperPtrPtr,
 				 Controller* _controller0,
 				 Controller* _controller1) :
 	CPU_6502(_log, 0x800)
@@ -143,5 +144,5 @@ CPU_NES::CPU_NES(Log* _log, PPU* _PPUPtr, GamePak* _gp,
 	PPUPtr = _PPUPtr;
 	controller0 = _controller0;
 	controller1 = _controller1;
-	gamePak = _gp;
+	mapperPtrPtr = _mapperPtrPtr;
 }

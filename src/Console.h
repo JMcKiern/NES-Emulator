@@ -16,7 +16,7 @@
 class Console {
 	CPU_NES cpu;
 	PPU ppu;
-	GamePak gp;
+	Mapper* mapperPtr;
 
 	Log log;
 

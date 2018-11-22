@@ -1,11 +1,11 @@
 #pragma once
 
-#include <string>
+#include <cstdint>
 #include <fstream>
-#include "Exceptions.h"
 
-class GamePak {
-	uint8_t* PRGROMU;
+class Mapper {
+protected:
+	uint8_t * PRGROMU;
 	uint8_t* PRGROML;
 	uint8_t* PRGRAM;
 	uint8_t* CHRROM;
@@ -25,27 +25,27 @@ class GamePak {
 	bool usingFourScreenMirroring;
 	int mapperNum;
 
-	bool CheckINes();
-	void SetupINes();
-	bool isGameLoaded = false;
+	void LoadINES(std::ifstream& f);
+	void SetupINES();
 
 	uint32_t GetOffsetPRG(uint8_t bankNum);
 	uint32_t GetOffsetCHR(uint8_t bankNum);
 	uint8_t* GetPtrPRG(uint8_t bankNum);
 	uint8_t* GetPtrCHR(uint8_t bankNum);
-	void RegisterUpdate(uint16_t addr, uint8_t data);
-public:
-	uint8_t Read(uint16_t addr);
-	void Write(uint16_t addr, uint8_t data);
 
+public:
+	virtual uint8_t Read(uint16_t addr);
+	virtual void Write(uint16_t addr, uint8_t data);
+
+	// TODO: Not sure about these 2
+	// Does VRAM always start at 0x2000?
 	bool isVRAM(uint16_t addr);
 	uint16_t GetVRAMAddr();
-	uint8_t PPURead(uint16_t addr);
-	void PPUWrite(uint16_t addr, uint8_t data);
+
+	virtual uint8_t PPURead(uint16_t addr);
+	virtual void PPUWrite(uint16_t addr, uint8_t data);
 	bool UsingVerticalMirroring();
 
-	void LoadINes(std::string filename);
-
-	~GamePak();
+	Mapper(std::ifstream& f);
+	~Mapper();
 };
-

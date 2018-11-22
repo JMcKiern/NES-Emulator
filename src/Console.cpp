@@ -6,6 +6,7 @@
 #include <string>
 #include <thread>
 #include "Console.h"
+#include "MapperFactory.h"
 #include "RegisterInterrupt.h"
 
 void Console::CreateWindow() {
@@ -139,14 +140,14 @@ std::string Console::GetFrameHash() {
 }
 void Console::LoadINES(std::string filename) {
 	std::cout << "Loading " << filename << '\n';
-	gp.LoadINes(filename);
+	mapperPtr = MapperFactory::GetMapper(filename);
 	cpu.PowerUp();
 }
 
 Console::Console(std::string logFile/*= ""*/) :
 	log(logFile),
-	cpu(&log, &ppu, &gp, &controller0, &controller1),
-	ppu(&cpu, &gp, &gls),
+	cpu(&log, &ppu, &mapperPtr, &controller0, &controller1),
+	ppu(&cpu, &mapperPtr, &gls),
 	gls(&log, RES_X, RES_Y)
 {} 
 Console::~Console() {

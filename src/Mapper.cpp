@@ -1,0 +1,112 @@
+#include "Mapper.h"
+
+uint32_t Mapper::GetOffsetPRG(uint8_t bankNum) {
+	if (bankNum < 0 || bankNum >= num16kPRGBanks) {
+		std::out_of_range(
+			"Attempted to access nonexistant bank number.");
+	}
+	uint32_t offset = 0x10; // Header
+	if (isTrainer) offset += 0x200; // Trainer
+	offset += 0x4000 * bankNum; // PRG Banks
+	return offset;
+}
+uint32_t Mapper::GetOffsetCHR(uint8_t bankNum) {
+	if (bankNum < 0 || bankNum >= num8kCHRBanks) {
+		std::out_of_range(
+			"Attempted to access nonexistant bank number.");
+	}
+	uint32_t offset = 0x10; // Header
+	if (isTrainer) offset += 0x200; // Trainer
+	offset += 0x4000 * num16kPRGBanks; // PRG Banks
+	offset += 0x2000 * bankNum; // CHR Banks
+	return offset;
+}
+uint8_t* Mapper::GetPtrPRG(uint8_t bankNum) {
+	uint32_t offset = GetOffsetPRG(bankNum);
+	return reinterpret_cast<uint8_t*>(cartridge + offset);
+}
+uint8_t* Mapper::GetPtrCHR(uint8_t bankNum) {
+	uint32_t offset = GetOffsetCHR(bankNum);
+	return reinterpret_cast<uint8_t*>(cartridge + offset);
+}
+bool Mapper::UsingVerticalMirroring() {
+	return usingVerticalMirroring;
+}
+bool Mapper::isVRAM(uint16_t addr) {
+	return (addr >= 0x2000);
+}
+uint16_t Mapper::GetVRAMAddr() {
+	return 0x2000;
+}
+
+void Mapper::LoadINES(std::ifstream& f) {
+	f.seekg(0, std::ios_base::end);
+	std::streampos sizef = f.tellg();
+	size = static_cast<int>(sizef);
+	cartridge = new char[size];
+
+	f.seekg(0, std::ios::beg);
+	f.read(cartridge, sizef);
+}
+void Mapper::SetupINES() {
+	num16kPRGBanks = cartridge[4];
+	num8kCHRBanks = cartridge[5];
+	usingVerticalMirroring = (cartridge[6] >> 0) & 0x1;
+	isBatteryBackedRAM = (cartridge[6] >> 1) & 0x1;
+	isTrainer = (cartridge[6] >> 2) & 0x1;
+	usingFourScreenMirroring = (cartridge[6] >> 3) & 0x1;
+	mapperNum = ((cartridge[6] >> 4) & 0xF) + (cartridge[7] & 0xF0);
+	num8kRAMBanks = cartridge[8];
+}
+
+uint8_t Mapper::Read(uint16_t addr) {
+	if (0x6000 <= addr && addr < 0x8000) {
+		if (PRGRAM != NULL)
+			return PRGRAM[addr - 0x6000];
+		else
+			return 0;
+	}
+	else if (0x8000 <= addr && addr < 0xC000) {
+		if (PRGROML != NULL)
+			return PRGROML[addr - 0x8000];
+		else
+			return 0;
+	}
+	else if (0xC000 <= addr && addr < 0x10000) {
+		if (PRGROMU != NULL)
+			return PRGROMU[addr - 0xC000];
+		else
+			return 0;
+	}
+	else {
+		// From Ice Climbers it looks like returning any value here is ok
+		return 0;
+	}
+	//throw MemoryAddressNotValidException();
+}
+
+void Mapper::Write(uint16_t addr, uint8_t data) {
+	// Do nothing
+}
+
+uint8_t Mapper::PPURead(uint16_t addr) {
+	if (num8kCHRBanks > 0)
+		return CHRROM[addr];
+	else
+		return CHRRAM[addr];
+}
+void Mapper::PPUWrite(uint16_t addr, uint8_t data) {
+	if (num8kCHRBanks > 0)
+		CHRROM[addr] = data;
+	else
+		CHRRAM[addr] = data;
+}
+
+Mapper::Mapper(std::ifstream& f) {
+	LoadINES(f);
+	SetupINES();
+}
+Mapper::~Mapper() {
+	if (size != -1) delete[] cartridge;
+	if (num8kCHRBanks == 0 && mapperNum == 0) delete[] CHRRAM;
+}

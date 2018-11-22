@@ -10,7 +10,7 @@ uint16_t PPU::UnMirror(uint16_t offset) {
 		offset = offset % 0x4000;
 	}
 	if (0x2400 <= offset && offset <= 0x2FFF) { // Nametable 1, 2 or 3
-		bool usingVerticalMirroring = gp->UsingVerticalMirroring();
+		bool usingVerticalMirroring = (*mapperPtrPtr)->UsingVerticalMirroring();
 		if (0x2400 <= offset && offset <= 0x27FF) { // NT 1
 			if (!usingVerticalMirroring) {
 				offset -= 0x400;
@@ -48,12 +48,12 @@ void PPU::Write(uint16_t offset, uint8_t data) {
 		PaletteRAM[offset - 0x3f00] = data;
 	}
 	else {
-		if (gp->isVRAM(offset)) {
-			uint16_t vramOffset = gp->GetVRAMAddr();
+		if ((*mapperPtrPtr)->isVRAM(offset)) {
+			uint16_t vramOffset = (*mapperPtrPtr)->GetVRAMAddr();
 			*(vram + (offset - vramOffset)) = data;
 		}
 		else {
-			gp->PPUWrite(offset, data);
+			(*mapperPtrPtr)->PPUWrite(offset, data);
 		}
 	}
 }
@@ -67,12 +67,12 @@ uint8_t PPU::Read(uint16_t offset) {
 			return (PaletteRAM[offset - 0x3f00] & 0x30);
 	}
 	else {
-		if (gp->isVRAM(offset)) {
-			uint16_t vramOffset = gp->GetVRAMAddr();
+		if ((*mapperPtrPtr)->isVRAM(offset)) {
+			uint16_t vramOffset = (*mapperPtrPtr)->GetVRAMAddr();
 			return vram[offset - vramOffset];
 		}
 		else {
-			return gp->PPURead(offset);
+			return (*mapperPtrPtr)->PPURead(offset);
 		}
 	}
 }
@@ -818,7 +818,7 @@ void PPU::PowerUp() {
 	PPUADDR(0);
 }
 
-PPU::PPU(CPU_NES* _CPUPtr, GamePak* _gp, GLScene2D* _gls) :
+PPU::PPU(CPU_NES* _CPUPtr, Mapper** _mapperPtrPtr, GLScene2D* _gls) :
 	PaletteRAM {
 		0x09, 0x01, 0x00, 0x01,
 		0x00, 0x02, 0x02, 0x0D,
@@ -833,7 +833,7 @@ PPU::PPU(CPU_NES* _CPUPtr, GamePak* _gp, GLScene2D* _gls) :
 	CPUPtr = _CPUPtr;
 	PowerUp();
 	CPUPtr->AddNMIConnection(&cpuNMIConnection);
-	gp = _gp;
+	mapperPtrPtr = _mapperPtrPtr;
 	gls = _gls;
 }
 
