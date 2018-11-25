@@ -9,27 +9,6 @@ uint16_t PPU::UnMirror(uint16_t offset) {
 	if (0x4000 <= offset && offset < 0x10000) {
 		offset = offset % 0x4000;
 	}
-	if (0x2400 <= offset && offset <= 0x2FFF) { // Nametable 1, 2 or 3
-		bool usingVerticalMirroring = (*mapperPtrPtr)->UsingVerticalMirroring();
-		if (0x2400 <= offset && offset <= 0x27FF) { // NT 1
-			if (!usingVerticalMirroring) {
-				offset -= 0x400;
-			}
-		}
-		else if (0x2800 <= offset && offset <= 0x2BFF) { // NT 2
-			if (usingVerticalMirroring) {
-				offset -= 0x800;
-			}
-		}
-		else if (0x2C00 <= offset && offset <= 0x2FFF) { // NT 3
-			if (usingVerticalMirroring) {
-				offset -= 0x800;
-			}
-			else {
-				offset -= 0x400;
-			}
-		}
-	}
 	if (0x3f00 <= offset && offset < 0x4000) {
 		offset = offset % 0x20 + 0x3f00;
 		// $3F10/$3F14/$3F18/$3F1C are mirrors of $3F00/$3F04/$3F08/$3F0C
@@ -38,6 +17,9 @@ uint16_t PPU::UnMirror(uint16_t offset) {
 	}
 	else if (0x3000 <= offset && offset < 0x3f00) {
 		offset -= 0x1000;
+	}
+	if (0x2400 <= offset && offset <= 0x2FFF) { // Nametable 1, 2 or 3
+		offset = (*mapperPtrPtr)->UnMirror(offset);
 	}
 	return offset;
 }

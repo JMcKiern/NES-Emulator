@@ -2,6 +2,7 @@
 #include "Exceptions.h"
 #include "MapperFactory.h"
 #include "NROM.h"
+#include "MMC1.h"
 #include "UxROM.h"
 #include "CNROM.h"
 
@@ -28,6 +29,7 @@ Mapper* MapperFactory::GetMapper(std::string filename) {
 	int mapperNum = ((header[6] >> 4) & 0xF) + (header[7] & 0xF0);
 	switch (mapperNum) {
 	case 0: mapper = new NROM(f); break;
+	case 1: mapper = new MMC1(f); break;
 	case 2: mapper = new UxROM(f); break;
 	case 3: mapper = new CNROM(f); break;
 	default:
