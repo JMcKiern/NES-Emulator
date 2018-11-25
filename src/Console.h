@@ -8,7 +8,6 @@
 #include "CPU_NES.h"
 #include "Controller.h"
 #include "Display/GLScene2D.h"
-#include "Log.h"
 #include "Peripheral.h"
 
 // Contains everything to do with everything
@@ -17,8 +16,6 @@ class Console {
 	CPU_NES cpu;
 	PPU ppu;
 	Mapper* mapperPtr;
-
-	Log log;
 
 	// Window
 	GLFWwindow* window;
@@ -103,6 +100,6 @@ public:
 	std::string GetFrameHash();
 	void LoadINES(std::string filename);
 
-	Console(std::string logFile = "");
+	Console();
 	~Console();
 };

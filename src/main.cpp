@@ -1,10 +1,12 @@
 #include <iostream>
 #include "Console.h"
+#include "Logger.h"
+
+Logger logger("log.txt");
 
 int main(int argc, char* argv[]) {
 	if (argc == 2) {
-		const std::string logFileName = "logfile.log";
-		Console console(logFileName);
+		Console console;
 		console.Run(argv[1]);
 		return 0;
 	}

@@ -4,7 +4,6 @@
 #include <sstream>
 #include <iomanip>
 #include "GLScene2D.h"
-#include "../Log.h"
 
 void GLScene2D::SetupPixels() {
 	for (int y = 0; y < RES_Y; y++) {
@@ -31,11 +30,13 @@ bool GLScene2D::InitGL() {
 	const GLubyte *version;
 	renderer = glGetString(GL_RENDERER);
 	version = glGetString(GL_VERSION);
+	/*
 	(*log) << "Renderer: ";
 	(*log) << (const char*)renderer;
 	(*log) << "\nOpenGL version supported ";
 	(*log) << (const char*)version;
 	(*log) << "\n\n";
+	*/
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
@@ -121,8 +122,7 @@ std::string GLScene2D::GetScreenHash() {
 	return ss.str();
 }
 
-GLScene2D::GLScene2D(Log* _log, int _RES_X, int _RES_Y) {
-	log = _log;
+GLScene2D::GLScene2D(int _RES_X, int _RES_Y) {
 	RES_X = _RES_X;
 	RES_Y = _RES_Y;
 	pixels = new uint8_t[3 * RES_X * RES_Y];

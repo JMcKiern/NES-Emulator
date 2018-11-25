@@ -4,7 +4,6 @@
 #include <string>
 #include "BitFlag.h"
 #include "enums.h"
-#include "Log.h"
 #include "Operation.h"
 #include "PeripheralLine.h"
 
@@ -125,10 +124,10 @@ protected:
 	virtual void Tick();
 
 	// Logging
-	Log* log;
 	uint16_t prevPC;
 	Operation prevOp;
 	uint16_t prevArgOffset;
+	std::string DisassembleInstr();
 
 	// Operation Table
 	Operation operationTable[0xFF];
@@ -169,6 +168,6 @@ public:
 	void PrintDebugInfo();
 
 	// Constructor
-	CPU_6502(Log* log, int sizeOfRam = 0x10000);
+	CPU_6502(int sizeOfRam = 0x10000);
 	~CPU_6502();
 };

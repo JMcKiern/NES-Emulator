@@ -5,7 +5,6 @@
 #include <string>
 #include "maths_funcs.h"
 #include "GLUtils.h"
-#include "../Log.h"
 #include "GLEntityHandler.h"
 
 // GLScene2D - allows an array of RGB pixels to be displayed
@@ -26,7 +25,6 @@ private:
 
 	GLEntityHandler glhScreen;
 
-	Log* log;
 	void SetupPixels();
 
 public:
@@ -35,6 +33,6 @@ public:
 	bool DrawGLScene(GLFWwindow* window, int w_width, int w_height);
 	std::string GetScreenHash();
 
-	GLScene2D(Log* log, int _RES_X, int _RES_Y);
+	GLScene2D(int _RES_X, int _RES_Y);
 	~GLScene2D();
 };

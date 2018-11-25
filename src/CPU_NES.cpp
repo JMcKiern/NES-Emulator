@@ -1,6 +1,9 @@
 #include <iomanip>
 #include "Exceptions.h"
 #include "CPU_NES.h"
+#include "Logger.h"
+
+extern Logger logger;
 
 // CPU Memory
 uint16_t CPU_NES::UnMirror(uint16_t offset) {
@@ -80,11 +83,11 @@ void CPU_NES::Write(uint16_t offset, uint8_t data, bool shouldTick/*= true*/) {
 void CPU_NES::PrintDebugInfoMesen() {
 	PrintDebugInfoMesenBasic();
 	/*
-	(*log) << std::hex << std::uppercase << std::setfill('0');
-	(*log) << " CYC:" << std::setw(3) << (unsigned int)PPUPtr->GetPPUCycle();
-	(*log) << " SL:" << std::setw(2) << (unsigned int)PPUPtr->GetPPUScanline();
+	logger << std::hex << std::uppercase << std::setfill('0');
+	logger << " CYC:" << std::setw(3) << (unsigned int)PPUPtr->GetPPUCycle();
+	logger << " SL:" << std::setw(2) << (unsigned int)PPUPtr->GetPPUScanline();
 	*/
-	(*log) << '\n';
+	logger << '\n';
 }
 
 // Other Processors
@@ -128,18 +131,18 @@ void CPU_NES::PowerUp() {
 }
 
 // Constructor
-CPU_NES::CPU_NES(Log* _log, PPU* _PPUPtr, Mapper** _mapperPtrPtr,
+CPU_NES::CPU_NES(PPU* _PPUPtr, Mapper** _mapperPtrPtr,
 				 Controller* _controller0) :
-	CPU_6502(_log, 0x800)
+	CPU_6502(0x800)
 {
 	PPUPtr = _PPUPtr;
 	controller0 = _controller0;
 	mapperPtrPtr = _mapperPtrPtr;
 }
-CPU_NES::CPU_NES(Log* _log, PPU* _PPUPtr, Mapper** _mapperPtrPtr,
+CPU_NES::CPU_NES(PPU* _PPUPtr, Mapper** _mapperPtrPtr,
 				 Controller* _controller0,
 				 Controller* _controller1) :
-	CPU_6502(_log, 0x800)
+	CPU_6502(0x800)
 {
 	PPUPtr = _PPUPtr;
 	controller0 = _controller0;

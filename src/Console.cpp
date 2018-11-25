@@ -117,20 +117,17 @@ void Console::Run(std::string filename) {
 	}
 }
 void Console::RunInstrs(std::string filename, int _numInstrsToRun) {
-	log.SetState(false);
 	numInstrsToRun = _numInstrsToRun;
 	Run(filename);
 }
 bool Console::Test(std::string filename, int _numInstrsToRun,
                    std::string _desiredHash) {
-	log.SetState(false);
 	desiredHash = _desiredHash;
 	numInstrsToRun = _numInstrsToRun;
 	Run(filename);
 	return desiredHash == ppu.GetDispHash();
 }
 void Console::PrintHash(std::string filename) {
-	log.SetState(false);
 	shouldPrintHash = true;
 	prevHash = GetFrameHash();
 	Run(filename);
@@ -144,11 +141,10 @@ void Console::LoadINES(std::string filename) {
 	cpu.PowerUp();
 }
 
-Console::Console(std::string logFile/*= ""*/) :
-	log(logFile),
-	cpu(&log, &ppu, &mapperPtr, &controller0, &controller1),
+Console::Console() :
+	cpu(&ppu, &mapperPtr, &controller0, &controller1),
 	ppu(&cpu, &mapperPtr, &gls),
-	gls(&log, RES_X, RES_Y)
+	gls(RES_X, RES_Y)
 {} 
 Console::~Console() {
 	glfwTerminate();

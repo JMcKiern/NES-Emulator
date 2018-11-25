@@ -4,6 +4,10 @@
 #include "CPU_6502.h"
 #include "enums.h"
 #include "Exceptions.h"
+#include "Logger.h"
+#include "LoggerUtils.h"
+
+extern Logger logger;
 
 // Instructions
 void CPU_6502::ADC(uint16_t offset, AddrMode addrMode) {
@@ -494,17 +498,17 @@ void CPU_6502::SetupOperationTable() {
 	operationTable[0x16] = Operation(INSTR_ASL, "ASL", AM_ZPX, "ZERO PAGE, X ( INS $??,X )", &CPU_6502::ASL, 1 << 6);
 	operationTable[0x0E] = Operation(INSTR_ASL, "ASL", AM_ABS, "ABSOLUTE ( INS $???? )", &CPU_6502::ASL, 1 << 6);
 	operationTable[0x1E] = Operation(INSTR_ASL, "ASL", AM_ABSX, "ABSOLUTE, X ( INS $????,X )", &CPU_6502::ASL, 1 << 7);
-	operationTable[0x90] = Operation(INSTR_BCC, "BCC", AM_REL, "RELATIVE", &CPU_6502::BCC, (1 << 2) + (1 << 3) + (1 << 4));
-	operationTable[0xB0] = Operation(INSTR_BCS, "BCS", AM_REL, "RELATIVE", &CPU_6502::BCS, (1 << 2) + (1 << 3) + (1 << 4));
-	operationTable[0xF0] = Operation(INSTR_BEQ, "BEQ", AM_REL, "RELATIVE", &CPU_6502::BEQ, (1 << 2) + (1 << 3) + (1 << 4));
+	operationTable[0x90] = Operation(INSTR_BCC, "BCC", AM_REL, "RELATIVE ( INS $???? )", &CPU_6502::BCC, (1 << 2) + (1 << 3) + (1 << 4));
+	operationTable[0xB0] = Operation(INSTR_BCS, "BCS", AM_REL, "RELATIVE ( INS $???? )", &CPU_6502::BCS, (1 << 2) + (1 << 3) + (1 << 4));
+	operationTable[0xF0] = Operation(INSTR_BEQ, "BEQ", AM_REL, "RELATIVE ( INS $???? )", &CPU_6502::BEQ, (1 << 2) + (1 << 3) + (1 << 4));
 	operationTable[0x24] = Operation(INSTR_BIT, "BIT", AM_ZP, "ZERO PAGE ( INS $?? )", &CPU_6502::BIT, 1 << 3);
 	operationTable[0x2C] = Operation(INSTR_BIT, "BIT", AM_ABS, "ABSOLUTE ( INS $???? )", &CPU_6502::BIT, 1 << 4);
-	operationTable[0x30] = Operation(INSTR_BMI, "BMI", AM_REL, "RELATIVE", &CPU_6502::BMI, (1 << 2) + (1 << 3) + (1 << 4));
-	operationTable[0xD0] = Operation(INSTR_BNE, "BNE", AM_REL, "RELATIVE", &CPU_6502::BNE, (1 << 2) + (1 << 3) + (1 << 4));
-	operationTable[0x10] = Operation(INSTR_BPL, "BPL", AM_REL, "RELATIVE", &CPU_6502::BPL, (1 << 2) + (1 << 3) + (1 << 4));
+	operationTable[0x30] = Operation(INSTR_BMI, "BMI", AM_REL, "RELATIVE ( INS $???? )", &CPU_6502::BMI, (1 << 2) + (1 << 3) + (1 << 4));
+	operationTable[0xD0] = Operation(INSTR_BNE, "BNE", AM_REL, "RELATIVE ( INS $???? )", &CPU_6502::BNE, (1 << 2) + (1 << 3) + (1 << 4));
+	operationTable[0x10] = Operation(INSTR_BPL, "BPL", AM_REL, "RELATIVE ( INS $???? )", &CPU_6502::BPL, (1 << 2) + (1 << 3) + (1 << 4));
 	operationTable[0x00] = Operation(INSTR_BRK, "BRK", AM_IMP, "IMPLIED ( INS )", &CPU_6502::BRK, 1 << 7);
-	operationTable[0x50] = Operation(INSTR_BVC, "BVC", AM_REL, "RELATIVE", &CPU_6502::BVC, (1 << 2) + (1 << 3) + (1 << 4));
-	operationTable[0x70] = Operation(INSTR_BVS, "BVS", AM_REL, "RELATIVE", &CPU_6502::BVS, (1 << 2) + (1 << 3) + (1 << 4));
+	operationTable[0x50] = Operation(INSTR_BVC, "BVC", AM_REL, "RELATIVE ( INS $???? )", &CPU_6502::BVC, (1 << 2) + (1 << 3) + (1 << 4));
+	operationTable[0x70] = Operation(INSTR_BVS, "BVS", AM_REL, "RELATIVE ( INS $???? )", &CPU_6502::BVS, (1 << 2) + (1 << 3) + (1 << 4));
 	operationTable[0x18] = Operation(INSTR_CLC, "CLC", AM_IMP, "IMPLIED ( INS )", &CPU_6502::CLC, 1 << 2);
 	operationTable[0xD8] = Operation(INSTR_CLD, "CLD", AM_IMP, "IMPLIED ( INS )", &CPU_6502::CLD, 1 << 2);
 	operationTable[0x58] = Operation(INSTR_CLI, "CLI", AM_IMP, "IMPLIED ( INS )", &CPU_6502::CLI, 1 << 2);
@@ -682,6 +686,7 @@ void CPU_6502::LoadFromFile(std::string filename, uint16_t toOffset) {
 // Running
 void CPU_6502::RunNextOpcode() {
 	CheckForInterrupt();
+	//PrintDebugInfoMesenBasic();
 
 	currentOpNumCycles = 0;
 	hasPageCrossed = false;
@@ -838,52 +843,97 @@ int CPU_6502::GetTotalCycles() {
 }
 
 // Logging
+std::string CPU_6502::DisassembleInstr() {
+	uint8_t opcode = ReadNoTick(PC);
+	Operation& op = operationTable[opcode];
+	std::string dis = op.addrModeStr;
+
+	size_t locPar = dis.find("(");
+	bool isRelative = dis.find("RELATIVE") != std::string::npos;
+	if (locPar != std::string::npos) {
+		// Only keep what's in brackets
+		dis.erase(0, locPar + 2); // "xxxx ( "
+		dis.erase(dis.size() - 2, 2); // " )"
+
+		// Replace INS with op.instrStr
+		size_t locINS = dis.find("INS");
+		dis.replace(locINS, 3, op.instrStr);
+		if (!isRelative) {
+			size_t locHash = dis.find('#');
+			if (locHash != std::string::npos) dis.insert(locHash + 1, "$");
+			int numBytes = std::count(dis.begin(), dis.end(), '?') / 2;
+			for (int i = numBytes; i > 0; i--) {
+				uint8_t byte = ReadNoTick(PC + i);
+				std::string byteStr = LoggerUtils::ToHexStr(byte);
+				size_t locByte = dis.find("??");
+				dis.replace(locByte, 2, byteStr);
+			}
+		}
+		else {
+			uint16_t finalDest = PC + (int8_t)(ReadNoTick(PC + 1)) + 2;
+			std::string byteStr = LoggerUtils::ToHexStr(finalDest);
+			size_t locByte = dis.find("????");
+			dis.replace(locByte, 4, byteStr);
+		}
+		return dis;
+	}
+	else {
+		return op.instrStr;
+	}
+}
 void CPU_6502::PrintDebugInfoMesenBasic() {
-	(*log) << std::hex << std::uppercase << std::setfill('0');
+	// [PC, h] [Disassembly][Align, 20] A:[A, h] X : [X, h] Y : [Y, h] P : [P, h] SP : [SP, h]
+	logger << std::hex << std::uppercase << std::setfill('0');
 
-	(*log) << std::setw(4) << (unsigned int)prevPC;
-	(*log) << std::setw(4) << prevOp.instrStr;
-	(*log) << std::setw(4) << prevArgOffset;
+	logger << std::setw(4) << (unsigned int)PC;
+	logger << " ";
+	logger << std::setfill(' ') << std::left
+	       << std::setw(15) << DisassembleInstr();
+	logger << std::setfill('0') << std::right;
+	
+	//logger << std::setw(4) << prevOp.instrStr << " ";
+	//logger << std::setw(4) << prevArgOffset;
 
-	(*log) << " A:" << std::setw(2) << (unsigned int)A;
-	(*log) << " X:" << std::setw(2) << (unsigned int)X;
-	(*log) << " Y:" << std::setw(2) << (unsigned int)Y;
-	(*log) << " P:" << std::setw(2) << (unsigned int)P+0x20;
-	(*log) << " SP:" << std::setw(2) << (unsigned int)SP;
+	logger << " A:" << std::setw(2) << (unsigned int)A;
+	logger << " X:" << std::setw(2) << (unsigned int)X;
+	logger << " Y:" << std::setw(2) << (unsigned int)Y;
+	logger << " P:" << std::setw(2) << (unsigned int)P;
+	logger << " SP:" << std::setw(2) << (unsigned int)SP;
+	logger << '\n';
+	logger.flush();
 }
 
 void CPU_6502::PrintDebugInfo() {
-	(*log) << std::hex << std::uppercase << std::setfill('0');
-	(*log) << std::setw(4) << (unsigned int)PC;
-	(*log) << " A:" << std::setw(2) << (unsigned int)A;
-	(*log) << " X:" << std::setw(2) << (unsigned int)X;
-	(*log) << " Y:" << std::setw(2) << (unsigned int)Y;
-	(*log) << " P:" << std::setw(2) << (unsigned int)P;
-	(*log) << " SP:" << std::setw(2) << (unsigned int)SP;
-	(*log) << '\n';
+	logger << std::hex << std::uppercase << std::setfill('0');
+	logger << std::setw(4) << (unsigned int)PC;
+	logger << " A:" << std::setw(2) << (unsigned int)A;
+	logger << " X:" << std::setw(2) << (unsigned int)X;
+	logger << " Y:" << std::setw(2) << (unsigned int)Y;
+	logger << " P:" << std::setw(2) << (unsigned int)P;
+	logger << " SP:" << std::setw(2) << (unsigned int)SP;
+	logger << '\n';
 	/*
-	if (SP != 0xFF) (*log) << "\n ";
+	if (SP != 0xFF) logger << "\n ";
 	for (uint8_t i = 0xFF; i>SP; i--) {
-		(*log) << (unsigned int)ReadNoTick(0x100 + i);
-		(*log) << " | ";
+		logger << (unsigned int)ReadNoTick(0x100 + i);
+		logger << " | ";
 	}
-	(*log) << std::hex << std::setfill('0');
-	(*log) << "\nA = $" << std::setw(2) << (unsigned int)A;
-	(*log) << " X = $" << std::setw(2) << (unsigned int)X;
-	(*log) << " Y = $" << std::setw(2) << (unsigned int)Y << '\n';
-	(*log) << " SP = $" << std::setw(2) << (unsigned int)SP;
-	(*log) << " PC = $" << std::setw(4) << (unsigned int)PC << '\n';
-	(*log) << "      NV-BDIZC\n      ";
+	logger << std::hex << std::setfill('0');
+	logger << "\nA = $" << std::setw(2) << (unsigned int)A;
+	logger << " X = $" << std::setw(2) << (unsigned int)X;
+	logger << " Y = $" << std::setw(2) << (unsigned int)Y << '\n';
+	logger << " SP = $" << std::setw(2) << (unsigned int)SP;
+	logger << " PC = $" << std::setw(4) << (unsigned int)PC << '\n';
+	logger << "      NV-BDIZC\n      ";
 	for (int i=7;i>=0;--i) {
-		(*log) << ((P >> i) & 0x1);
+		logger << ((P >> i) & 0x1);
 	}
-	(*log) << "\n\n";
+	logger << "\n\n";
 	*/
 }
 
 // Constructor
-CPU_6502::CPU_6502(Log* _log, int sizeOfRam/*= 0x10000*/) {
-	log = _log;
+CPU_6502::CPU_6502(int sizeOfRam/*= 0x10000*/) {
 	SetupOperationTable();
 	RAM = new uint8_t[sizeOfRam];
 }

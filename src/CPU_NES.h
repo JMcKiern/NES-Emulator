@@ -38,8 +38,8 @@ public:
 	// Start Up
 	void PowerUp();
 
-	CPU_NES(Log* _log, PPU* _PPUPtr, Mapper** _mapperPtr,
+	CPU_NES(PPU* _PPUPtr, Mapper** _mapperPtr,
 	        Controller* _controller0);
-	CPU_NES(Log* _log, PPU* _PPUPtr, Mapper** _mapperPtr,
+	CPU_NES(PPU* _PPUPtr, Mapper** _mapperPtr,
 	        Controller* _controller0, Controller* _controller1);
 };
