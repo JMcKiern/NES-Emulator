@@ -5,10 +5,17 @@ project(NES-Emulator)
 file(GLOB_RECURSE SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
 file(GLOB_RECURSE HEADERS "${PROJECT_SOURCE_DIR}/src/*.h")
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
 add_executable(NES-Emulator ${SOURCES} ${HEADERS})
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT NES-Emulator)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-trigraphs")
 endif()
@@ -43,7 +50,7 @@ include_directories(
 	${GLFW_INCLUDE_DIR}
 	)
 target_link_libraries(
-	NES-Emulator 
+	NES-Emulator
 	${OPENGL_LIBRARIES}
 	${OPENGL_gl_LIBRARY}
 	${GLEW_LIBRARIES}
