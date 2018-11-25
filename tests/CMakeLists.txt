@@ -2,8 +2,9 @@ cmake_minimum_required(VERSION 3.1)
 set (CMAKE_CXX_STANDARD 14)
 project(NES-Emulator-Test)
 
-file(GLOB_RECURSE SOURCES "${PROJECT_SOURCE_DIR}/../src/*.cpp" "*.cpp")
-file(GLOB_RECURSE HEADERS "${PROJECT_SOURCE_DIR}/../src/*.h")
+file(GLOB_RECURSE SOURCES "${PROJECT_SOURCE_DIR}/../src/*.cpp" "${PROJECT_SOURCE_DIR}/src/*.cpp")
+list(FILTER SOURCES EXCLUDE REGEX "${PROJECT_SOURCE_DIR}/\.\./src/main\.cpp")
+file(GLOB_RECURSE HEADERS "${PROJECT_SOURCE_DIR}/../src/*.h" "${PROJECT_SOURCE_DIR}/src/*.h")
 
 add_executable(NES-Emulator-Test ${SOURCES} ${HEADERS})
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT NES-Emulator-Test)

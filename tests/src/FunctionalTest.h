@@ -5,9 +5,9 @@
 #include <vector>
 #include <memory>
 #include <chrono>
-#include "CPU_6502.h"
-#include "Peripheral.h"
-#include "RegisterInterrupt.h"
+#include "../../src/CPU_6502.h"
+#include "../../src/Peripheral.h"
+#include "../../src/RegisterInterrupt.h"
 
 struct FunctionalTestRun {
 	std::string filename;
@@ -19,9 +19,7 @@ struct FunctionalTestRun {
 };
 
 bool FunctionalTest(std::string filename, uint16_t memOffset, uint16_t startPC, uint16_t _successPC, bool shouldSetupRegisterInterrupts, bool shouldPrint) {
-	Log log("");
-	log.SetState(false); // Do not log CPU
-	CPU_6502 cpu(&log);
+	CPU_6502 cpu;
 	std::vector<std::unique_ptr<Peripheral>> peripherals;
 
 	if (shouldPrint) std::cout << "Loading: " << filename << '\n';

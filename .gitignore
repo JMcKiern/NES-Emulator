@@ -275,3 +275,4 @@ CTestTestfile.cmake
 
 *.bak
 build/
+tests/tests/
