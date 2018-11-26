@@ -735,34 +735,35 @@ void CPU_6502::RunNextOpcode() {
 		}
 		case AM_ABS: {
 			argLen = 2;
-			argOffset = (Read(PC + 1)) + ((Read(PC + 2)) << 8);
+			argOffset = Read(PC + 1);
+			argOffset += Read(PC + 2) << 8;
 			break;
 		}
 		case AM_ABSX: {
 			argLen = 2;
-			argOffset = AddAndCheckForPageCrossing(Read(PC + 1), X) 
-			                                       + ((Read(PC + 2) << 8));
+			argOffset = AddAndCheckForPageCrossing(Read(PC + 1), X);
+			argOffset += Read(PC + 2) << 8;
 			break;
 		}
 		case AM_ABSY: {
 			argLen = 2;
-			argOffset = AddAndCheckForPageCrossing(Read(PC + 1), Y)
-			                                       + ((Read(PC + 2) << 8));
+			argOffset = AddAndCheckForPageCrossing(Read(PC + 1), Y);
+			argOffset += Read(PC + 2) << 8;
 			break;
 		}
 		case AM_IDXIND: {
 			argLen = 1;
 			uint8_t BAL = Read(PC + 1);
 			Tick();
-			argOffset = Read(((BAL + X) & 0xFF))
-			            + (Read(((BAL + X + 1) & 0xFF)) << 8);
+			argOffset = Read(((BAL + X) & 0xFF));
+			argOffset += Read(((BAL + X + 1) & 0xFF)) << 8;
 			break;
 		}
 		case AM_INDIDX: {
 			argLen = 1;
 			uint8_t IAL = Read(PC + 1);
-			argOffset = (Read((IAL + 1) & 0xFF) << 8)
-			             + AddAndCheckForPageCrossing(Read((IAL)), Y);
+			argOffset = AddAndCheckForPageCrossing(Read(IAL), Y);
+			argOffset += Read((IAL + 1) & 0xFF) << 8;
  			break;
 		}
 		case AM_REL: {
@@ -775,8 +776,8 @@ void CPU_6502::RunNextOpcode() {
 			argLen = 2;
 			uint8_t IAL = Read(PC + 1);
 			uint8_t IAH = Read(PC + 2);
-			argOffset = Read(((IAH << 8) + IAL)) 
-			            + (Read((IAH << 8) + ((IAL + 1) & 0xFF)) << 8);
+			argOffset = Read(((IAH << 8) + IAL));
+			argOffset += Read((IAH << 8) + ((IAL + 1) & 0xFF)) << 8;
 			break;
 		 }
 		default: {
