@@ -59,7 +59,7 @@ int main() {
 
 		{"../tests/PPU/blargg_ppu_tests_2005.09.15b/palette_ram.nes", 178166, "a028c0ca"},
 		{"../tests/PPU/blargg_ppu_tests_2005.09.15b/power_up_palette.nes", 178299, "a028c0ca"},
-		//{"../tests/PPU/blargg_ppu_tests_2005.09.15b/sprite_ram.nes", 169720, "6f4afa73"}, // Fails because test is bad
+		//{"../tests/PPU/blargg_ppu_tests_2005.09.15b/sprite_ram.nes", 169720, "a028c0ca"},
 		//PrintHash("../tests/PPU/blargg_ppu_tests_2005.09.15b/sprite_ram.nes"},
 		//PrintHash("../tests/PPU/blargg_ppu_tests_2005.09.15b/vbl_clear_time.nes"},
 		{"../tests/PPU/blargg_ppu_tests_2005.09.15b/vram_access.nes", 186572, "a028c0ca"},
@@ -79,16 +79,12 @@ int main() {
 
 		//console.Run("../tests/PPU/color_test.nes");
 
-		{"../tests/PPU/ppu_open_bus/ppu_open_bus.nes", 3046392, "6bcc0f25"}
+		{"../tests/PPU/ppu_open_bus/ppu_open_bus.nes", 3046392, "6bcc0f25"},
 
 		// Mappers
-		//{"../tests/holydriverbatman-bin-0.01/testroms/M0_P32K_C8K_V.nes", 859728, "56dfded7"},
-		//PrintHash("../tests/holydriverbatman-bin-0.01/testroms/M1_P128K.nes"},
-		//PrintHash("../tests/holydriverbatman-bin-0.01/testroms/M1_P128K_C32K.nes"},
-		//PrintHash("../tests/holydriverbatman-bin-0.01/testroms/M1_P128K_C32K_S8K.nes"},
-		//PrintHash("../tests/holydriverbatman-bin-0.01/testroms/M1_P128K_C32K_W8K.nes"},
-		//{"../tests/holydriverbatman-bin-0.01/testroms/M2_P128K_V.nes", 859756, "38f478c3"},
-		//{"../tests/holydriverbatman-bin-0.01/testroms/M3_P32K_C32K_H.nes", 3220777, "7859454d"},
+		{"../tests/holydiverbatman-bin-0.01/testroms/M0_P32K_C8K_V.nes", 859728, "56dfded7"},
+		{"../tests/holydiverbatman-bin-0.01/testroms/M2_P128K_V.nes", 859756, "38f478c3"},
+		{"../tests/holydiverbatman-bin-0.01/testroms/M3_P32K_C32K_H.nes", 3220777, "7859454d"}
 
 		// Controller
 		//console.Run("../tests/Controller/allpads.nes");
@@ -97,6 +93,10 @@ int main() {
 		//console.Run("../tests/Controller/read_joy3/test_buttons.nes");
 		//console.Run("../tests/Controller/read_joy3/thorough_test.nes");
 	};
+	//PrintHash("../tests/holydiverbatman-bin-0.01/testroms/M1_P128K.nes");
+	//PrintHash("../tests/holydiverbatman-bin-0.01/testroms/M1_P128K_C32K.nes");
+	//PrintHash("../tests/holydiverbatman-bin-0.01/testroms/M1_P128K_C32K_S8K.nes");
+	//PrintHash("../tests/holydiverbatman-bin-0.01/testroms/M1_P128K_C32K_W8K.nes");
 
 	std::vector<std::string> failedFilenames;
 	for (auto it = ftrs.begin(); it != ftrs.end(); ++it) {
