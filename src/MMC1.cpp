@@ -16,7 +16,8 @@ uint8_t MMC1::PPURead(uint16_t addr) {
 }
 void MMC1::Write(uint16_t addr, uint8_t data) {
 	if (0x8000 <= addr && addr <= 0xFFFF) {
-		shiftReg = (shiftReg << 1) | (data & 1);
+		//shiftReg = (shiftReg << 1) | (data & 1);
+		shiftReg = (shiftReg >> 1) | ((data & 1) << 4);
 		shiftNum++;
 
 		if (((data >> 7) & 1) == 1) {
@@ -84,7 +85,8 @@ void MMC1::Write(uint16_t addr, uint8_t data) {
 				uint8_t R = (shiftReg >> 4) & 0x1;
 				if (R == 0) {
 					if (PRGRAM == nullptr) {
-						PRGRAM = new uint8_t[0x2000];
+						// https://stackoverflow.com/a/2030018/2471379
+						PRGRAM = new uint8_t[0x2000]();
 					}
 				}
 				else {
@@ -106,6 +108,11 @@ MMC1::MMC1(std::ifstream& f) :
 		PRGRAM = new uint8_t[0x2000];
 	PRGROML = GetPtrPRG(0, 0x4000);
 	PRGROMU = GetPtrPRG(num16kPRGBanks - 1, 0x4000);
-	CHRROML = GetPtrCHR(0, 0x1000);
-	CHRROMU = GetPtrCHR(1, 0x1000);
+	if (num8kCHRBanks > 0) {
+		CHRROML = GetPtrCHR(0, 0x1000);
+		CHRROMU = GetPtrCHR(1, 0x1000);
+	}
+	else {
+		CHRRAM = new uint8_t[0x2000];
+	}
 }

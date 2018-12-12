@@ -124,6 +124,10 @@ uint8_t Mapper::Read(uint16_t addr) {
 
 void Mapper::Write(uint16_t addr, uint8_t data) {
 	// Do nothing
+	if (0x6000 <= addr && addr < 0x8000) {
+		if (PRGRAM != NULL)
+			PRGRAM[addr - 0x6000] = data;
+	}
 }
 
 uint8_t Mapper::PPURead(uint16_t addr) {

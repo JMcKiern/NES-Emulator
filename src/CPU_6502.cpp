@@ -936,7 +936,7 @@ void CPU_6502::PrintDebugInfo() {
 // Constructor
 CPU_6502::CPU_6502(int sizeOfRam/*= 0x10000*/) {
 	SetupOperationTable();
-	RAM = new uint8_t[sizeOfRam];
+	RAM = new uint8_t[sizeOfRam]();
 }
 CPU_6502::~CPU_6502() {
 	delete[] RAM;
