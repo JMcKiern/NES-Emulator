@@ -21,7 +21,7 @@ class Console {
 	GLFWwindow* window;
 	const std::string windowTitle = "Window Title";
 	int w_width = 512, w_height = 480;
-	void CreateWindow();
+	void InitializeWindow();
 	void SetCallbacks();
 	void ResizeWinCB(GLFWwindow* _window, int w, int h);
 	void KeyCB(GLFWwindow* _window, int key, int scancode, int action,

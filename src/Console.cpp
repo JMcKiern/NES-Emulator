@@ -9,7 +9,7 @@
 #include "MapperFactory.h"
 #include "RegisterInterrupt.h"
 
-void Console::CreateWindow() {
+void Console::InitializeWindow() {
 	if (!glfwInit()) {
 		throw std::runtime_error("Error: GLFW failed to initialise");
 	}
@@ -91,7 +91,7 @@ void Console::RunFrame() {
 void Console::Run(std::string filename) {
 	LoadINES(filename);
 	UpdatePeripherals(); // Only needed for Register Interrupts
-	CreateWindow();
+	InitializeWindow();
 	SetCallbacks();
 	gls.InitGL();
 
