@@ -4,7 +4,7 @@
 #include "NesTest.h"
 #include "../../src/Logger.h"
 
-Logger logger;
+Logger logger("log.txt");
 
 int main() {
 	// 6502 Tests
@@ -93,10 +93,10 @@ int main() {
 		//console.Run("../tests/Controller/read_joy3/test_buttons.nes");
 		//console.Run("../tests/Controller/read_joy3/thorough_test.nes");
 	};
-	//PrintHash("../tests/holydiverbatman-bin-0.01/testroms/M1_P128K.nes");
-	//PrintHash("../tests/holydiverbatman-bin-0.01/testroms/M1_P128K_C32K.nes");
-	//PrintHash("../tests/holydiverbatman-bin-0.01/testroms/M1_P128K_C32K_S8K.nes");
-	//PrintHash("../tests/holydiverbatman-bin-0.01/testroms/M1_P128K_C32K_W8K.nes");
+	PrintHash("../tests/holydiverbatman-bin-0.01/testroms/M1_P128K.nes");
+	PrintHash("../tests/holydiverbatman-bin-0.01/testroms/M1_P128K_C32K.nes");
+	PrintHash("../tests/holydiverbatman-bin-0.01/testroms/M1_P128K_C32K_S8K.nes");
+	PrintHash("../tests/holydiverbatman-bin-0.01/testroms/M1_P128K_C32K_W8K.nes");
 
 	std::vector<std::string> failedFilenames;
 	for (auto it = ftrs.begin(); it != ftrs.end(); ++it) {
