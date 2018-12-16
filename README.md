@@ -31,6 +31,7 @@ After the dependencies have been installed run these commands
 git clone https://github.com/jmckiern/NES-Emulator
 cd NES-Emulator
 mkdir build
+cd build
 cmake ..
 make
 ```
