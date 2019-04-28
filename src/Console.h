@@ -26,6 +26,8 @@ class Console {
 	void ResizeWinCB(GLFWwindow* _window, int w, int h);
 	void KeyCB(GLFWwindow* _window, int key, int scancode, int action,
 	           int mods);
+	const int FPS_WINDOW = 10;
+	void UpdateFPSCounter(int numFrames=1);
 
 	// OpenGL
 	const int RES_X = 256;

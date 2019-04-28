@@ -69,6 +69,21 @@ void Console::CheckJoystick() {
 		}
 	}
 }
+void Console::UpdateFPSCounter(int numFrames/*=1*/) {
+	static auto prevTime = std::chrono::system_clock::now();
+	auto dT = std::chrono::duration_cast<
+		std::chrono::milliseconds>(
+			std::chrono::system_clock::now() - prevTime
+		).count();
+	if (dT == 0) {
+		dT = 1;
+	}
+
+	// Truncates the value but that's fine
+	std::string title = "FPS: " + std::to_string(numFrames * 1000 / dT);
+	glfwSetWindowTitle(window, title.c_str());
+	prevTime = std::chrono::system_clock::now();
+}
 void Console::RunFrame() {
 	// A frame should take 16ms (and sleep for 16 - run_time = ~9)
 	//std::cout << "Sleeping for "
@@ -95,9 +110,15 @@ void Console::Run(std::string filename) {
 	SetCallbacks();
 	gls.InitGL();
 
+	int i = 0;
 	nextFrame = std::chrono::system_clock::now() + cycles{0};
 	while (!glfwWindowShouldClose(window)) {
+		i++;
 		RunFrame();
+		if (i % FPS_WINDOW == 0) {
+			UpdateFPSCounter(FPS_WINDOW);
+			i = 0;
+		}
 		glfwPollEvents();
 		if (usingGamePad) CheckJoystick();
 		UpdatePeripherals(); // Only needed for Register Interrupts
