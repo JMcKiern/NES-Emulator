@@ -584,6 +584,7 @@ void PPU::LoadSpritesForScanline() {
 		uint16_t YInTile = shouldFlipVert
 		                   ? spriteHeight - (scanline - spriteY) - 1
 		                   : scanline - spriteY;
+		uint8_t secondTile8x16Offset = YInTile >= 8 ? 8 : 0;
 		uint16_t tileAddr;
 		if (spriteHeight == 8) {
 			uint16_t patTabAddr = patternTableAddrSprite;
@@ -596,9 +597,9 @@ void PPU::LoadSpritesForScanline() {
 		if (isTileLow) {
 			if (isSpriteOnCurrScanline) {
 				if (!shouldFlipHori)
-					bsrSpr[spriteNum][0] = Read(tileAddr);
+					bsrSpr[spriteNum][0] = Read(tileAddr + secondTile8x16Offset);
 				else
-					bsrSpr[spriteNum][0] = ReverseByte(Read(tileAddr));
+					bsrSpr[spriteNum][0] = ReverseByte(Read(tileAddr + secondTile8x16Offset));
 			}
 			else
 				bsrSpr[spriteNum][0] = 0;
@@ -607,9 +608,9 @@ void PPU::LoadSpritesForScanline() {
 			if (isSpriteOnCurrScanline) {
 				// http://wiki.nesdev.com/w/index.php/PPU_pattern_tables
 				if (!shouldFlipHori)
-					bsrSpr[spriteNum][1] = Read(tileAddr + 8);
+					bsrSpr[spriteNum][1] = Read(tileAddr + 8 + secondTile8x16Offset);
 				else
-					bsrSpr[spriteNum][1] = ReverseByte(Read(tileAddr + 8));
+					bsrSpr[spriteNum][1] = ReverseByte(Read(tileAddr + 8 + secondTile8x16Offset));
 			}
 			else
 				bsrSpr[spriteNum][1] = 0;
