@@ -179,7 +179,7 @@ void CPU_6502::INY(uint16_t offset, AddrMode addrMode) {
 void CPU_6502::JMP(uint16_t offset, AddrMode addrMode) {
 	PC = offset;
 }
-void CPU_6502::JSR(uint16_t offset, AddrMode addrMode) { 
+void CPU_6502::JSR(uint16_t offset, AddrMode addrMode) {
 	// TODO: Potential Error: ADH should only be fetched on cycle 6
 	PC -= 1;
 	StackPush((PC >> 8) & 0xFF);
@@ -448,7 +448,7 @@ void CPU_6502::RespondToInterrupt(bool isIRQ) {
 }
 
 // CPU Memory
-uint8_t CPU_6502::Read(uint16_t offset, bool shouldTick/*= true*/) { 
+uint8_t CPU_6502::Read(uint16_t offset, bool shouldTick/*= true*/) {
 	if (shouldTick) Tick();
 	return *(RAM + offset);
 }
@@ -783,7 +783,7 @@ void CPU_6502::RunNextOpcode() {
 		default: {
 			throw std::invalid_argument("Invalid AddrMode: "
 			                            + std::to_string(op.addrMode)
-			                            + "(" + op.addrModeStr + ")");
+			                            + " (" + op.addrModeStr + ")");
 			break;
 		 }
 	}
@@ -811,7 +811,7 @@ int CPU_6502::GetTotalNumInstrs() {
 void CPU_6502::SetP(uint8_t val) {
 	N = ((val >> N.GetBitNum()) & 0x1);
 	V = ((val >> V.GetBitNum()) & 0x1);
-	// Bit 4 and 5 are ignored 
+	// Bit 4 and 5 are ignored
 	D = ((val >> D.GetBitNum()) & 0x1);
 	I = ((val >> I.GetBitNum()) & 0x1);
 	Z = ((val >> Z.GetBitNum()) & 0x1);
@@ -891,7 +891,7 @@ void CPU_6502::PrintDebugInfoMesenBasic() {
 	logger << std::setfill(' ') << std::left
 	       << std::setw(15) << DisassembleInstr();
 	logger << std::setfill('0') << std::right;
-	
+
 	//logger << std::setw(4) << prevOp.instrStr << " ";
 	//logger << std::setw(4) << prevArgOffset;
 
