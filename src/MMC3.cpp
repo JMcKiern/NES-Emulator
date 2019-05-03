@@ -9,7 +9,27 @@ uint8_t MMC3::PPURead(uint16_t addr) {
 	if (num8kCHRBanks > 0) {
 		int bankNum = addr / 0x400;
 		int offset = addr % 0x400;
-		return CHRROM[bankNum][offset];
+
+		if (CHRInversion) {
+			bankNum = (bankNum + 4) % 8;
+		}
+		switch (bankNum) {
+		case 0:
+			return R[0][offset];
+		case 1:
+			return R[0][offset + 0x400];
+		case 2:
+			return R[1][offset];
+		case 3:
+			return R[1][offset + 0x400];
+		case 4:
+		case 5:
+		case 6:
+		case 7:
+			return R[bankNum - 2][offset];
+		default:
+			return 0;
+		}
 	}
 	else
 		return CHRRAM[addr];
@@ -39,11 +59,11 @@ void MMC3::IRQClock() {
 void MMC3::Write(uint16_t addr, uint8_t data) {
 	if (0x8000 <= addr && addr <= 0x9FFF) {
 		if (addr % 2 == 0) {
-			uint8_t RRR = data & 0x3;
+			uint8_t RRR = data & 0x7;
 			uint8_t P = (data >> 6) & 0x1;
 			uint8_t C = (data >> 7) & 0x1;
 
-			nextBank = RRR;
+			nextBankRegister = RRR;
 
 			PRGROMBankMode = P == 0 ? PRGROM_SWAPPABLE_8000
 			                        : PRGROM_SWAPPABLE_C000;
@@ -51,84 +71,25 @@ void MMC3::Write(uint16_t addr, uint8_t data) {
 
 		}
 		else {
-			switch (nextBank) {
-			case 0: {
-				int baseBankNum4K = (data * 2);
-				if (!CHRInversion) {
-					CHRROM[0] = GetPtrCHR(baseBankNum4K, 0x0400);
-					CHRROM[1] = GetPtrCHR(baseBankNum4K + 1, 0x0400);
-				}
-				else {
-					CHRROM[4] = GetPtrCHR(baseBankNum4K, 0x0400);
-					CHRROM[5] = GetPtrCHR(baseBankNum4K + 1, 0x0400);
-				}
-				break;
-			}
+			uint8_t bankNum = data;
+			switch (nextBankRegister) {
+			case 0:
 			case 1: {
-				int baseBankNum4K = (data * 2);
-				if (!CHRInversion) {
-					CHRROM[2] = GetPtrCHR(baseBankNum4K, 0x0400);
-					CHRROM[3] = GetPtrCHR(baseBankNum4K + 1, 0x0400);
-				}
-				else {
-					CHRROM[6] = GetPtrCHR(baseBankNum4K, 0x0400);
-					CHRROM[7] = GetPtrCHR(baseBankNum4K + 1, 0x0400);
-				}
+				bankNum &= ~0x01;
+				R[nextBankRegister] = GetPtrCHR(bankNum, 0x400);
 				break;
 			}
-			case 2: {
-				int baseBankNum4K = data;
-				if (!CHRInversion) {
-					CHRROM[4] = GetPtrCHR(baseBankNum4K, 0x0400);
-				}
-				else {
-					CHRROM[0] = GetPtrCHR(baseBankNum4K, 0x0400);
-				}
+			case 2:
+			case 3:
+			case 4:
+			case 5:{
+				R[nextBankRegister] = GetPtrCHR(bankNum, 0x400);
 				break;
 			}
-			case 3: {
-				int baseBankNum4K = data;
-				if (!CHRInversion) {
-					CHRROM[5] = GetPtrCHR(baseBankNum4K, 0x0400);
-				}
-				else {
-					CHRROM[1] = GetPtrCHR(baseBankNum4K, 0x0400);
-				}
-				break;
-			}
-			case 4: {
-				int baseBankNum4K = data;
-				if (!CHRInversion) {
-					CHRROM[6] = GetPtrCHR(baseBankNum4K, 0x0400);
-				}
-				else {
-					CHRROM[2] = GetPtrCHR(baseBankNum4K, 0x0400);
-				}
-				break;
-			}
-			case 5: {
-				int baseBankNum4K = data;
-				if (!CHRInversion) {
-					CHRROM[7] = GetPtrCHR(baseBankNum4K, 0x0400);
-				}
-				else {
-					CHRROM[3] = GetPtrCHR(baseBankNum4K, 0x0400);
-				}
-				break;
-			}
-			case 6: {
-				uint8_t bankNum = data & ~0xc0;
-				if (PRGROMBankMode == PRGROM_SWAPPABLE_8000) {
-					PRGROM[0] = GetPtrPRG(bankNum, 0x1000);
-				}
-				else {
-					PRGROM[2] = GetPtrPRG(bankNum, 0x1000);
-				}
-				break;
-			}
+			case 6:
 			case 7: {
-				uint8_t bankNum = data & ~0xc0;
-				PRGROM[1] = GetPtrPRG(bankNum, 0x1000);
+				bankNum &= ~0xc0;
+				R[nextBankRegister] = GetPtrPRG(bankNum, 0x2000);
 				break;
 			}
 			default:
@@ -181,23 +142,40 @@ uint8_t MMC3::Read(uint16_t addr) {
 		else
 			return 0;
 	}
-	else if (0x8000 <= addr && addr < 0xC000) {
-		if (PRGROML != NULL)
-			return PRGROML[addr - 0x8000];
-		else
+	else if (0x8000 <= addr && addr < 0x10000) {
+		addr = addr - 0x8000;
+		int bankNum = addr / 0x2000;
+		int offset = addr % 0x2000;
+
+		switch (bankNum) {
+		case 0:
+			if (PRGROMBankMode == PRGROM_SWAPPABLE_8000) {
+				return R[6][offset];
+			}
+			else {
+				return GetPtrPRG((2 * num16kPRGBanks) - 2, 0x4000 / 2)[offset];
+			}
+		case 1:
+			return R[7][offset];
+		case 2:
+			if (PRGROMBankMode == PRGROM_SWAPPABLE_8000) {
+				return GetPtrPRG((2 * num16kPRGBanks) - 2, 0x4000 / 2)[offset];
+			}
+			else {
+				return R[6][offset];
+			}
+		case 3:
+			return GetPtrPRG((2 * num16kPRGBanks) - 1, 0x4000 / 2)[offset];
+		default:
 			return 0;
-	}
-	else if (0xC000 <= addr && addr < 0x10000) {
-		if (PRGROMU != NULL)
-			return PRGROMU[addr - 0xC000];
-		else
-			return 0;
+		}
 	}
 	else {
 		// From Ice Climbers it looks like returning any value here is ok
 		return 0;
 	}
 	//throw MemoryAddressNotValidException();
+	
 }
 
 MMC3::MMC3(std::ifstream& f, CPU_NES* cpuPtr) :
@@ -205,14 +183,19 @@ MMC3::MMC3(std::ifstream& f, CPU_NES* cpuPtr) :
 {
 	if (num8kRAMBanks > 0)
 		PRGRAM = new uint8_t[0x2000];
-	PRGROML = GetPtrPRG(0, 0x4000);
-	PRGROMU = GetPtrPRG(num16kPRGBanks - 1, 0x4000);
 	if (num8kCHRBanks > 0) {
 		//CHRROML = GetPtrCHR(0, 0x1000);
 		//CHRROMU = GetPtrCHR(1, 0x1000);
 	}
 	else {
 		CHRRAM = new uint8_t[0x2000];
+	}
+	for (int i = 0; i < 6; i++) {
+		// Setting this because it will be accessed before it can be set by
+		// the loaded rom.
+		R[i] = GetPtrCHR(0);
+		// Not setting PRG since that would have consequences if it was loaded
+		// wrong
 	}
 	cpuPtr->AddIRQConnection(&irqConnection);
 }

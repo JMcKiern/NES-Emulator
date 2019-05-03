@@ -9,20 +9,24 @@ uint8_t* Mapper::GetPtrCHR(uint8_t bankNum) {
 	return reinterpret_cast<uint8_t*>(cartridge + offset);
 }
 uint32_t Mapper::GetOffsetPRG(uint8_t bankNum, uint16_t bankSize) {
-	if (bankNum < 0 || bankNum >= num16kPRGBanks)
-		std::out_of_range("Attempted to access nonexistant bank number.");
+	if (bankNum < 0 || bankNum * bankSize >= num16kPRGBanks * 0x4000)
+		throw std::out_of_range("Attempted to access nonexistant bank number.");
 	uint32_t offset = 0x10; // Header
 	if (isTrainer) offset += 0x200; // Trainer
 	offset += bankSize * bankNum; // PRG Banks
+	if (offset + bankSize > size)
+		throw std::out_of_range("Out of range cartidge access.");
 	return offset;
 }
 uint32_t Mapper::GetOffsetCHR(uint8_t bankNum, uint16_t bankSize) {
-	if (bankNum < 0 || bankNum >= num8kCHRBanks)
-		std::out_of_range("Attempted to access nonexistant bank number.");
+	if (bankNum < 0 || bankNum * bankSize >= num8kCHRBanks * 0x2000)
+		throw std::out_of_range("Attempted to access nonexistant bank number.");
 	uint32_t offset = 0x10; // Header
 	if (isTrainer) offset += 0x200; // Trainer
 	offset += 0x4000 * num16kPRGBanks; // PRG Banks
 	offset += bankSize * bankNum; // CHR Banks
+	if (offset + bankSize > size)
+		throw std::out_of_range("Out of range cartidge access.");
 	return offset;
 }
 uint8_t* Mapper::GetPtrPRG(uint8_t bankNum, uint16_t bankSize) {

@@ -6,8 +6,7 @@
 #include "PeripheralConnection.h"
 
 class MMC3 : public Mapper {
-	uint8_t* CHRROM[8];
-	uint8_t* PRGROM[4];
+	uint8_t* R[8];
 	//uint8_t shiftReg = 0;
 	//int shiftNum = 0;
 	bool shouldSwitch8KCHRROM;
@@ -22,7 +21,7 @@ class MMC3 : public Mapper {
 		R6_PRG8K_0x8000,
 		R7_PRG8K_0xA000
 	};
-	int nextBank = R0_CHR2K_0x0000;
+	int nextBankRegister = R0_CHR2K_0x0000;
 	enum {
 		PRGROM_SWAPPABLE_8000,
 		PRGROM_SWAPPABLE_C000
