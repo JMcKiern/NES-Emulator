@@ -42,6 +42,7 @@ void MMC3::IRQClock() {
 	}
 	if ((irqCounter == 0) || irqReloadFlag) {
 		irqCounter = irqLatch;
+		irqReloadFlag = false;
 	}
 	else {
 		irqCounter--;
