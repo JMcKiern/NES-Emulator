@@ -119,6 +119,8 @@ private:
 	void LoadSpritesForScanline();
 	uint8_t ReverseByte(uint8_t byte);
 	void ShiftSprShifters();
+
+	void UpdateA12(uint16_t addr);
 	
 	GLScene2D* gls;
 

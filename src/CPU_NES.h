@@ -12,7 +12,6 @@ private:
 	uint16_t UnMirror(uint16_t offset);
 	uint8_t Read(uint16_t offset, bool shouldTick = true);
 	void Write(uint16_t offset, uint8_t data, bool shouldTick = true);
-	uint8_t openBus;
 
 	// Logging
 	void PrintDebugInfoMesen();
@@ -37,6 +36,9 @@ public:
 
 	// Start Up
 	void PowerUp();
+
+	// Public so MMC3 can return it if PRGRAM disabled
+	uint8_t openBus;
 
 	CPU_NES(PPU* _PPUPtr, Mapper** _mapperPtr,
 	        Controller* _controller0);

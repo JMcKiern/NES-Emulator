@@ -145,6 +145,14 @@ void Mapper::PPUWrite(uint16_t addr, uint8_t data) {
 		CHRRAM[addr] = data;
 }
 
+void Mapper::IRQClock() {
+	// Do nothing
+}
+
+uint8_t Mapper::GetMapperNum() {
+	return mapperNum;
+}
+
 Mapper::Mapper(std::ifstream& f) {
 	LoadINES(f);
 	SetupINES();

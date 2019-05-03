@@ -5,8 +5,10 @@
 #include "MMC1.h"
 #include "UxROM.h"
 #include "CNROM.h"
+#include "MMC3.h"
+#include "CPU_NES.h"
 
-Mapper* MapperFactory::GetMapper(std::string filename) {
+Mapper* MapperFactory::GetMapper(std::string filename, CPU_NES* cpuPtr) {
 	std::ifstream f;
 	std::streampos sizef;
 
@@ -32,6 +34,8 @@ Mapper* MapperFactory::GetMapper(std::string filename) {
 	case 1: mapper = new MMC1(f); break;
 	case 2: mapper = new UxROM(f); break;
 	case 3: mapper = new CNROM(f); break;
+	case 4: mapper = new MMC3(f, cpuPtr); break;
+
 	default:
 		throw MapperNotImplementedException();
 	}

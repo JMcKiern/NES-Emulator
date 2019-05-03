@@ -807,6 +807,10 @@ int CPU_6502::GetTotalNumInstrs() {
 	return totalNumInstrs;
 }
 
+int CPU_6502::GetTotalCycles() {
+	return totalCycles;
+}
+
 // Debugging
 void CPU_6502::SetP(uint8_t val) {
 	N = ((val >> N.GetBitNum()) & 0x1);

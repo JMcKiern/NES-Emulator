@@ -58,6 +58,10 @@ public:
 	virtual uint8_t PPURead(uint16_t addr);
 	virtual void PPUWrite(uint16_t addr, uint8_t data);
 
+	virtual void IRQClock();
+
+	uint8_t GetMapperNum();
+
 	Mapper(std::ifstream& f);
 	~Mapper();
 };

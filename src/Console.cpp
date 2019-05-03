@@ -158,7 +158,7 @@ std::string Console::GetFrameHash() {
 }
 void Console::LoadINES(std::string filename) {
 	std::cout << "Loading " << filename << '\n';
-	mapperPtr = MapperFactory::GetMapper(filename);
+	mapperPtr = MapperFactory::GetMapper(filename, &cpu);
 	cpu.PowerUp();
 }
 

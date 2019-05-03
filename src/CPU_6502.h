@@ -151,6 +151,7 @@ public:
 	void RunNextOpcode();
 	uint16_t GetPC();
 	int GetTotalNumInstrs();
+	int GetTotalCycles();
 
 	// Debugging
 	void SetP(uint8_t val);
