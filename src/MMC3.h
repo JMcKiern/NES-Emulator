@@ -47,5 +47,5 @@ public:
 	void IRQClock();
 	void Write(uint16_t addr, uint8_t data);
 	uint8_t Read(uint16_t addr);
-	MMC3(std::ifstream& f, CPU_NES* cpuPtr);
+	MMC3(std::ifstream& f, CPU_NES* _cpuPtr);
 };

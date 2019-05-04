@@ -128,7 +128,7 @@ void MMC3::Write(uint16_t addr, uint8_t data) {
 		}
 	}
 	else if (0xE000 <= addr && addr <= 0xFFFF) {
-		irqEnabled = addr % 2 == 0;
+		irqEnabled = addr % 2 == 1;
 	}
 }
 
@@ -179,7 +179,7 @@ uint8_t MMC3::Read(uint16_t addr) {
 	
 }
 
-MMC3::MMC3(std::ifstream& f, CPU_NES* cpuPtr) :
+MMC3::MMC3(std::ifstream& f, CPU_NES* _cpuPtr) :
 	Mapper(f)
 {
 	if (num8kRAMBanks > 0)
@@ -198,5 +198,6 @@ MMC3::MMC3(std::ifstream& f, CPU_NES* cpuPtr) :
 		// Not setting PRG since that would have consequences if it was loaded
 		// wrong
 	}
+	cpuPtr = _cpuPtr;
 	cpuPtr->AddIRQConnection(&irqConnection);
 }
