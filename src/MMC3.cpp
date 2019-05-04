@@ -35,9 +35,7 @@ uint8_t MMC3::PPURead(uint16_t addr) {
 		return CHRRAM[addr];
 }
 void MMC3::IRQClock() {
-	if (irqConnection.GetState() == LOW && irqCycle < cpuPtr->GetTotalCycles()) {
-		// Ensure that IRQ is low for at least one cpu tick (i.e. so it can be
-		// detected)
+	if (!irqEnabled) {
 		irqConnection.SetState(HIGH);
 	}
 	if ((irqCounter == 0) || irqReloadFlag) {
@@ -49,7 +47,6 @@ void MMC3::IRQClock() {
 		// Normal/new behaviour
 		if (irqCounter == 0 && irqEnabled) {
 			irqConnection.SetState(LOW);
-			irqCycle = cpuPtr->GetTotalCycles();
 		}
 	}
 	/*// Alternate/new behaviour
@@ -58,7 +55,12 @@ void MMC3::IRQClock() {
 	}*/
 }
 void MMC3::Write(uint16_t addr, uint8_t data) {
-	if (0x8000 <= addr && addr <= 0x9FFF) {
+	if (0x6000 <= addr && addr <=0x7FFF) {
+		if (isPRGRAMEnabled && PRGRAM != NULL) {
+			PRGRAM[addr - 0x6000] = data;
+		}
+	}
+	else if (0x8000 <= addr && addr <= 0x9FFF) {
 		if (addr % 2 == 0) {
 			uint8_t RRR = data & 0x7;
 			uint8_t P = (data >> 6) & 0x1;
@@ -182,8 +184,7 @@ uint8_t MMC3::Read(uint16_t addr) {
 MMC3::MMC3(std::ifstream& f, CPU_NES* _cpuPtr) :
 	Mapper(f)
 {
-	if (num8kRAMBanks > 0)
-		PRGRAM = new uint8_t[0x2000];
+	PRGRAM = new uint8_t[0x2000];
 	if (num8kCHRBanks > 0) {
 		//CHRROML = GetPtrCHR(0, 0x1000);
 		//CHRROMU = GetPtrCHR(1, 0x1000);
@@ -196,7 +197,8 @@ MMC3::MMC3(std::ifstream& f, CPU_NES* _cpuPtr) :
 		// the loaded rom.
 		R[i] = GetPtrCHR(0);
 		// Not setting PRG since that would have consequences if it was loaded
-		// wrong
+		// wrong. The software in the last prgrom bank should load this on
+		// reset.
 	}
 	cpuPtr = _cpuPtr;
 	cpuPtr->AddIRQConnection(&irqConnection);

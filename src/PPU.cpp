@@ -24,7 +24,6 @@ uint16_t PPU::UnMirror(uint16_t offset) {
 	return offset;
 }
 void PPU::Write(uint16_t offset, uint8_t data) {
-	UpdateA12(offset);
 	offset = UnMirror(offset);
 	if (0x3f00 <= offset && offset <= 0x3f20) {
 		// Palette Ram
@@ -41,7 +40,6 @@ void PPU::Write(uint16_t offset, uint8_t data) {
 	}
 }
 uint8_t PPU::Read(uint16_t offset) {
-	UpdateA12(offset);
 	offset = UnMirror(offset);
 	if (0x3f00 <= offset && offset <= 0x3f20) {
 		// Palette Ram
@@ -64,7 +62,10 @@ uint8_t PPU::Read(uint16_t offset) {
 void PPU::UpdateA12(uint16_t addr) {
 	static uint8_t prevA12;
 	uint8_t currA12 = (addr >> 12) & 0x1;
-	if (prevA12 == 0 && currA12 == 1) {
+	// Need to correct dummy fetches for this to work
+	//if (prevA12 == 0 && currA12 == 1) {
+	// Quick fix
+	if (cycle == 256) {
 		// PPU A12 0->1
 		if ((*mapperPtrPtr)->GetMapperNum() == 4) {
 			(*mapperPtrPtr)->IRQClock();
@@ -637,6 +638,7 @@ void PPU::RenderTick() {
 	}
 	else if ((shouldShowBackground || shouldShowSprites)
 	         && 0 <= scanline && scanline <= 239) {
+		UpdateA12(0x0);
 		// Visible scanlines
 		if (cycle == 0) {
 			// Idle
