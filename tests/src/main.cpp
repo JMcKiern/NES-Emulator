@@ -9,9 +9,9 @@ Logger logger("log.txt");
 int main() {
 	// 6502 Tests
 	std::vector<FunctionalTestRun> ftrs = {
-		{"../roms/6502_functional_test.bin", 0x0, 0x400, 0x336d, false, false},
-		{"../roms/6502_interrupt_test.bin", 0x0, 0x400, 0x06f5, true, false},
-		{"../roms/timingtest-1.bin", 0x1000, 0x1000, 0x1000, false, false}
+		//{"../roms/6502_functional_test.bin", 0x0, 0x400, 0x336d, false, false},
+		//{"../roms/6502_interrupt_test.bin", 0x0, 0x400, 0x06f5, true, false},
+		//{"../roms/timingtest-1.bin", 0x1000, 0x1000, 0x1000, false, false}
 	};
 
 	// NES Tests
@@ -93,10 +93,10 @@ int main() {
 		//console.Run("../tests/Controller/read_joy3/test_buttons.nes");
 		//console.Run("../tests/Controller/read_joy3/thorough_test.nes");
 	};
-	PrintHash("../tests/holydiverbatman-bin-0.01/testroms/M1_P128K.nes");
-	PrintHash("../tests/holydiverbatman-bin-0.01/testroms/M1_P128K_C32K.nes");
-	PrintHash("../tests/holydiverbatman-bin-0.01/testroms/M1_P128K_C32K_S8K.nes");
-	PrintHash("../tests/holydiverbatman-bin-0.01/testroms/M1_P128K_C32K_W8K.nes");
+	//PrintHash("../tests/holydiverbatman-bin-0.01/testroms/M1_P128K.nes");
+	//PrintHash("../tests/holydiverbatman-bin-0.01/testroms/M1_P128K_C32K.nes");
+	//PrintHash("../tests/holydiverbatman-bin-0.01/testroms/M1_P128K_C32K_S8K.nes");
+	//PrintHash("../tests/holydiverbatman-bin-0.01/testroms/M1_P128K_C32K_W8K.nes");
 
 	std::vector<std::string> failedFilenames;
 	for (auto it = ftrs.begin(); it != ftrs.end(); ++it) {
@@ -119,6 +119,9 @@ int main() {
 		     ++it) {
 			std::cout << (*it) << '\n';
 		}
+	}
+	else {
+		std::cout << "Passed all tests!\n";
 	}
 	char x;
 	std::cin >> x;
