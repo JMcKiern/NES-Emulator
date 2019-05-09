@@ -1,6 +1,7 @@
 #pragma once
 
 #include <exception>
+#include <string>
 
 struct ItemNotFoundException : public std::exception {
 	const char* what() const throw () {
@@ -18,8 +19,13 @@ struct BadInstrTimingException : public std::exception {
 	}
 };
 struct MapperNotImplementedException : public std::exception {
+	int mapperNum;
 	const char* what() const throw () {
-		return "Mapper has not been implemented!";
+		return ("Mapper " + std::to_string(mapperNum) + " has not been implemented!").c_str();
+	}
+	MapperNotImplementedException(int _mapperNum) {
+		std::exception();
+		mapperNum = _mapperNum;
 	}
 };
 struct InvalidFileTypeException : public std::exception {

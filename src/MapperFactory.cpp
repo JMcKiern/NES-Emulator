@@ -37,7 +37,7 @@ Mapper* MapperFactory::GetMapper(std::string filename, CPU_NES* cpuPtr) {
 	case 4: mapper = new MMC3(f, cpuPtr); break;
 
 	default:
-		throw MapperNotImplementedException();
+		throw MapperNotImplementedException(mapperNum);
 	}
 	f.close();
 
