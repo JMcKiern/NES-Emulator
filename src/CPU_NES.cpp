@@ -66,7 +66,7 @@ void CPU_NES::Write(uint16_t offset, uint8_t data, bool shouldTick/*= true*/) {
 	else if (offset >= 0x4020 && offset <= 0xFFFF) {
 		(*mapperPtrPtr)->Write(offset, data);
 	}
-	else if (offset >= 0x4000 && offset <= 0x4013 || offset == 0x4015) {
+	else if (offset >= 0x4000 && offset <= 0x4013 || offset == 0x4015 || offset == 0x4017) {
 		// Audio
 		APUPtr->Write(offset, data);
 	}
@@ -77,6 +77,7 @@ void CPU_NES::Write(uint16_t offset, uint8_t data, bool shouldTick/*= true*/) {
 			if (controller1 != nullptr)
 				controller1->Write(data);
 		}
+		APUPtr->Write(offset, data);
 	}
 	else {
 		throw MemoryAddressNotValidException();

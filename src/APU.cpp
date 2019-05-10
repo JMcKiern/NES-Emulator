@@ -1,5 +1,13 @@
 #include <exception>
+#include <cstdint>
+#define HAVE_STDINT_H 1
+#include "SDL.h"
+#include "Sound_Queue.h"
 #include "APU.h"
+
+void APU::output_samples(const blip_sample_t * smpl, size_t count) {
+	sound_queue->write(smpl, count);
+}
 
 int APU::elapsed() {
 	return total_cycles - cycles_remain;
@@ -41,14 +49,20 @@ void APU::end_time_frame(int length) {
 		size_t count = buf.read_samples(out_buf, out_size);
 		output_samples(out_buf, count);
 	}
-
 }
 
-void APU::RunFrame(int numCycles) {
+void APU::AddCycles(int numCycles) {
 	total_cycles += numCycles;
-	cycles_remain += numCycles;
+	//cycles_remain += numCycles;
+}
 
-	end_time_frame(elapsed())
+void APU::RunFrame() {
+	end_time_frame(elapsed());
+}
+
+void APU::play_samples(const blip_sample_t* samples, long count)
+{
+	sound_queue->write(samples, count);
 }
 
 
@@ -61,4 +75,19 @@ APU::APU(CPU_NES* _cpuPtr) {
 	apu.output(&buf);
 	//apu.dmc_reader(static_cast<APU*>(this)->dmc_read);
 	apu.dmc_reader(apu_dmc_read, cpuPtr);
+	if (SDL_Init(SDL_INIT_AUDIO) < 0)
+		exit(EXIT_FAILURE);
+
+	atexit(SDL_Quit);
+
+	sound_queue = new Sound_Queue;
+	if (!sound_queue)
+		exit(EXIT_FAILURE);
+
+	if (sound_queue->init(44100))
+		exit(EXIT_FAILURE);
+}
+
+APU::~APU() {
+	delete sound_queue;
 }

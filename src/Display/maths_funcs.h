@@ -16,8 +16,9 @@
 #ifndef _MATHS_FUNCS_H_
 #define _MATHS_FUNCS_H_
 
-
+#ifndef M_PI
 #define M_PI 3.14159265358979323846
+#endif
 // const used to convert degrees into radians
 #define TAU 2.0 * M_PI
 #define ONE_DEG_IN_RAD ( 2.0 * M_PI ) / 360.0 // 0.017444444

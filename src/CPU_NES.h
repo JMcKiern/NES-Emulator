@@ -6,6 +6,7 @@
 #include "Controller.h"
 
 class PPU;
+class APU;
 
 class CPU_NES : public CPU_6502 {
 private:

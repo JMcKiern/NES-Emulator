@@ -6,6 +6,9 @@
 
 // I'm going to be lazy and just use blargg's library
 #include "nes_apu/Nes_Apu.h"
+#include "Sound_Queue.h"
+
+class CPU_NES;
 
 class APU {
 private:
@@ -18,8 +21,8 @@ private:
 	// Maybe for full apu support
 	cpu_time_t cpu_end_time;
 
-	int total_cycles;
-	int cycles_remain;
+	int total_cycles = 0;
+	int cycles_remain = 0;
 
 	int elapsed();
 
@@ -29,12 +32,19 @@ private:
 
 	void end_time_frame(int length);
 
+	// For actual output
+	Sound_Queue* sound_queue;
+	void play_samples(const blip_sample_t* samples, long count);
+
 
 public:
 	uint8_t Read(uint16_t offset);
 	void Write(uint16_t offset, uint8_t data);
 
-	void RunFrame(int numCycles);
+	void RunFrame();
+	void AddCycles(int numCycles);
+
 
 	APU(CPU_NES* _cpuPtr);
+	~APU();
 };

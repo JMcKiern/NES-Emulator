@@ -94,19 +94,16 @@ void Console::RunFrame() {
 	//	<< " ms\n";
 	std::this_thread::sleep_until(nextFrame);
 
-	int startFrameCycle = cpu.GetTotalCycles();
-
 	bool isOddFrame = ppu.IsOddFrame();
 	while (isOddFrame == ppu.IsOddFrame()) {
+		int startCycles = cpu.GetTotalCycles();
 		cpu.RunNextOpcode();
+		apu.AddCycles(cpu.GetTotalCycles() - startCycles);
 	}
-
-	int numCycles = cpu.GetTotalCycles() - startFrameCycle;
-	apu.RunFrame(numCycles);
-
 
 	int cyclesRun = cpu.GetTotalCycles() - prevCycles;
 	prevCycles = cpu.GetTotalCycles();
+	apu.RunFrame();
 	nextFrame += cycles{cyclesRun};
 }
 void Console::Run(std::string filename) {
@@ -169,8 +166,9 @@ void Console::LoadINES(std::string filename) {
 }
 
 Console::Console() :
-	cpu(&ppu, &mapperPtr, &controller0, &controller1),
+	cpu(&ppu, &apu, &mapperPtr, &controller0, &controller1),
 	ppu(&cpu, &mapperPtr, &gls),
+	apu(&cpu),
 	gls(RES_X, RES_Y)
 {} 
 Console::~Console() {
