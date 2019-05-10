@@ -24,6 +24,12 @@ Use CMake to generate the build files.
 
 It is likely that CMAKE_INCLUDE_PATH and CMAKE_LIBRARY_PATH will need to be defined.
 
+For example
+
+```
+cmake -G "Visual Studio 15 2017 Win64" -DCMAKE_INCLUDE_PATH=<path-to-include> -DCMAKE_LIBRARY_PATH=<path-to-libraries> ..
+```
+
 ### Linux
 
 After the dependencies have been installed run these commands
