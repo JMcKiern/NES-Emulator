@@ -94,10 +94,16 @@ void Console::RunFrame() {
 	//	<< " ms\n";
 	std::this_thread::sleep_until(nextFrame);
 
+	int startFrameCycle = cpu.GetTotalCycles();
+
 	bool isOddFrame = ppu.IsOddFrame();
 	while (isOddFrame == ppu.IsOddFrame()) {
 		cpu.RunNextOpcode();
 	}
+
+	int numCycles = cpu.GetTotalCycles() - startFrameCycle;
+	apu.RunFrame(numCycles);
+
 
 	int cyclesRun = cpu.GetTotalCycles() - prevCycles;
 	prevCycles = cpu.GetTotalCycles();

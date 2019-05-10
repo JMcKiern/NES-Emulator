@@ -1,6 +1,7 @@
 #pragma once
 #include "CPU_6502.h"
 #include "PPU.h"
+#include "APU.h"
 #include "Mapper.h"
 #include "Controller.h"
 
@@ -18,6 +19,7 @@ private:
 
 	// Other Processors
 	PPU* PPUPtr;
+	APU* APUPtr;
 	Controller* controller0 = nullptr;
 	Controller* controller1 = nullptr;
 	Mapper** mapperPtrPtr;
@@ -40,8 +42,8 @@ public:
 	// Public so MMC3 can return it if PRGRAM disabled
 	uint8_t openBus;
 
-	CPU_NES(PPU* _PPUPtr, Mapper** _mapperPtr,
+	CPU_NES(PPU* _PPUPtr, APU* _APUPtr, Mapper** _mapperPtr,
 	        Controller* _controller0);
-	CPU_NES(PPU* _PPUPtr, Mapper** _mapperPtr,
+	CPU_NES(PPU* _PPUPtr, APU* _APUPtr, Mapper** _mapperPtr,
 	        Controller* _controller0, Controller* _controller1);
 };

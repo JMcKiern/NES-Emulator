@@ -824,6 +824,9 @@ void CPU_6502::SetPC(uint16_t _PC) {
 void CPU_6502::SetI() {
 	I = 1;
 }
+uint8_t CPU_6502::GetI() {
+	return I;
+}
 void CPU_6502::SetSP(uint8_t val) {
 	SP = val;
 }
