@@ -5,7 +5,8 @@
 #include "Console.h"
 #include "Logger.h"
 
-Logger logger("log.txt");
+//Logger logger("log.txt");
+Logger logger();
 
 #ifdef _WIN32
 int main(int argc, char* argv[]);
