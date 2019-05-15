@@ -156,6 +156,7 @@ public:
 	void SetP(uint8_t val);
 	void SetPC(uint16_t _PC);
 	void SetI();
+	uint8_t GetI();
 	void SetSP(uint8_t val);
 	uint8_t GetSP();
 	void SetA(uint8_t val);

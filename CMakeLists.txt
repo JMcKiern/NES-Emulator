@@ -45,6 +45,13 @@ endforeach()
 foreach(file_path ${GLFW_INCLUDE_DIR})
 	message(${file_path})
 endforeach()
+find_package(SDL2 REQUIRED)
+foreach(file_path ${SDL2_LIBRARY})
+	message(${file_path})
+endforeach()
+foreach(file_path ${SDL2_INCLUDE_DIR})
+	message(${file_path})
+endforeach()
 
 include_directories(
 	${OPENGL_INCLUDE_DIRS}
@@ -57,4 +64,5 @@ target_link_libraries(
 	${OPENGL_gl_LIBRARY}
 	${GLEW_LIBRARIES}
 	${GLFW_LIBRARY}
+	${SDL2_LIBRARY}
 	)

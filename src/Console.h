@@ -6,6 +6,7 @@
 #include <iostream>
 #include <stdint.h>
 #include "CPU_NES.h"
+#include "APU.h"
 #include "Controller.h"
 #include "Display/GLScene2D.h"
 #include "Peripheral.h"
@@ -15,6 +16,7 @@
 class Console {
 	CPU_NES cpu;
 	PPU ppu;
+	APU apu;
 	Mapper* mapperPtr;
 
 	// Window

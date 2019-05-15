@@ -30,7 +30,10 @@ uint8_t CPU_NES::Read(uint16_t offset, bool shouldTick/*= true*/) {
 	}
 	else if (offset >= 0x4000 && offset <= 0x4013 || offset == 0x4015) {
 		// Audio
-		value = 0xFF;
+		//value = 0xFF;
+		// I think you can only read the status register
+		if (offset == 0x4015)
+			value = APUPtr->Read(offset);
 	}
 	else if (offset >= 0x4016 && offset <= 0x4017) {
 		// Controllers
@@ -63,8 +66,9 @@ void CPU_NES::Write(uint16_t offset, uint8_t data, bool shouldTick/*= true*/) {
 	else if (offset >= 0x4020 && offset <= 0xFFFF) {
 		(*mapperPtrPtr)->Write(offset, data);
 	}
-	else if (offset >= 0x4000 && offset <= 0x4013 || offset == 0x4015) {
+	else if (offset >= 0x4000 && offset <= 0x4013 || offset == 0x4015 || offset == 0x4017) {
 		// Audio
+		APUPtr->Write(offset, data);
 	}
 	else if (offset >= 0x4016 && offset <= 0x4017) {
 		// Controllers
@@ -73,6 +77,7 @@ void CPU_NES::Write(uint16_t offset, uint8_t data, bool shouldTick/*= true*/) {
 			if (controller1 != nullptr)
 				controller1->Write(data);
 		}
+		APUPtr->Write(offset, data);
 	}
 	else {
 		throw MemoryAddressNotValidException();
@@ -131,7 +136,7 @@ void CPU_NES::PowerUp() {
 }
 
 // Constructor
-CPU_NES::CPU_NES(PPU* _PPUPtr, Mapper** _mapperPtrPtr,
+CPU_NES::CPU_NES(PPU* _PPUPtr, APU* _APUPtr, Mapper** _mapperPtrPtr,
 				 Controller* _controller0) :
 	CPU_6502(0x800)
 {
@@ -139,12 +144,13 @@ CPU_NES::CPU_NES(PPU* _PPUPtr, Mapper** _mapperPtrPtr,
 	controller0 = _controller0;
 	mapperPtrPtr = _mapperPtrPtr;
 }
-CPU_NES::CPU_NES(PPU* _PPUPtr, Mapper** _mapperPtrPtr,
+CPU_NES::CPU_NES(PPU* _PPUPtr, APU* _APUPtr, Mapper** _mapperPtrPtr,
 				 Controller* _controller0,
 				 Controller* _controller1) :
 	CPU_6502(0x800)
 {
 	PPUPtr = _PPUPtr;
+	APUPtr = _APUPtr;
 	controller0 = _controller0;
 	controller1 = _controller1;
 	mapperPtrPtr = _mapperPtrPtr;
