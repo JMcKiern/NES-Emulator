@@ -60,11 +60,6 @@ void APU::RunFrame() {
 	end_time_frame(elapsed());
 }
 
-void APU::play_samples(const blip_sample_t* samples, long count)
-{
-	sound_queue->write(samples, count);
-}
-
 
 APU::APU(CPU_NES* _cpuPtr) {
 	cpuPtr = _cpuPtr;
