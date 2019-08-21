@@ -57,6 +57,7 @@ include_directories(
 	${OPENGL_INCLUDE_DIRS}
 	${GLEW_INCLUDE_DIRS}
 	${GLFW_INCLUDE_DIR}
+	${SDL2_INCLUDE_DIR}
 	)
 target_link_libraries(
 	NES-Emulator
