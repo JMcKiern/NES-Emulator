@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
 	try {
 		if (argc == 2) {
 			Console console;
-			console.Run(__argv[1]);
+			console.Run(argv[1]);
 		}
 		else if (argc < 2) {
 			throw std::runtime_error("You must supply a file to run!\n");

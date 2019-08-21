@@ -65,7 +65,7 @@ APU::APU(CPU_NES* _cpuPtr) {
 	cpuPtr = _cpuPtr;
 	blargg_err_t error = buf.sample_rate(44100);
 	if (error)
-		throw std::exception(error);
+		throw std::runtime_error(error);
 	buf.clock_rate(1789773);
 	apu.output(&buf);
 	//apu.dmc_reader(static_cast<APU*>(this)->dmc_read);
