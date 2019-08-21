@@ -44,11 +44,12 @@ void Blip_Buffer::clear( bool entire_buffer )
 
 blargg_err_t Blip_Buffer::sample_rate( long new_rate, int msec )
 {
+	unsigned new_size;
 	// jmckiern: Had to add this to stop insane mem alloc attempts...
 	if (ULONG_MAX > 0xFFFFFFFF)
-		unsigned new_size = (0xFFFFFFFF >> BLIP_BUFFER_ACCURACY) + 1 - widest_impulse_ - 64;
+		new_size = (0xFFFFFFFF >> BLIP_BUFFER_ACCURACY) + 1 - widest_impulse_ - 64;
 	else
-		unsigned new_size = ( ULONG_MAX >> BLIP_BUFFER_ACCURACY) + 1 - widest_impulse_ - 64;
+		new_size = ( ULONG_MAX >> BLIP_BUFFER_ACCURACY) + 1 - widest_impulse_ - 64;
 
 	if ( msec != blip_default_length )
 	{
