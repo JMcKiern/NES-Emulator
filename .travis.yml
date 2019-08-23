@@ -16,3 +16,12 @@ script:
     - cd build
     - cmake ..
     - make
+
+deploy:
+    provider: releases
+    api_key: "GITHUB OAUTH TOKEN"
+    file: NES-Emulator
+    skip_cleanup: true
+    draft: true
+    on:
+        branch: travis
