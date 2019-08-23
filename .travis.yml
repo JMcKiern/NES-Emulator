@@ -20,4 +20,5 @@ deploy:
   file: NES-Emulator
   on:
     repo: JMcKiern/NES-Emulator
-    branch: travis
+    branch: master
+    tags: true
