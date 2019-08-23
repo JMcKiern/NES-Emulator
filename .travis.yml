@@ -2,13 +2,13 @@ sudo: required
 language: cpp
 
 compiler:
-	- gcc
+    - gcc
 
 install:
-	- sudo apt install libglew-dev libglfw3-dev libsdl2-dev
+    - sudo apt install libglew-dev libglfw3-dev libsdl2-dev
 
 script:
-	- mkdir build
-	- cd build
-	- cmake ..
-	- make
+    - mkdir build
+    - cd build
+    - cmake ..
+    - make
