@@ -339,7 +339,7 @@ void PPU::SpriteEvaluation() {
 			}
 		}
 	}
-	else if (321 <= cycle && cycle <= 340 || cycle == 0) {
+	else if ((321 <= cycle && cycle <= 340) || cycle == 0) {
 		// Step 4
 	}
 }

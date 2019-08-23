@@ -28,9 +28,9 @@ uint8_t CPU_NES::Read(uint16_t offset, bool shouldTick/*= true*/) {
 	else if (offset >= 0x4020 && offset <= 0xFFFF) {
 		value = (*mapperPtrPtr)->Read(offset);
 	}
-	else if (offset >= 0x4000 && offset <= 0x4013 || offset == 0x4015) {
+	else if ((offset >= 0x4000 && offset <= 0x4013) || offset == 0x4015) {
 		// Audio
-		//value = 0xFF;
+		value = 0xFF;
 		// I think you can only read the status register
 		if (offset == 0x4015)
 			value = APUPtr->Read(offset);
@@ -66,7 +66,8 @@ void CPU_NES::Write(uint16_t offset, uint8_t data, bool shouldTick/*= true*/) {
 	else if (offset >= 0x4020 && offset <= 0xFFFF) {
 		(*mapperPtrPtr)->Write(offset, data);
 	}
-	else if (offset >= 0x4000 && offset <= 0x4013 || offset == 0x4015 || offset == 0x4017) {
+	else if ((offset >= 0x4000 && offset <= 0x4013) || offset == 0x4015 
+			|| offset == 0x4017) {
 		// Audio
 		APUPtr->Write(offset, data);
 	}
@@ -141,6 +142,7 @@ CPU_NES::CPU_NES(PPU* _PPUPtr, APU* _APUPtr, Mapper** _mapperPtrPtr,
 	CPU_6502(0x800)
 {
 	PPUPtr = _PPUPtr;
+	APUPtr = _APUPtr;
 	controller0 = _controller0;
 	mapperPtrPtr = _mapperPtrPtr;
 }

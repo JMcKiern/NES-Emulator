@@ -21,7 +21,7 @@ protected:
 	uint8_t* CHRRAM = nullptr;
 
 	char* cartridge;
-	int size = -1;
+	unsigned int size = -1;
 
 	uint8_t num16kPRGBanks;
 	uint8_t num8kCHRBanks;
