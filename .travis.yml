@@ -5,6 +5,9 @@ language: cpp
 compiler:
     - gcc
 
+before_install:
+	- sudo apt update
+
 install:
     - sudo apt install libglew-dev libglfw3-dev libsdl2-dev
 
