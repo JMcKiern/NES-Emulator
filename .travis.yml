@@ -1,27 +1,22 @@
 sudo: required
 dist: cosmic
 language: cpp
-
 compiler:
-    - gcc
-
+- gcc
 before_install:
-    - sudo apt update
-
+- sudo apt update
 install:
-    - sudo apt install libglew-dev libglfw3-dev libsdl2-dev
-
+- sudo apt install libglew-dev libglfw3-dev libsdl2-dev
 script:
-    - mkdir build
-    - cd build
-    - cmake ..
-    - make
-
+- mkdir build
+- cd build
+- cmake ..
+- make
 deploy:
-    provider: releases
-    api_key: "GITHUB OAUTH TOKEN"
-    file: NES-Emulator
-    skip_cleanup: true
-    draft: true
-    on:
-        branch: travis
+  provider: releases
+  api_key:
+    secure: q/Co0GJSVEDWG4n01FAZKPhPgu+DOays6FlzGqBRIaivnoPypzu2gkBWhx+b3Ehfze4zLbSPkPoAJMuuUJtGtcWLWdRqw8YJWiLkTqc+Oucq8W89X+3h33qMtimi5O9KgXLPM+WAVE6E/EsuGMXRkjz6zm1AEpwuu0johh+jylA2Yg2lPvvywD1HaGqAXB4d+W2fXlvE4DTRuhHCeAvdv356JoxJgM/3JQzJ8fSKhIZm3NJUQz+4s9w+Ctu6peeeYRPxPl1VxaU2Q3vDbBTlxO1N8Orqi3sIe1wbI54DminzHiVcuNzcYrUMZbB+cuYC0PL694OmraCO9jgPFjQf8jLc/Xsov2WTDya9YN+4OA6Hsj7S0dn1NA5680QzaSxw9Fm9/DfVzp8lMvPkmcwN6IjE7euSzVZROu4hwI4sFHzA6MDLWc4mmFHlK52mCe17WSdqku9Dz59alI72BHuVhSzuD4UiipFRJivZGHJk3IAXbdck373N6jlnoxQPxc+OP/nK10flu8Dc4JFTilpVIJQmI4ipqt57rKTm7KPxgXlQgMzs4D4MZ1EqpalSTPo6zPnE+UtGwtqcaLsoNhUYUK320HwbgQQGNawfrjg3uNKI4uDi/EFvJv3CBviXHGMOrSZWVVeoIPzhxQYPrW1aoep2muT1UC0S6bydiJEERjE=
+  file: NES-Emulator
+  on:
+    repo: JMcKiern/NES-Emulator
+    branch: travis
