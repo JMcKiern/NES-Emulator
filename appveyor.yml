@@ -24,10 +24,6 @@ build_script:
 
 after_build:
   - ps: 7z a -tzip NES-Emulator_$env:VCPKG_TRIPLET.zip ./$env:CONFIGURATION/*
-  - ps: dir
-  - ps: cd ..
-  - ps: dir
-  - ps: cd build
 
 artifacts:
   - path: "build/NES-Emulator_$(VCPKG_TRIPLET).zip"
@@ -39,6 +35,5 @@ deploy:
   auth_token:
     secure: m3cBOTDVPvla+9ySt/Q2Bt6dYjkOrNPPGc/mH1txvGRRbGK07uLLLlkKDGU/u+BI
   on:
-    branch: master
     APPVEYOR_REPO_TAG: true
   artifact: NES-Emulator
