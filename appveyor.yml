@@ -8,7 +8,7 @@ configuration:
 image: Visual Studio 2015
 
 install:
-    - ps: vcpgk install glfw3 glew sdl2
+    - ps: vcpkg install glfw3 glew sdl2
     - ps: vcpkg list
 
 build_script:
