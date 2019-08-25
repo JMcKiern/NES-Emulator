@@ -26,7 +26,7 @@ after_build:
   - ps: 7z a -tzip NES-Emulator_$env:VCPKG_TRIPLET.zip ./$env:CONFIGURATION/*
 
 artifacts:
-  - path: NES-Emulator_$env:VCPKG_TRIPLET.zip
+  - path: "NES-Emulator_$env:VCPKG_TRIPLET.zip"
     name: NES-Emulator
 
 deploy:
