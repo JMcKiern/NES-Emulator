@@ -24,7 +24,10 @@ build_script:
 
 after_build:
   - ps: 7z a -tzip NES-Emulator_$env:VCPKG_TRIPLET.zip ./$env:CONFIGURATION/*
-  - ps: tree
+  - ps: dir
+  - ps: cd ..
+  - ps: dir
+  - ps: cd build
 
 artifacts:
   - path: "NES-Emulator_$(VCPKG_TRIPLET).zip"
