@@ -7,7 +7,6 @@ cache:
 
 configuration:
   - Release
-  - Debug
 
 image: Visual Studio 2017
 
@@ -20,5 +19,5 @@ install:
 build_script:
   - ps: mkdir build
   - ps: cd build
-  - ps: cmake -G"$env:CMAKE_GENERATOR" -DCMAKE_TOOLCHAIN_FILE=C:/Tools/vcpkg/scripts/buildsystems/vcpkg.cmake .. 2>&1 | %{ "$_" }
+  - ps: cmake -G"$env:CMAKE_GENERATOR" -DCMAKE_TOOLCHAIN_FILE=C:/Tools/vcpkg/scripts/buildsystems/vcpkg.cmake ..
   - ps: cmake --build . --target ALL_BUILD --config $env:CONFIGURATION
