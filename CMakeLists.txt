@@ -28,7 +28,7 @@ set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 # If using vcpkg
 if(CMAKE_TOOLCHAIN_FILE)
 
-	find_package(OpenGL CONFIG REQUIRED)
+	find_package(OpenGL REQUIRED)
 	find_package(GLEW CONFIG REQUIRED)
 	find_package(glfw3 CONFIG REQUIRED)
 	find_package(SDL2 CONFIG REQUIRED)
