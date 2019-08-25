@@ -30,7 +30,7 @@ after_build:
   - ps: cd build
 
 artifacts:
-  - path: "NES-Emulator_$(VCPKG_TRIPLET).zip"
+  - path: "build/NES-Emulator_$(VCPKG_TRIPLET).zip"
     name: NES-Emulator
 
 deploy:
