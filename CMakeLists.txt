@@ -24,40 +24,67 @@ endif()
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
-find_package(OpenGL REQUIRED)
-foreach(file_path ${OPENGL_LIBRARIES})
-	message(STATUS ${file_path})
-endforeach()
-foreach(file_path ${OPENGL_INCLUDE_DIRS})
-	message(STATUS ${file_path})
-endforeach()
-find_package(GLEW REQUIRED)
-foreach(file_path ${GLEW_LIBRARIES})
-	message(STATUS ${file_path})
-endforeach()
-foreach(file_path ${GLEW_INCLUDE_DIRS})
-	message(STATUS ${file_path})
-endforeach()
-find_package(glfw3 REQUIRED)
-foreach(file_path ${glfw3_LIBRARY})
-	message(STATUS ${file_path})
-endforeach()
-foreach(file_path ${glfw3_INCLUDE_DIR})
-	message(STATUS ${file_path})
-endforeach()
-find_package(SDL2 REQUIRED)
-foreach(file_path ${SDL2_LIBRARY})
-	message(STATUS ${file_path})
-endforeach()
-foreach(file_path ${SDL2_INCLUDE_DIR})
-	message(STATUS ${file_path})
-endforeach()
 
-target_link_libraries(
-	NES-Emulator
-	PRIVATE
-	GLEW::GLEW
-	glfw
-	SDL2::SDL2
-	SDL2::SDL2main
-	)
+# If using vcpkg
+if(CMAKE_TOOLCHAIN_FILE)
+
+	find_package(OpenGL CONFIG REQUIRED)
+	find_package(GLEW CONFIG REQUIRED)
+	find_package(glfw3 CONFIG REQUIRED)
+	find_package(SDL2 CONFIG REQUIRED)
+	target_link_libraries(
+		NES-Emulator
+		PRIVATE
+		GLEW::GLEW
+		glfw
+		SDL2::SDL2
+		SDL2::SDL2main
+		)
+
+else(CMAKE_TOOLCHAIN_FILE)
+
+	find_package(OpenGL REQUIRED)
+	foreach(file_path ${OPENGL_LIBRARIES})
+		message(STATUS ${file_path})
+	endforeach()
+	foreach(file_path ${OPENGL_INCLUDE_DIRS})
+		message(STATUS ${file_path})
+	endforeach()
+	find_package(GLEW REQUIRED)
+	foreach(file_path ${GLEW_LIBRARIES})
+		message(STATUS ${file_path})
+	endforeach()
+	foreach(file_path ${GLEW_INCLUDE_DIRS})
+		message(STATUS ${file_path})
+	endforeach()
+	find_package(glfw3 REQUIRED)
+	foreach(file_path ${glfw3_LIBRARY})
+		message(STATUS ${file_path})
+	endforeach()
+	foreach(file_path ${glfw3_INCLUDE_DIR})
+		message(STATUS ${file_path})
+	endforeach()
+	find_package(SDL2 REQUIRED)
+	foreach(file_path ${SDL2_LIBRARY})
+		message(STATUS ${file_path})
+	endforeach()
+	foreach(file_path ${SDL2_INCLUDE_DIR})
+		message(STATUS ${file_path})
+	endforeach()
+
+	include_directories(
+		${OPENGL_INCLUDE_DIRS}
+		${GLEW_INCLUDE_DIRS}
+		${GLFW_INCLUDE_DIR}
+		${SDL2_INCLUDE_DIR}
+		)
+	target_link_libraries(
+		NES-Emulator
+		${OPENGL_LIBRARIES}
+		${OPENGL_gl_LIBRARY}
+		${GLEW_LIBRARIES}
+		${GLFW_LIBRARY}
+		${SDL2_LIBRARY}
+		)
+
+endif(CMAKE_TOOLCHAIN_FILE)
