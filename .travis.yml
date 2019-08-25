@@ -1,5 +1,4 @@
 sudo: required
-dist: cosmic
 language: cpp
 compiler:
 - gcc
