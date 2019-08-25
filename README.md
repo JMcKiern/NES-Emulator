@@ -1,5 +1,8 @@
 # NES Emulator
 
+[![Build Status](https://travis-ci.com/JMcKiern/NES-Emulator.svg?branch=master)](https://travis-ci.com/JMcKiern/NES-Emulator)
+[![Build status](https://ci.appveyor.com/api/projects/status/mgv6b0ply361d6nx?svg=true)](https://ci.appveyor.com/project/JMcKiern/nes-emulator)
+
 Another NES emulator written in C++
 
 ## How to Build
