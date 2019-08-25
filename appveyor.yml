@@ -9,6 +9,7 @@ configuration:
 image: Visual Studio 2015
 
 install:
+  - ps: C:/Tools/vcpkg/bootstrap-vcpkg.bat
   - ps: vcpkg install glfw3:$env:VCPKG_TRIPLET
   - ps: vcpkg install glew:$env:VCPKG_TRIPLET
   - ps: vcpkg install sdl2:$env:VCPKG_TRIPLET
