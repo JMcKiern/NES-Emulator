@@ -1,0 +1,39 @@
+environment:
+  CMAKE_GENERATOR: "Visual Studio 15 2017 Win64"
+  VCPKG_TRIPLET: "x64-windows"
+
+cache:
+  - "C:/Tools/vcpkg/installed/"
+
+configuration:
+  - Release
+
+image: Visual Studio 2017
+
+install:
+  - ps: vcpkg install glfw3:$env:VCPKG_TRIPLET
+  - ps: vcpkg install glew:$env:VCPKG_TRIPLET
+  - ps: vcpkg install sdl2:$env:VCPKG_TRIPLET
+  - ps: vcpkg list
+
+build_script:
+  - ps: mkdir build
+  - ps: cd build
+  - ps: cmake -G"$env:CMAKE_GENERATOR" -DCMAKE_TOOLCHAIN_FILE=C:/Tools/vcpkg/scripts/buildsystems/vcpkg.cmake ..
+  - ps: cmake --build . --target ALL_BUILD --config $env:CONFIGURATION
+
+after_build:
+  - ps: 7z a -tzip NES-Emulator_$env:VCPKG_TRIPLET.zip ./$env:CONFIGURATION/*
+
+artifacts:
+  - path: "build/NES-Emulator_$(VCPKG_TRIPLET).zip"
+    name: NES-Emulator
+
+deploy:
+  provider: GitHub
+  description: ""
+  auth_token:
+    secure: m3cBOTDVPvla+9ySt/Q2Bt6dYjkOrNPPGc/mH1txvGRRbGK07uLLLlkKDGU/u+BI
+  on:
+    APPVEYOR_REPO_TAG: true
+  artifact: NES-Emulator
