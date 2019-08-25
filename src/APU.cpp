@@ -1,7 +1,7 @@
 #include <exception>
 #include <cstdint>
 #define HAVE_STDINT_H 1
-#include "SDL.h"
+#include <SDL2/SDL.h>
 #include "Sound_Queue.h"
 #include "APU.h"
 
