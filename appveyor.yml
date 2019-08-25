@@ -1,20 +1,23 @@
 environment:
-    CMAKE_GENERATOR: "Visual Studio 15 2017 Win64"
+  CMAKE_GENERATOR: "Visual Studio 15 2017 Win64"
+  VCPKG_TRIPLET: "x64-windows"
 
 configuration:
-    - Release
-    - Debug
+  - Release
+  - Debug
 
 image: Visual Studio 2015
 
 install:
-    - ps: vcpkg install glfw3 glew sdl2
-    - ps: vcpkg list
+  - ps: vcpkg install glfw3:$env:VCPKG_TRIPLET
+  - ps: vcpkg install glew:$env:VCPKG_TRIPLET
+  - ps: vcpkg install sdl2:$env:VCPKG_TRIPLET
+  - ps: vcpkg list
 
 build_script:
-    - ps: mkdir build
-    - ps: cd build
-    - ps: |
-        cmake -G"$env:CMAKE_GENERATOR"
-        -DCMAKE_TOOLCHAIN_FILE=C:/Tools/vcpkg/scripts/buildsystems/vcpkg.cmake ..
-    - ps: cmake --build . --target ALL_BUILD --config $env:CONFIGURATION
+  - ps: mkdir build
+  - ps: cd build
+  - ps: |
+      cmake -G"$env:CMAKE_GENERATOR"
+      -DCMAKE_TOOLCHAIN_FILE=C:/Tools/vcpkg/scripts/buildsystems/vcpkg.cmake ..
+  - ps: cmake --build . --target ALL_BUILD --config $env:CONFIGURATION
