@@ -47,9 +47,10 @@ void Console::KeyCB(GLFWwindow* _window, int key, int scancode, int action,
                     int mods) {
 	if (window != _window) return;
 	if (controller0KeyMap.count(key) > 0)
-		controller0.SetKey(controller0KeyMap[key], action); 
+		controller0.SetKey(controller0KeyMap[key], action);
 	if (controller1KeyMap.count(key) > 0)
-		controller1.SetKey(controller1KeyMap[key], action); 
+		controller1.SetKey(controller1KeyMap[key], action);
+	if (key == GLFW_KEY_F11 && action == GLFW_PRESS) ToggleFullscreen();
 }
 void Console::UpdatePeripherals() {
 	for (std::vector<std::unique_ptr<Peripheral>>::iterator it
@@ -65,7 +66,7 @@ void Console::CheckJoystick() {
 	if (buttons != NULL) {
 		for (int i = 0; i < 8; i++) {
 			int action = buttons[gamePadKeyMap[i]];
-			controller0.SetJoyKey(i, action); 
+			controller0.SetJoyKey(i, action);
 		}
 	}
 }
@@ -83,6 +84,27 @@ void Console::UpdateFPSCounter(int numFrames/*=1*/) {
 	std::string title = "FPS: " + std::to_string(numFrames * 1000 / dT);
 	glfwSetWindowTitle(window, title.c_str());
 	prevTime = std::chrono::system_clock::now();
+}
+void Console::ToggleFullscreen() {
+	if (isFullscreen) {
+		// Return to windowed
+		glfwSetWindowMonitor(window, NULL, old_xpos, old_ypos, old_width,
+				old_height, 0);
+		isFullscreen = false;
+	}
+	else {
+		// Save window pos and size
+		glfwGetWindowPos(window, &old_xpos, &old_ypos);
+		old_width = w_width;
+		old_height = w_height;
+
+		// Set fullscreen
+		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+		glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height,
+				mode->refreshRate);
+		isFullscreen = true;
+	}
 }
 void Console::RunFrame() {
 	// A frame should take 16ms (and sleep for 16 - run_time = ~9)
@@ -170,7 +192,7 @@ Console::Console() :
 	ppu(&cpu, &mapperPtr, &gls),
 	apu(&cpu),
 	gls(RES_X, RES_Y)
-{} 
+{}
 Console::~Console() {
 	glfwTerminate();
 }
