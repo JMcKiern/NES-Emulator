@@ -21,7 +21,7 @@ script:
 - make
 - git clone https://github.com/jmckiern/nes-tests.git
 - export AUDIODEV=null
-- ./NES-Emulator-Test
+- xvfb-run ./NES-Emulator-Test
 - cd ../../
 
   # Build main project
