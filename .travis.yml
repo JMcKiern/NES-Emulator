@@ -14,6 +14,7 @@ script:
 - cd build
 - cmake ..
 - make
+- export AUDIODEV=null
 - ./NES-Emulator-Test
 - cd ../../
   # Build main project
