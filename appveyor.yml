@@ -9,8 +9,6 @@ configuration:
   - Release
 
 image: Visual Studio 2017
-on_finish:
-  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 install:
   - ps: vcpkg install glfw3:$env:VCPKG_TRIPLET
