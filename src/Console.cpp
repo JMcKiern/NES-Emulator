@@ -51,6 +51,7 @@ void Console::KeyCB(GLFWwindow* _window, int key, int scancode, int action,
 	if (controller1KeyMap.count(key) > 0)
 		controller1.SetKey(controller1KeyMap[key], action);
 	if (key == GLFW_KEY_F11 && action == GLFW_PRESS) ToggleFullscreen();
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) glfwSetWindowShouldClose(window, 1);
 }
 void Console::UpdatePeripherals() {
 	for (std::vector<std::unique_ptr<Peripheral>>::iterator it
