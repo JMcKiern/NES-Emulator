@@ -71,16 +71,16 @@ APU::APU(CPU_NES* _cpuPtr) {
 	//apu.dmc_reader(static_cast<APU*>(this)->dmc_read);
 	apu.dmc_reader(apu_dmc_read, cpuPtr);
 	if (SDL_Init(SDL_INIT_AUDIO) < 0)
-		exit(EXIT_FAILURE);
+		throw std::runtime_error("Failed to initialize SDL");
 
 	atexit(SDL_Quit);
 
 	sound_queue = new Sound_Queue;
 	if (!sound_queue)
-		exit(EXIT_FAILURE);
+		throw std::runtime_error("Failed to create Sound_Queue");
 
 	if (sound_queue->init(44100))
-		exit(EXIT_FAILURE);
+		throw std::runtime_error("Failed to initialize Sound_Queue");
 }
 
 APU::~APU() {

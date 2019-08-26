@@ -5,6 +5,7 @@
 
 #include <assert.h>
 #include <string.h>
+#include <stdexcept>
 
 /* Copyright (C) 2005 by Shay Green. Permission is hereby granted, free of
 charge, to any person obtaining a copy of this software module and associated
@@ -47,10 +48,10 @@ Sound_Queue::~Sound_Queue()
 		SDL_PauseAudio( true );
 		SDL_CloseAudio();
 	}
-	
+
 	if ( free_sem )
 		SDL_DestroySemaphore( free_sem );
-	
+
 	delete [] bufs;
 }
 
@@ -63,15 +64,15 @@ int Sound_Queue::sample_count() const
 const char* Sound_Queue::init( long sample_rate, int chan_count )
 {
 	assert( !bufs ); // can only be initialized once
-	
+
 	bufs = new sample_t [(long) buf_size * buf_count];
 	if ( !bufs )
 		return "Out of memory";
-	
+
 	free_sem = SDL_CreateSemaphore( buf_count - 1 );
 	if ( !free_sem )
-		return sdl_error( "Couldn't create semaphore" );
-	
+		throw std::runtime_error( "Couldn't create semaphore" );
+
 	SDL_AudioSpec as;
 	as.freq = sample_rate;
 	as.format = AUDIO_S16SYS;
@@ -82,10 +83,10 @@ const char* Sound_Queue::init( long sample_rate, int chan_count )
 	as.callback = fill_buffer_;
 	as.userdata = this;
 	if ( SDL_OpenAudio( &as, NULL ) < 0 )
-		return sdl_error( "Couldn't open SDL audio" );
+		throw std::runtime_error( "Couldn't open SDL audio" );
 	SDL_PauseAudio( false );
 	sound_open = true;
-	
+
 	return NULL;
 }
 
@@ -102,12 +103,12 @@ void Sound_Queue::write( const sample_t* in, int count )
 		int n = buf_size - write_pos;
 		if ( n > count )
 			n = count;
-		
+
 		memcpy( buf( write_buf ) + write_pos, in, n * sizeof (sample_t) );
 		in += n;
 		write_pos += n;
 		count -= n;
-		
+
 		if ( write_pos >= buf_size )
 		{
 			write_pos = 0;
