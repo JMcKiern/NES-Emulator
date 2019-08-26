@@ -36,6 +36,8 @@ private:
 	Sound_Queue* sound_queue;
 	void play_samples(const blip_sample_t* samples, long count);
 
+	bool isHeadless = false;
+
 
 public:
 	uint8_t Read(uint16_t offset);
@@ -45,6 +47,6 @@ public:
 	void AddCycles(int numCycles);
 
 
-	APU(CPU_NES* _cpuPtr);
+	APU(CPU_NES* _cpuPtr, bool _isHeadless);
 	~APU();
 };

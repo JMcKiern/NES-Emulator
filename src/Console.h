@@ -33,6 +33,7 @@ class Console {
 	bool isFullscreen = false;
 	int old_xpos, old_ypos, old_width, old_height;
 	void ToggleFullscreen();
+	bool isHeadless = false;
 
 	// OpenGL
 	const int RES_X = 256;
@@ -107,6 +108,6 @@ public:
 	std::string GetFrameHash();
 	void LoadINES(std::string filename);
 
-	Console();
+	Console(bool _isHeadless = false);
 	~Console();
 };
