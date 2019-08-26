@@ -8,10 +8,18 @@ before_install:
 install:
 - sudo apt install libglew-dev libglfw3-dev libsdl2-dev
 script:
+  # Build main project
 - mkdir build
 - cd build
 - cmake ..
 - make
+  # Build tests
+- cd ../tests
+- mkdir build
+- cd build
+- cmake ..
+- make
+- ./NES-Emulator-Test
 deploy:
   provider: releases
   skip_cleanup: true

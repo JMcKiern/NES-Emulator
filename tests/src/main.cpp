@@ -113,17 +113,15 @@ int main() {
 	}
 	std::cout << "All tests completed\n";
 	if (failedFilenames.size() > 0) {
-		std::cout << "Failed: \n";
+		std::cerr << "Failed: \n";
 		for (auto it = failedFilenames.begin();
 		     it != failedFilenames.end();
 		     ++it) {
-			std::cout << (*it) << '\n';
+			std::cerr << (*it) << '\n';
 		}
 	}
 	else {
 		std::cout << "Passed all tests!\n";
 	}
-	char x;
-	std::cin >> x;
 	return 0;
 }
