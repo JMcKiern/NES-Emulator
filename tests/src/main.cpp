@@ -6,7 +6,7 @@
 
 Logger logger("log.txt");
 
-int main() {
+int main(int argc, char* argv[]) {
 	// 6502 Tests
 	std::vector<FunctionalTestRun> ftrs = {
 		//{"../roms/6502_functional_test.bin", 0x0, 0x400, 0x336d, false, false},
@@ -100,15 +100,27 @@ int main() {
 
 	std::vector<std::string> failedFilenames;
 	for (auto it = ftrs.begin(); it != ftrs.end(); ++it) {
-		if (!FunctionalTest(it->filename, it->memOffset,
-			                it->startPC, it->successPC,
-			                it->shouldRegIntr, it->shouldPrint)) {
-			failedFilenames.push_back(it->filename);
+		try {
+			bool testResult = FunctionalTest(it->filename, it->memOffset,
+								it->startPC, it->successPC,
+								it->shouldRegIntr, it->shouldPrint);
+			if (!testResult) {
+				failedFilenames.push_back(it->filename);
+			}
+		}
+		catch (const std::exception& e) {
+			std::cerr << e.what();
 		}
 	}
 	for (auto it = ntrs.begin(); it != ntrs.end(); ++it) {
-		if (!Test(it->filename, it->numInstrs, it->desiredHash)) {
-			failedFilenames.push_back(it->filename);
+		try {
+			bool testResult = Test(it->filename, it->numInstrs, it->desiredHash);
+			if (!testResult) {
+				failedFilenames.push_back(it->filename);
+			}
+		}
+		catch (const std::exception& e) {
+			std::cerr << e.what();
 		}
 	}
 	std::cout << "All tests completed\n";
@@ -119,9 +131,10 @@ int main() {
 		     ++it) {
 			std::cerr << (*it) << '\n';
 		}
+		return 1;
 	}
 	else {
 		std::cout << "Passed all tests!\n";
+		return 0;
 	}
-	return 0;
 }
