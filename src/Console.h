@@ -12,7 +12,7 @@
 #include "Peripheral.h"
 
 // Contains everything to do with everything
-// i.e. CPU, PPU, APU, Peripherals, Screen 
+// i.e. CPU, PPU, APU, Peripherals, Screen
 class Console {
 	CPU_NES cpu;
 	PPU ppu;
@@ -30,6 +30,9 @@ class Console {
 	           int mods);
 	const int FPS_WINDOW = 10;
 	void UpdateFPSCounter(int numFrames=1);
+	bool isFullscreen = false;
+	int old_xpos, old_ypos, old_width, old_height;
+	void ToggleFullscreen();
 
 	// OpenGL
 	const int RES_X = 256;
@@ -77,7 +80,7 @@ class Console {
 	const static int CLOCK_SPEED = 1790000; // 1.79 MHz
 	using cycles = std::chrono::duration<int64_t, std::ratio<1, CLOCK_SPEED>>;
 	std::chrono::time_point<
-		std::chrono::system_clock, 
+		std::chrono::system_clock,
 		std::chrono::duration<
 			std::common_type_t<std::chrono::system_clock::rep,
 				std::chrono::system_clock::rep
