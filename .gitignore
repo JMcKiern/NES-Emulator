@@ -276,3 +276,4 @@ CTestTestfile.cmake
 *.bak
 build/
 tests/tests/
+tests/nes-tests/

@@ -25,6 +25,7 @@ build_script:
   - ps: cd build
   - ps: cmake -G"$env:CMAKE_GENERATOR" -DCMAKE_TOOLCHAIN_FILE=C:/Tools/vcpkg/scripts/buildsystems/vcpkg.cmake ..
   - ps: cmake --build . --target ALL_BUILD --config $env:CONFIGURATION
+  - ps: git clone https://github.com/jmckiern/nes-tests.git
   - ps: ./Release/NES-Emulator-Test.exe
   - ps: cd ../../
 
