@@ -19,6 +19,7 @@ script:
 - cd build
 - cmake ..
 - make
+- export AUDIODEV=NULL
 - ./NES-Emulator-Test
 deploy:
   provider: releases
