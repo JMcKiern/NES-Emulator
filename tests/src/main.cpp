@@ -100,27 +100,38 @@ int main(int argc, char* argv[]) {
 
 	std::vector<std::string> failedFilenames;
 	for (auto it = ftrs.begin(); it != ftrs.end(); ++it) {
+		bool failed = false;
 		try {
 			bool testResult = FunctionalTest(it->filename, it->memOffset,
 								it->startPC, it->successPC,
 								it->shouldRegIntr, it->shouldPrint);
 			if (!testResult) {
-				failedFilenames.push_back(it->filename);
+				failed = true;
 			}
 		}
 		catch (const std::exception& e) {
-			std::cerr << e.what();
+			std::cerr << e.what() << std::endl;
+			failed = true;
 		}
+		if (failed) {
+			failedFilenames.push_back(it->filename);
+		}
+
 	}
 	for (auto it = ntrs.begin(); it != ntrs.end(); ++it) {
+		bool failed = false;
 		try {
 			bool testResult = Test(it->filename, it->numInstrs, it->desiredHash);
 			if (!testResult) {
-				failedFilenames.push_back(it->filename);
+				failed = true;
 			}
 		}
 		catch (const std::exception& e) {
-			std::cerr << e.what();
+			std::cerr << e.what() << std::endl;
+			failed = true;
+		}
+		if (failed) {
+			failedFilenames.push_back(it->filename);
 		}
 	}
 	std::cout << "All tests completed\n";
