@@ -61,9 +61,8 @@ void APU::RunFrame() {
 }
 
 
-APU::APU(CPU_NES* _cpuPtr, bool _isHeadless) {
+APU::APU(CPU_NES* _cpuPtr) {
 	cpuPtr = _cpuPtr;
-	isHeadless = _isHeadless;
 	blargg_err_t error = buf.sample_rate(44100);
 	if (error)
 		throw std::runtime_error(error);
@@ -71,15 +70,12 @@ APU::APU(CPU_NES* _cpuPtr, bool _isHeadless) {
 	apu.output(&buf);
 	//apu.dmc_reader(static_cast<APU*>(this)->dmc_read);
 	apu.dmc_reader(apu_dmc_read, cpuPtr);
+	if (SDL_Init(SDL_INIT_AUDIO) < 0)
+		exit(EXIT_FAILURE);
 
-	if (!isHeadless) {
-		if (SDL_Init(SDL_INIT_AUDIO) < 0)
-			exit(EXIT_FAILURE);
+	atexit(SDL_Quit);
 
-		atexit(SDL_Quit);
-	}
-
-	sound_queue = new Sound_Queue(isHeadless);
+	sound_queue = new Sound_Queue;
 	if (!sound_queue)
 		exit(EXIT_FAILURE);
 

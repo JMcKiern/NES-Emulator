@@ -12,7 +12,6 @@
 class Sound_Queue {
 public:
 	Sound_Queue();
-	Sound_Queue(bool _isHeadless);
 	~Sound_Queue();
 
 	// Initialize with specified sample rate and channel count.
@@ -39,8 +38,6 @@ private:
 	sample_t* buf( int index );
 	void fill_buffer( Uint8*, int );
 	static void fill_buffer_( void*, Uint8*, int );
-
-	bool isHeadless = false;
 };
 
 #endif

@@ -132,27 +132,23 @@ void Console::RunFrame() {
 void Console::Run(std::string filename) {
 	LoadINES(filename);
 	UpdatePeripherals(); // Only needed for Register Interrupts
-	if (!isHeadless) {
-		InitializeWindow();
-		SetCallbacks();
-		gls.InitGL();
-	}
+	InitializeWindow();
+	SetCallbacks();
+	gls.InitGL();
 
 	int i = 0;
 	nextFrame = std::chrono::system_clock::now() + cycles{0};
-	while (isHeadless || !glfwWindowShouldClose(window)) {
+	while (!glfwWindowShouldClose(window)) {
 		i++;
 		RunFrame();
-		UpdatePeripherals(); // Only needed for Register Interrupts
-		if (!isHeadless) {
-			gls.DrawGLScene(window, w_width, w_height);
-			if (i % FPS_WINDOW == 0) {
-				UpdateFPSCounter(FPS_WINDOW);
-				i = 0;
-			}
-			glfwPollEvents();
-			if (usingGamePad) CheckJoystick();
+		if (i % FPS_WINDOW == 0) {
+			UpdateFPSCounter(FPS_WINDOW);
+			i = 0;
 		}
+		glfwPollEvents();
+		if (usingGamePad) CheckJoystick();
+		UpdatePeripherals(); // Only needed for Register Interrupts
+		gls.DrawGLScene(window, w_width, w_height);
 
 		if (desiredHash != "" && desiredHash == ppu.GetDispHash()) break;
 		if (numInstrsToRun != 0
@@ -192,12 +188,11 @@ void Console::LoadINES(std::string filename) {
 	cpu.PowerUp();
 }
 
-Console::Console(bool _isHeadless/*= false*/) :
+Console::Console() :
 	cpu(&ppu, &apu, &mapperPtr, &controller0, &controller1),
 	ppu(&cpu, &mapperPtr, &gls),
-	apu(&cpu, _isHeadless),
-	gls(RES_X, RES_Y),
-	isHeadless(_isHeadless)
+	apu(&cpu),
+	gls(RES_X, RES_Y)
 {}
 Console::~Console() {
 	glfwTerminate();
