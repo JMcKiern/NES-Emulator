@@ -50,8 +50,8 @@ void GLEntityHandler::BindAndDraw(GLuint shaderProg, mat4 viewMat, mat4 projMat,
 	glUseProgram(shaderProg);
 	glBindVertexArray(vao);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	glUniformMatrix4fv(viewMatLoc, 1, GL_FALSE, (float*)viewMat.m);
-	glUniformMatrix4fv(projMatLoc, 1, GL_FALSE, (float*)projMat.m);
+	glUniformMatrix4fv(viewMatLoc, 1, GL_FALSE, viewMat.m);
+	glUniformMatrix4fv(projMatLoc, 1, GL_FALSE, projMat.m);
 	glDrawArrays(GL_TRIANGLES, 0, numPoints);
 }
 void GLEntityHandler::BindAndDraw(GLuint shaderProg) {

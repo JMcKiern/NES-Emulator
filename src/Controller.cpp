@@ -2,7 +2,7 @@
 #include "Controller.h"
 
 void Controller::IncCycle() {
-	cycle = (cycle + 1) % 24; 
+	cycle = (cycle + 1) % 24;
 }
 
 void Controller::SetKey(int keyNum, bool isPressed) {

@@ -28,7 +28,7 @@ namespace GLUtils {
 		R.m[10] = cos(ang_rad) + u_z * u_z * (1 - cos(ang_rad));
 		return R;
 	}
-	std::string readShaderFile(std::string fileName) {
+	std::string readShaderFile(const std::string& fileName) {
 		std::ifstream f;
 		f.open(fileName);
 		if (!f.is_open()) {
@@ -41,8 +41,8 @@ namespace GLUtils {
 		f.close();
 		return sstr.str();
 	}
-	GLuint loadShaderFile(std::string vertexShaderFile,
-	                      std::string fragmentShaderFile) {
+	GLuint loadShaderFile(const std::string& vertexShaderFile,
+	                      const std::string& fragmentShaderFile) {
 
 		std::string vs = readShaderFile(vertexShaderFile);
 		const char* vertex_shader = vs.c_str();
@@ -53,8 +53,8 @@ namespace GLUtils {
 		return loadShaderProg(vertex_shader, fragment_shader);
 	}
 
-	GLuint loadShaderProg(std::string vertex_shader,
-	                      std::string fragment_shader) {
+	GLuint loadShaderProg(const std::string& vertex_shader,
+	                      const std::string& fragment_shader) {
 		GLuint vert_shader, frag_shader;
 
 		vert_shader = glCreateShader(GL_VERTEX_SHADER);
@@ -77,7 +77,7 @@ namespace GLUtils {
 		return sProg;
 	}
 
-	void checkForShaderCompilationErrors(std::string shader_code,
+	void checkForShaderCompilationErrors(const std::string& shader_code,
 	                                     GLuint shader) {
 		GLint isCompiled = 0;
 		glGetShaderiv(shader, GL_COMPILE_STATUS, &isCompiled);
