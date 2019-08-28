@@ -20,7 +20,7 @@ script:
 - cmake ..
 - make
 - git clone https://github.com/jmckiern/nes-tests.git
-- xvfb-run ./NES-Emulator-Test
+- ./NES-Emulator-Test
 - cd ../../
 
   # Build main project
