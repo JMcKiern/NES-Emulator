@@ -47,7 +47,6 @@ int main(int argc, char* argv[]) {
 		{"nes-tests/PPU/ppu_vbl_nmi/rom_singles/07-nmi_on_timing.nes", 1855652, "383b9dd3"},
 		{"nes-tests/PPU/ppu_vbl_nmi/rom_singles/08-nmi_off_timing.nes", 2265642, "2fb5e6ea"},
 		{"nes-tests/PPU/ppu_vbl_nmi/rom_singles/09-even_odd_frames.nes", 821446, "e91565bd"},
-		//PrintHash("nes-tests/PPU/ppu_vbl_nmi/rom_singles/10-even_odd_timing.nes"},
 
 		{"nes-tests/PPU/vbl_nmi_timing/1.frame_basics.nes", 2075574, "567b5999"},
 		{"nes-tests/PPU/vbl_nmi_timing/2.vbl_timing.nes", 1742482, "3dfd8260"},
@@ -66,16 +65,14 @@ int main(int argc, char* argv[]) {
 
 		//PrintHash("nes-tests/PPU/nmi_sync/demo_ntsc.nes"},
 
-		{"nes-tests/PPU/ppu_sprite_hit/rom_singles/01-basics.nes", 319189, "9841a902"},
-		{"nes-tests/PPU/ppu_sprite_hit/rom_singles/02-alignment.nes", 289939, "675733ee"},
-		{"nes-tests/PPU/ppu_sprite_hit/rom_singles/03-corners.nes", 186100, "197580da"},
-		{"nes-tests/PPU/ppu_sprite_hit/rom_singles/04-flip.nes", 165301, "6303c2dc"},
-		{"nes-tests/PPU/ppu_sprite_hit/rom_singles/05-left_clip.nes", 294721, "2ab6d048"},
-		{"nes-tests/PPU/ppu_sprite_hit/rom_singles/06-right_edge.nes", 206910, "fda8b859"},
-		//PrintHash("nes-tests/PPU/ppu_sprite_hit/rom_singles/07-screen_bottom.nes"},
-		{"nes-tests/PPU/ppu_sprite_hit/rom_singles/08-double_height.nes", 186120, "c6b0913b"},
-		//PrintHash("nes-tests/PPU/ppu_sprite_hit/rom_singles/09-timing.nes"},
-		//PrintHash("nes-tests/PPU/ppu_sprite_hit/rom_singles/10-timing_order.nes"},
+		{"nes-tests/PPU/ppu_sprite_hit/rom_singles/01-basics.nes", 402814, "9841a902"},
+		{"nes-tests/PPU/ppu_sprite_hit/rom_singles/02-alignment.nes", 382217, "675733ee"},
+		{"nes-tests/PPU/ppu_sprite_hit/rom_singles/03-corners.nes", 219549, "197580da"},
+		{"nes-tests/PPU/ppu_sprite_hit/rom_singles/04-flip.nes", 190388, "6303c2dc"},
+		{"nes-tests/PPU/ppu_sprite_hit/rom_singles/05-left_clip.nes", 336094, "2ab6d048"},
+		{"nes-tests/PPU/ppu_sprite_hit/rom_singles/06-right_edge.nes", 248722, "fda8b859"},
+		{"nes-tests/PPU/ppu_sprite_hit/rom_singles/07-screen_bottom.nes", 286370, "5cdf0f2b"},
+		{"nes-tests/PPU/ppu_sprite_hit/rom_singles/08-double_height.nes", 219570, "c6b0913b"},
 
 		//console.Run("nes-tests/PPU/color_test.nes");
 
@@ -87,12 +84,15 @@ int main(int argc, char* argv[]) {
 		{"nes-tests/holydiverbatman-bin-0.01/testroms/M3_P32K_C32K_H.nes", 3220777, "7859454d"}
 
 		// Controller
-		//console.Run("nes-tests/Controller/allpads.nes");
 		//console.Run("nes-tests/Controller/read_joy3/count_errors.nes");
 		//console.Run("nes-tests/Controller/read_joy3/count_errors_fast.nes");
 		//console.Run("nes-tests/Controller/read_joy3/test_buttons.nes");
 		//console.Run("nes-tests/Controller/read_joy3/thorough_test.nes");
 	};
+	//PrintHash("nes-tests/PPU/ppu_sprite_hit/rom_singles/09-timing.nes");
+	//PrintHash("nes-tests/PPU/ppu_sprite_hit/rom_singles/10-timing_order.nes");
+	//PrintHash("nes-tests/PPU/ppu_vbl_nmi/rom_singles/10-even_odd_timing.nes");
+	//PrintHash("nes-tests/Controller/allpads.nes");
 	//PrintHash("nes-tests/holydiverbatman-bin-0.01/testroms/M1_P128K.nes");
 	//PrintHash("nes-tests/holydiverbatman-bin-0.01/testroms/M1_P128K_C32K.nes");
 	//PrintHash("nes-tests/holydiverbatman-bin-0.01/testroms/M1_P128K_C32K_S8K.nes");

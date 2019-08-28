@@ -94,10 +94,10 @@ void CPU_NES::PrintDebugInfoMesen() {
 
 // Other Processors
 void CPU_NES::PPURequestingWrite(uint16_t offset, uint8_t data) {
-	WriteNoTick(offset, data);
+	Write(offset, data);
 }
 uint8_t CPU_NES::PPURequestingRead(uint16_t offset) {
-	return ReadNoTick(offset);
+	return Read(offset);
 }
 
 // Timing

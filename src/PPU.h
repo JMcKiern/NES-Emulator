@@ -29,19 +29,18 @@ private:
 	bool VBlankShouldNMI;
 
 	// PPUMASK Variables
-	bool isInColourMode;
-	// TODO: Implement clipping
-	bool shouldClipBackground;
-	bool shouldClipSprites;
-	bool shouldShowBackground;
-	bool shouldShowSprites;
+	bool isInColourMode = true;
+	bool shouldClipBackground = false;
+	bool shouldClipSprites = false;
+	bool shouldShowBackground = false;
+	bool shouldShowSprites = false;
 	uint8_t colourEmphasis; // Background Colour in Monochrome Mode or 
 							// Colour Intensity in Colour Mode
 
 	// PPUSTATUS Variables
-	bool isSpriteOverflow;
-	bool isSprite0Hit;
-	bool isInVBlank;
+	bool isSpriteOverflow = false;
+	bool isSprite0Hit = false;
+	bool isInVBlank = true; // Stays here for 1 cycle upon initialization
 	bool shouldSuppressSettingVBL = false;
 	bool shouldSuppressNMI = false;
 
@@ -75,7 +74,7 @@ private:
 	static const int dispWidth = 256;
 	uint8_t disp[dispWidth][dispHeight]; // Used for hashing
 	bool isOddFrame = false;
-	int cycle = 0;		// across 0 <= x <= 340 (x = cycle - 1 (idle cycle))
+	int cycle = 0;		// across 0 <= x <= 340 (x = cycle)
 	int scanline = -1;	// down -1 <= y <= 260  (y = scanline)
 	void RenderTick();
 	void ChoosePixel();
@@ -86,11 +85,12 @@ private:
 	//			whereas NES shifts right and takes low bit
 	uint16_t bsr16Bg[2]; // bitmap
 	uint8_t bsr8Bg[2]; // palette attributes
-	uint8_t attrLatch;
-	uint8_t nextNTByte;
-	uint8_t nextTileLow, nextTileHigh;
-	uint8_t nextAttrByte;
-	uint8_t bgNTTemp;
+	uint8_t attrLatch = 0;
+	uint8_t nextNTByte = 0;
+	uint8_t nextTileLow = 0;
+	uint8_t nextTileHigh = 0;
+	uint8_t nextAttrByte = 0;
+	uint8_t bgNTTemp = 0;
 	void LoadBGTile(int stepNum);
 	void FlushBGShifters();
 	void ShiftBGShifters();

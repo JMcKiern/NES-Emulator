@@ -207,8 +207,8 @@ uint8_t PPU::PPUDATA() {
 }
 void PPU::OAMDMA(uint8_t data) {
 	for (int i = 0; i < 0x100; i++) {
-		OAM[(oamAddr + i) % 0x100]
-			= CPUPtr->PPURequestingRead((data * 0x100) + i);
+		uint8_t byte = CPUPtr->PPURequestingRead((data * 0x100) + i);
+		CPUPtr->PPURequestingWrite(0x2004, byte);
 	}
 }
 
@@ -626,9 +626,10 @@ void PPU::RenderTick() {
 		// Pre-render scanline
 		if (cycle == 1) {
 			isInVBlank = false;
-			// Bit 6 of PPUSTATUS ($2002) is cleared to 0 at dot 1 of the
+			// Bit 7, 6 and 5 of PPUSTATUS ($2002) is cleared at dot 1 of the
 			// pre-render line.
 			isSprite0Hit = false; 
+			isSpriteOverflow = false;
 		}
 		else if (321 <= cycle && cycle <= 336) {
 			// Load first 2 background tiles for next scanline into registers
@@ -736,19 +737,16 @@ void PPU::ScrlYInc() {
 }
 void PPU::ShiftSprShifters() {
 	// TODO: Are the sprite bsr's shifted even when not in visible pixels
-	// or when shouldShowSprites is off?
 	if (1 <= cycle && cycle <= 256 && 0 <= scanline && scanline <= 239) {
-		if (shouldShowSprites) {
-			for (int i = 0; i < 8; i++) {
-				if (ctrSpr[i] == 0) { // Sprite active
-					bsrSpr[i][0] = bsrSpr[i][0] << 1;
-					bsrSpr[i][1] = bsrSpr[i][1] << 1;
-					if (spritePixelsLeft[i] > 0)
-						spritePixelsLeft[i]--;
-				}
-				if (ctrSpr[i] > 0) // Decrement X position
-					ctrSpr[i]--;
+		for (int i = 0; i < 8; i++) {
+			if (ctrSpr[i] == 0) { // Sprite active
+				bsrSpr[i][0] = bsrSpr[i][0] << 1;
+				bsrSpr[i][1] = bsrSpr[i][1] << 1;
+				if (spritePixelsLeft[i] > 0)
+					spritePixelsLeft[i]--;
 			}
+			if (ctrSpr[i] > 0) // Decrement X position
+				ctrSpr[i]--;
 		}
 	}
 }
@@ -834,6 +832,20 @@ PPU::PPU(CPU_NES* _CPUPtr, Mapper** _mapperPtrPtr, GLScene2D* _gls) :
 	CPUPtr->AddNMIConnection(&cpuNMIConnection);
 	mapperPtrPtr = _mapperPtrPtr;
 	gls = _gls;
+
+	for (int i = 0; i < 0x100; i++) {
+		OAM[i] = 0xFF;
+	}
+	for (int i = 0; i < 0x20; i++) {
+		OAMSL[i] = 0xFF;
+	}
+	for (int i = 0; i < 8; i++) {
+		bsrSpr[i][0] = 0;
+		bsrSpr[i][1] = 0;
+		lchSpr[i] = 0;
+		ctrSpr[i] = 0;
+		spritePixelsLeft[i] = 0;
+	}
 }
 
 // Frame Check

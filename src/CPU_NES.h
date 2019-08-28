@@ -33,7 +33,7 @@ private:
 
 public:
 	// Other Processors
-	void PPURequestingWrite(uint16_t data, uint8_t offset);
+	void PPURequestingWrite(uint16_t offset, uint8_t data);
 	uint8_t PPURequestingRead(uint16_t offset);
 
 	// Start Up
