@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.com/JMcKiern/NES-Emulator.svg?branch=master)](https://travis-ci.com/JMcKiern/NES-Emulator)
 [![Build status](https://ci.appveyor.com/api/projects/status/mgv6b0ply361d6nx?svg=true)](https://ci.appveyor.com/project/JMcKiern/nes-emulator)
+[![Coverity Scan](https://scan.coverity.com/projects/19074/badge.svg)](https://scan.coverity.com/projects/jmckiern-nes-emulator)
 
 NES emulator written in C++
 
