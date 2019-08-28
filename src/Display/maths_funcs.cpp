@@ -8,7 +8,7 @@
 |******************************************************************************|
 | Commonly-used maths structures and functions                                 |
 | Simple-as-possible. No disgusting templates.                                 |
-| Structs vec3, mat4, versor. just hold arrays of doubles called "v","m","q",   |
+| Structs vec3, mat4, versor. just hold arrays of floats called "v","m","q",   |
 | respectively. So, for example, to get values from a mat4 do: my_mat.m        |
 | A versor is the proper name for a unit quaternion.                           |
 \******************************************************************************/
@@ -20,20 +20,20 @@
 /*--------------------------------CONSTRUCTORS--------------------------------*/
 vec2::vec2() {}
 
-vec2::vec2(double x, double y) {
+vec2::vec2(float x, float y) {
 	v[0] = x;
 	v[1] = y;
 }
 
 vec3::vec3() {}
 
-vec3::vec3(double x, double y, double z) {
+vec3::vec3(float x, float y, float z) {
 	v[0] = x;
 	v[1] = y;
 	v[2] = z;
 }
 
-vec3::vec3(const vec2 &vv, double z) {
+vec3::vec3(const vec2 &vv, float z) {
 	v[0] = vv.v[0];
 	v[1] = vv.v[1];
 	v[2] = z;
@@ -47,21 +47,21 @@ vec3::vec3(const vec4 &vv) {
 
 vec4::vec4() {}
 
-vec4::vec4(double x, double y, double z, double w) {
+vec4::vec4(float x, float y, float z, float w) {
 	v[0] = x;
 	v[1] = y;
 	v[2] = z;
 	v[3] = w;
 }
 
-vec4::vec4(const vec2 &vv, double z, double w) {
+vec4::vec4(const vec2 &vv, float z, float w) {
 	v[0] = vv.v[0];
 	v[1] = vv.v[1];
 	v[2] = z;
 	v[3] = w;
 }
 
-vec4::vec4(const vec3 &vv, double w) {
+vec4::vec4(const vec3 &vv, float w) {
 	v[0] = vv.v[0];
 	v[1] = vv.v[1];
 	v[2] = vv.v[2];
@@ -71,8 +71,8 @@ vec4::vec4(const vec3 &vv, double w) {
 mat3::mat3() {}
 
 /* note: entered in COLUMNS */
-mat3::mat3(double a, double b, double c, double d, double e, double f, double g, double h,
-	double i) {
+mat3::mat3(float a, float b, float c, float d, float e, float f, float g, float h,
+	float i) {
 	m[0] = a;
 	m[1] = b;
 	m[2] = c;
@@ -87,9 +87,9 @@ mat3::mat3(double a, double b, double c, double d, double e, double f, double g,
 mat4::mat4() {}
 
 /* note: entered in COLUMNS */
-mat4::mat4(double a, double b, double c, double d, double e, double f, double g, double h,
-	double i, double j, double k, double l, double mm, double n, double o,
-	double p) {
+mat4::mat4(float a, float b, float c, float d, float e, float f, float g, float h,
+	float i, float j, float k, float l, float mm, float n, float o,
+	float p) {
 	m[0] = a;
 	m[1] = b;
 	m[2] = c;
@@ -135,19 +135,19 @@ void print(const mat4 &m) {
 }
 
 /*------------------------------VECTOR FUNCTIONS------------------------------*/
-double length(const vec3 &v) {
+float length(const vec3 &v) {
 	return sqrt(v.v[0] * v.v[0] + v.v[1] * v.v[1] + v.v[2] * v.v[2]);
 }
 
 // squared length
-double length2(const vec3 &v) {
+float length2(const vec3 &v) {
 	return v.v[0] * v.v[0] + v.v[1] * v.v[1] + v.v[2] * v.v[2];
 }
 
 // note: proper spelling (hehe)
 vec3 normalise(const vec3 &v) {
 	vec3 vb;
-	double l = length(v);
+	float l = length(v);
 	if (0.0f == l) {
 		return vec3(0.0f, 0.0f, 0.0f);
 	}
@@ -187,7 +187,7 @@ vec3 &vec3::operator-=(const vec3 &rhs) {
 	return *this;
 }
 
-vec3 vec3::operator+(double rhs) {
+vec3 vec3::operator+(float rhs) {
 	vec3 vc;
 	vc.v[0] = v[0] + rhs;
 	vc.v[1] = v[1] + rhs;
@@ -195,7 +195,7 @@ vec3 vec3::operator+(double rhs) {
 	return vc;
 }
 
-vec3 vec3::operator-(double rhs) {
+vec3 vec3::operator-(float rhs) {
 	vec3 vc;
 	vc.v[0] = v[0] - rhs;
 	vc.v[1] = v[1] - rhs;
@@ -203,7 +203,7 @@ vec3 vec3::operator-(double rhs) {
 	return vc;
 }
 
-vec3 vec3::operator*(double rhs) {
+vec3 vec3::operator*(float rhs) {
 	vec3 vc;
 	vc.v[0] = v[0] * rhs;
 	vc.v[1] = v[1] * rhs;
@@ -211,7 +211,7 @@ vec3 vec3::operator*(double rhs) {
 	return vc;
 }
 
-vec3 vec3::operator/(double rhs) {
+vec3 vec3::operator/(float rhs) {
 	vec3 vc;
 	vc.v[0] = v[0] / rhs;
 	vc.v[1] = v[1] / rhs;
@@ -219,7 +219,7 @@ vec3 vec3::operator/(double rhs) {
 	return vc;
 }
 
-vec3 &vec3::operator*=(double rhs) {
+vec3 &vec3::operator*=(float rhs) {
 	v[0] = v[0] * rhs;
 	v[1] = v[1] * rhs;
 	v[2] = v[2] * rhs;
@@ -233,33 +233,33 @@ vec3 &vec3::operator=(const vec3 &rhs) {
 	return *this;
 }
 
-double dot(const vec3 &a, const vec3 &b) {
+float dot(const vec3 &a, const vec3 &b) {
 	return a.v[0] * b.v[0] + a.v[1] * b.v[1] + a.v[2] * b.v[2];
 }
 
 vec3 cross(const vec3 &a, const vec3 &b) {
-	double x = a.v[1] * b.v[2] - a.v[2] * b.v[1];
-	double y = a.v[2] * b.v[0] - a.v[0] * b.v[2];
-	double z = a.v[0] * b.v[1] - a.v[1] * b.v[0];
+	float x = a.v[1] * b.v[2] - a.v[2] * b.v[1];
+	float y = a.v[2] * b.v[0] - a.v[0] * b.v[2];
+	float z = a.v[0] * b.v[1] - a.v[1] * b.v[0];
 	return vec3(x, y, z);
 }
 
-double get_squared_dist(vec3 from, vec3 to) {
-	double x = (to.v[0] - from.v[0]) * (to.v[0] - from.v[0]);
-	double y = (to.v[1] - from.v[1]) * (to.v[1] - from.v[1]);
-	double z = (to.v[2] - from.v[2]) * (to.v[2] - from.v[2]);
+float get_squared_dist(vec3 from, vec3 to) {
+	float x = (to.v[0] - from.v[0]) * (to.v[0] - from.v[0]);
+	float y = (to.v[1] - from.v[1]) * (to.v[1] - from.v[1]);
+	float z = (to.v[2] - from.v[2]) * (to.v[2] - from.v[2]);
 	return x + y + z;
 }
 
 /* converts an un-normalised direction into a heading in degrees
 NB i suspect that the z is backwards here but i've used in in
 several places like this. d'oh! */
-double direction_to_heading(vec3 d) {
+float direction_to_heading(vec3 d) {
 	return atan2(-d.v[0], -d.v[2]) * ONE_RAD_IN_DEG;
 }
 
-vec3 heading_to_direction(double degrees) {
-	double rad = degrees * ONE_DEG_IN_RAD;
+vec3 heading_to_direction(float degrees) {
+	float rad = degrees * ONE_DEG_IN_RAD;
 	return vec3(-sin(rad), 0.0f, -cos(rad));
 }
 
@@ -291,13 +291,13 @@ mat4 identity_mat4() {
 
 vec4 mat4::operator*(const vec4 &rhs) {
 	// 0x + 4y + 8z + 12w
-	double x = m[0] * rhs.v[0] + m[4] * rhs.v[1] + m[8] * rhs.v[2] + m[12] * rhs.v[3];
+	float x = m[0] * rhs.v[0] + m[4] * rhs.v[1] + m[8] * rhs.v[2] + m[12] * rhs.v[3];
 	// 1x + 5y + 9z + 13w
-	double y = m[1] * rhs.v[0] + m[5] * rhs.v[1] + m[9] * rhs.v[2] + m[13] * rhs.v[3];
+	float y = m[1] * rhs.v[0] + m[5] * rhs.v[1] + m[9] * rhs.v[2] + m[13] * rhs.v[3];
 	// 2x + 6y + 10z + 14w
-	double z = m[2] * rhs.v[0] + m[6] * rhs.v[1] + m[10] * rhs.v[2] + m[14] * rhs.v[3];
+	float z = m[2] * rhs.v[0] + m[6] * rhs.v[1] + m[10] * rhs.v[2] + m[14] * rhs.v[3];
 	// 3x + 7y + 11z + 15w
-	double w = m[3] * rhs.v[0] + m[7] * rhs.v[1] + m[11] * rhs.v[2] + m[15] * rhs.v[3];
+	float w = m[3] * rhs.v[0] + m[7] * rhs.v[1] + m[11] * rhs.v[2] + m[15] * rhs.v[3];
 	return vec4(x, y, z, w);
 }
 
@@ -306,7 +306,7 @@ mat4 mat4::operator*(const mat4 &rhs) {
 	int r_index = 0;
 	for (int col = 0; col < 4; col++) {
 		for (int row = 0; row < 4; row++) {
-			double sum = 0.0f;
+			float sum = 0.0f;
 			for (int i = 0; i < 4; i++) {
 				sum += rhs.m[i + col * 4] * m[row + i * 4];
 			}
@@ -327,7 +327,7 @@ mat4 &mat4::operator=(const mat4 &rhs) {
 // returns a scalar value with the determinant for a 4x4 matrix
 // see
 // http://www.euclideanspace.com/maths/algebra/matrix/functions/determinant/fourD/index.htm
-double determinant(const mat4 &mm) {
+float determinant(const mat4 &mm) {
 	return mm.m[12] * mm.m[9] * mm.m[6] * mm.m[3] -
 		mm.m[8] * mm.m[13] * mm.m[6] * mm.m[3] -
 		mm.m[12] * mm.m[5] * mm.m[10] * mm.m[3] +
@@ -359,14 +359,14 @@ matrix). see
 http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
 */
 mat4 inverse(const mat4 &mm) {
-	double det = determinant(mm);
+	float det = determinant(mm);
 	/* there is no inverse if determinant is zero (not likely unless scale is
 	broken) */
 	if (0.0f == det) {
 		fprintf(stderr, "WARNING. matrix has no determinant. can not invert\n");
 		return mm;
 	}
-	double inv_det = 1.0f / det;
+	float inv_det = 1.0f / det;
 
 	return mat4(
 		inv_det * (mm.m[9] * mm.m[14] * mm.m[7] - mm.m[13] * mm.m[10] * mm.m[7] +
@@ -437,9 +437,9 @@ mat4 translate(const mat4 &m, const vec3 &v) {
 }
 
 // rotate around x axis by an angle in degrees
-mat4 rotate_x_deg(const mat4 &m, double deg) {
+mat4 rotate_x_deg(const mat4 &m, float deg) {
 	// convert to radians
-	double rad = deg * ONE_DEG_IN_RAD;
+	float rad = deg * ONE_DEG_IN_RAD;
 	mat4 m_r = identity_mat4();
 	m_r.m[5] = cos(rad);
 	m_r.m[9] = -sin(rad);
@@ -449,9 +449,9 @@ mat4 rotate_x_deg(const mat4 &m, double deg) {
 }
 
 // rotate around y axis by an angle in degrees
-mat4 rotate_y_deg(const mat4 &m, double deg) {
+mat4 rotate_y_deg(const mat4 &m, float deg) {
 	// convert to radians
-	double rad = deg * ONE_DEG_IN_RAD;
+	float rad = deg * ONE_DEG_IN_RAD;
 	mat4 m_r = identity_mat4();
 	m_r.m[0] = cos(rad);
 	m_r.m[8] = sin(rad);
@@ -461,9 +461,9 @@ mat4 rotate_y_deg(const mat4 &m, double deg) {
 }
 
 // rotate around z axis by an angle in degrees
-mat4 rotate_z_deg(const mat4 &m, double deg) {
+mat4 rotate_z_deg(const mat4 &m, float deg) {
 	// convert to radians
-	double rad = deg * ONE_DEG_IN_RAD;
+	float rad = deg * ONE_DEG_IN_RAD;
 	mat4 m_r = identity_mat4();
 	m_r.m[0] = cos(rad);
 	m_r.m[4] = -sin(rad);
@@ -510,13 +510,13 @@ mat4 look_at(const vec3 &cam_pos, vec3 targ_pos, const vec3 &up) {
 }
 
 // returns a perspective function mimicking the opengl projection style.
-mat4 perspective(double fovy, double aspect, double near, double far) {
-	double fov_rad = fovy * ONE_DEG_IN_RAD;
-	double range = tan(fov_rad / 2.0f) * near;
-	double sx = (2.0f * near) / (range * aspect + range * aspect);
-	double sy = near / range;
-	double sz = -(far + near) / (far - near);
-	double pz = -(2.0f * far * near) / (far - near);
+mat4 perspective(float fovy, float aspect, float near, float far) {
+	float fov_rad = fovy * ONE_DEG_IN_RAD;
+	float range = tan(fov_rad / 2.0f) * near;
+	float sx = (2.0f * near) / (range * aspect + range * aspect);
+	float sy = near / range;
+	float sz = -(far + near) / (far - near);
+	float pz = -(2.0f * far * near) / (far - near);
 	mat4 m = zero_mat4(); // make sure bottom-right corner is zero
 	m.m[0] = sx;
 	m.m[5] = sy;
@@ -529,7 +529,7 @@ mat4 perspective(double fovy, double aspect, double near, double far) {
 /*----------------------------HAMILTON IN DA HOUSE!---------------------------*/
 versor::versor() {}
 
-versor versor::operator/(double rhs) {
+versor versor::operator/(float rhs) {
 	versor result;
 	result.q[0] = q[0] / rhs;
 	result.q[1] = q[1] / rhs;
@@ -538,7 +538,7 @@ versor versor::operator/(double rhs) {
 	return result;
 }
 
-versor versor::operator*(double rhs) {
+versor versor::operator*(float rhs) {
 	versor result;
 	result.q[0] = q[0] * rhs;
 	result.q[1] = q[1] * rhs;
@@ -575,7 +575,7 @@ versor versor::operator+(const versor &rhs) {
 	return normalise(result);
 }
 
-versor quat_from_axis_rad(double radians, double x, double y, double z) {
+versor quat_from_axis_rad(float radians, float x, float y, float z) {
 	versor result;
 	result.q[0] = cos(radians / 2.0);
 	result.q[1] = sin(radians / 2.0) * x;
@@ -584,15 +584,15 @@ versor quat_from_axis_rad(double radians, double x, double y, double z) {
 	return result;
 }
 
-versor quat_from_axis_deg(double degrees, double x, double y, double z) {
+versor quat_from_axis_deg(float degrees, float x, float y, float z) {
 	return quat_from_axis_rad(ONE_DEG_IN_RAD * degrees, x, y, z);
 }
 
 mat4 quat_to_mat4(const versor &q) {
-	double w = q.q[0];
-	double x = q.q[1];
-	double y = q.q[2];
-	double z = q.q[3];
+	float w = q.q[0];
+	float x = q.q[1];
+	float y = q.q[2];
+	float z = q.q[3];
 	return mat4(1.0f - 2.0f * y * y - 2.0f * z * z, 2.0f * x * y + 2.0f * w * z,
 		2.0f * x * z - 2.0f * w * y, 0.0f, 2.0f * x * y - 2.0f * w * z,
 		1.0f - 2.0f * x * x - 2.0f * z * z, 2.0f * y * z + 2.0f * w * x,
@@ -604,23 +604,23 @@ versor normalise(versor &q) {
 	// norm(q) = q / magnitude (q)
 	// magnitude (q) = sqrt (w*w + x*x...)
 	// only compute sqrt if interior sum != 1.0
-	double sum = q.q[0] * q.q[0] + q.q[1] * q.q[1] + q.q[2] * q.q[2] + q.q[3] * q.q[3];
-	// NB: doubles have min 6 digits of precision
-	const double thresh = 0.0001f;
+	float sum = q.q[0] * q.q[0] + q.q[1] * q.q[1] + q.q[2] * q.q[2] + q.q[3] * q.q[3];
+	// NB: floats have min 6 digits of precision
+	const float thresh = 0.0001f;
 	if (fabs(1.0f - sum) < thresh) {
 		return q;
 	}
-	double mag = sqrt(sum);
+	float mag = sqrt(sum);
 	return q / mag;
 }
 
-double dot(const versor &q, const versor &r) {
+float dot(const versor &q, const versor &r) {
 	return q.q[0] * r.q[0] + q.q[1] * r.q[1] + q.q[2] * r.q[2] + q.q[3] * r.q[3];
 }
 
-versor slerp(versor &q, versor &r, double t) {
+versor slerp(versor &q, versor &r, float t) {
 	// angle between q0-q1
-	double cos_half_theta = dot(q, r);
+	float cos_half_theta = dot(q, r);
 	// as found here
 	// http://stackoverflow.com/questions/2886606/flipping-issue-when-interpolating-rotations-using-quaternions
 	// if dot product is negative then one quaternion should be negated, to make
@@ -637,7 +637,7 @@ versor slerp(versor &q, versor &r, double t) {
 		return q;
 	}
 	// Calculate temporary values
-	double sin_half_theta = sqrt(1.0f - cos_half_theta * cos_half_theta);
+	float sin_half_theta = sqrt(1.0f - cos_half_theta * cos_half_theta);
 	// if theta = 180 degrees then result is not fully defined
 	// we could rotate around any axis normal to qa or qb
 	versor result;
@@ -647,9 +647,9 @@ versor slerp(versor &q, versor &r, double t) {
 		}
 		return result;
 	}
-	double half_theta = acos(cos_half_theta);
-	double a = sin((1.0f - t) * half_theta) / sin_half_theta;
-	double b = sin(t * half_theta) / sin_half_theta;
+	float half_theta = acos(cos_half_theta);
+	float a = sin((1.0f - t) * half_theta) / sin_half_theta;
+	float b = sin(t * half_theta) / sin_half_theta;
 	for (int i = 0; i < 4; i++) {
 		result.q[i] = q.q[i] * a + r.q[i] * b;
 	}

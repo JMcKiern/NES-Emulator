@@ -47,7 +47,7 @@ void MMC1::Write(uint16_t addr, uint8_t data) {
 			else if (0xA000 <= addr && addr <= 0xBFFF) {
 				// CHR bank 0
 				uint8_t bankNum = (shiftReg & 0x1F);
-				if (shouldSwitch8KCHRROM) bankNum = bankNum & 0x1; // TODO: does it ignore or AND?
+				if (shouldSwitch8KCHRROM) bankNum = bankNum & 0x1;
 				if (UsingCHRROM()) {
 					CHRROML = GetPtrCHR(bankNum, 0x1000);
 				}

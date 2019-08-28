@@ -14,10 +14,10 @@ enum {
 
 class Mapper {
 protected:
-	uint8_t * PRGROMU;
-	uint8_t* PRGROML;
+	uint8_t * PRGROMU = nullptr;
+	uint8_t* PRGROML = nullptr;
 	uint8_t* PRGRAM = nullptr;
-	uint8_t* CHRROM;
+	uint8_t* CHRROM = nullptr;
 	uint8_t* CHRRAM = nullptr;
 
 	char* cartridge;
