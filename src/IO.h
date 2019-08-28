@@ -1,7 +1,7 @@
 #pragma once
 
 #include <map>
-#include <GL\glew.h>
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "Controller.h"
 #include "Display/GLScene2D.h"
