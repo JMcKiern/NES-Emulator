@@ -4,7 +4,7 @@
 #include "Palette.h"
 #include "Colour.h"
 
-void Palette::LoadPal(std::string palFile) {
+void Palette::LoadPal(const std::string& palFile) {
 	std::ifstream f;
 	std::streampos sizef;
 
@@ -39,7 +39,7 @@ Colour Palette::GetColour(uint8_t colourNum, uint8_t colourEmp) {
 	b = palette[palStart + colourNum * 3 + 2];
 	return Colour(r, g, b);
 }
-Palette::Palette(std::string palFile) {
+Palette::Palette(const std::string& palFile) {
 	LoadPal(palFile);
 }
 Palette::Palette() :

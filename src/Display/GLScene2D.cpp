@@ -26,11 +26,11 @@ bool GLScene2D::InitGL() {
 	glewExperimental = GL_TRUE;
 	glewInit();
 
+	/*
 	const GLubyte *renderer;
 	const GLubyte *version;
 	renderer = glGetString(GL_RENDERER);
 	version = glGetString(GL_VERSION);
-	/*
 	(*log) << "Renderer: ";
 	(*log) << (const char*)renderer;
 	(*log) << "\nOpenGL version supported ";

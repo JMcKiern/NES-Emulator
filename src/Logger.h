@@ -15,7 +15,7 @@ private:
 			f.close();
 		}
 	}
-	void SetOutFile(std::string filename) {
+	void SetOutFile(const std::string& filename) {
 		CloseIfOpen();
 		f.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 		f.open(filename, std::ios::out | std::ios::trunc);
@@ -32,7 +32,7 @@ public:
 			f.flush();
 	}
 	Logger() {}
-	Logger(std::string filename) {
+	Logger(const std::string& filename) {
 		SetOutFile(filename);
 	}
 	~Logger() {

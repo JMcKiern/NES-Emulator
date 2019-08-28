@@ -4,13 +4,12 @@
 
 class Controller {
 private:
-	bool isStrobeOn; // TODO: What is initial state?
+	bool isStrobeOn = true;
 	int cycle = 0;
 
 	// In order: A, B, Select, Start, Up, Down, Left, Right
 	bool keys[8];
 	bool joykeys[8];
-	uint8_t key;
 
 	void IncCycle();
 

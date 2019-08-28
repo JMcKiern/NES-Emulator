@@ -784,7 +784,6 @@ void CPU_6502::RunNextOpcode() {
 			throw std::invalid_argument("Invalid AddrMode: "
 			                            + std::to_string(op.addrMode)
 			                            + " (" + op.addrModeStr + ")");
-			break;
 		 }
 	}
 

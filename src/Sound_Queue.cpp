@@ -138,6 +138,6 @@ void Sound_Queue::fill_buffer( Uint8* out, int count )
 
 void Sound_Queue::fill_buffer_( void* user_data, Uint8* out, int count )
 {
-	((Sound_Queue*) user_data)->fill_buffer( out, count );
+	(reinterpret_cast<Sound_Queue*>(user_data))->fill_buffer( out, count );
 }
 

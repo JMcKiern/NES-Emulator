@@ -8,11 +8,11 @@
 
 namespace GLUtils {
 	mat4 rotateAboutAxis(double ang_deg, vec3 axis);
-	std::string readShaderFile(std::string fileName);
-	GLuint loadShaderFile(std::string vertexShaderFile,
-	                      std::string fragmentShaderFile);
-	GLuint loadShaderProg(std::string vertex_shader,
-	                      std::string fragment_shader);
-	void checkForShaderCompilationErrors(std::string shader_code,
+	std::string readShaderFile(const std::string& fileName);
+	GLuint loadShaderFile(const std::string& vertexShaderFile,
+	                      const std::string& fragmentShaderFile);
+	GLuint loadShaderProg(const std::string& vertex_shader,
+	                      const std::string& fragment_shader);
+	void checkForShaderCompilationErrors(const std::string& shader_code,
 	                                     GLuint shader);
 } // GLUtils

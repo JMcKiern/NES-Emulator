@@ -15,8 +15,9 @@ struct Operation {
 	OpFnPtr Run;
 	uint8_t numCycles;
 
-	Operation(Instr _instr, std::string _instrStr, AddrMode _addrMode,
-	          std::string _addrModeStr, OpFnPtr _Run, uint8_t _numCycles) :
+	Operation(Instr _instr, const std::string& _instrStr, AddrMode _addrMode,
+	          const std::string& _addrModeStr, OpFnPtr _Run,
+			  uint8_t _numCycles) :
 		instr(_instr),
 		instrStr(_instrStr),
 		addrMode(_addrMode),

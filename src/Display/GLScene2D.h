@@ -10,10 +10,10 @@
 // GLScene2D - allows an array of RGB pixels to be displayed
 class GLScene2D {
 private:
-	const std::string vertexShaderCode = 
+	const std::string vertexShaderCode =
 		#include "GLScene2D_vs.glsl"
 		;
-	const std::string fragmentShaderCode = 
+	const std::string fragmentShaderCode =
 		#include "GLScene2D_fs.glsl"
 		;
 
