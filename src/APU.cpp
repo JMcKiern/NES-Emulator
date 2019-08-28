@@ -5,7 +5,7 @@
 #include "APU.h"
 
 void APU::output_samples(const blip_sample_t * smpl, size_t count) {
-#ifndef NES_DISABLE_AUDIO
+#ifndef NES_DISABLE_IO
 	sound_queue.write(smpl, count);
 #endif
 }
@@ -72,7 +72,7 @@ APU::APU(CPU_NES* _cpuPtr) {
 	//apu.dmc_reader(static_cast<APU*>(this)->dmc_read);
 	apu.dmc_reader(apu_dmc_read, cpuPtr);
 
-#ifndef NES_DISABLE_AUDIO
+#ifndef NES_DISABLE_IO
 	if (sound_queue.init(44100))
 		throw std::runtime_error("Failed to initialize Sound_Queue");
 #endif

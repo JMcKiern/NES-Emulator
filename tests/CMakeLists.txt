@@ -20,7 +20,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-trigraphs")
 endif()
 
-target_compile_definitions(NES-Emulator-Test PRIVATE NES_DISABLE_AUDIO)
+target_compile_definitions(NES-Emulator-Test PRIVATE NES_DISABLE_IO)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/../cmake")
 

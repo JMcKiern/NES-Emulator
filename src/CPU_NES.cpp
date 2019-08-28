@@ -38,13 +38,10 @@ uint8_t CPU_NES::Read(uint16_t offset, bool shouldTick/*= true*/) {
 	else if (offset >= 0x4016 && offset <= 0x4017) {
 		// Controllers
 		if (offset == 0x4016) {
-			value = controller0->Read();
+			value = IOPtr->controller0.Read();
 		}
 		else {
-			if (controller1 != nullptr)
-				value = controller1->Read();
-			else
-				value = 0;
+			value = IOPtr->controller1.Read();
 		}
 		value |= (openBus & 0xe0);
 	}
@@ -74,9 +71,8 @@ void CPU_NES::Write(uint16_t offset, uint8_t data, bool shouldTick/*= true*/) {
 	else if (offset >= 0x4016 && offset <= 0x4017) {
 		// Controllers
 		if (offset == 0x4016) {
-			controller0->Write(data);
-			if (controller1 != nullptr)
-				controller1->Write(data);
+			IOPtr->controller0.Write(data);
+			IOPtr->controller1.Write(data);
 		}
 		APUPtr->Write(offset, data);
 	}
@@ -137,23 +133,11 @@ void CPU_NES::PowerUp() {
 }
 
 // Constructor
-CPU_NES::CPU_NES(PPU* _PPUPtr, APU* _APUPtr, Mapper** _mapperPtrPtr,
-				 Controller* _controller0) :
+CPU_NES::CPU_NES(PPU* _PPUPtr, APU* _APUPtr, Mapper** _mapperPtrPtr, IO* _IOPtr) :
 	CPU_6502(0x800)
 {
 	PPUPtr = _PPUPtr;
 	APUPtr = _APUPtr;
-	controller0 = _controller0;
 	mapperPtrPtr = _mapperPtrPtr;
-}
-CPU_NES::CPU_NES(PPU* _PPUPtr, APU* _APUPtr, Mapper** _mapperPtrPtr,
-				 Controller* _controller0,
-				 Controller* _controller1) :
-	CPU_6502(0x800)
-{
-	PPUPtr = _PPUPtr;
-	APUPtr = _APUPtr;
-	controller0 = _controller0;
-	controller1 = _controller1;
-	mapperPtrPtr = _mapperPtrPtr;
+	IOPtr = _IOPtr;
 }
