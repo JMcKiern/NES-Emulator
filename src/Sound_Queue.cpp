@@ -63,6 +63,10 @@ int Sound_Queue::sample_count() const
 
 const char* Sound_Queue::init( long sample_rate, int chan_count )
 {
+	if (SDL_Init(SDL_INIT_AUDIO) < 0)
+		throw std::runtime_error("Failed to initialize SDL");
+	atexit(SDL_Quit);
+
 	assert( !bufs ); // can only be initialized once
 
 	bufs = new sample_t [(long) buf_size * buf_count];
