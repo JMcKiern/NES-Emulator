@@ -17,13 +17,25 @@ install:
   - ps: vcpkg list
 
 build_script:
+  # Build and run tests
+  - ps: cd tests
   - ps: mkdir build
   - ps: cd build
   - ps: cmake -G"$env:CMAKE_GENERATOR" -DCMAKE_TOOLCHAIN_FILE=C:/Tools/vcpkg/scripts/buildsystems/vcpkg.cmake ..
   - ps: cmake --build . --target ALL_BUILD --config $env:CONFIGURATION
+  - ps: git clone -q https://github.com/jmckiern/nes-tests.git
+  - ps: ./Release/NES-Emulator-Test.exe
+  - ps: cd ../../
+
+  # Build main project
+  - ps: mkdir build
+  - ps: cd build
+  - ps: cmake -G"$env:CMAKE_GENERATOR" -DCMAKE_TOOLCHAIN_FILE=C:/Tools/vcpkg/scripts/buildsystems/vcpkg.cmake ..
+  - ps: cmake --build . --target ALL_BUILD --config $env:CONFIGURATION
+  - ps: cd ..
 
 after_build:
-  - ps: 7z a -tzip NES-Emulator_$env:VCPKG_TRIPLET.zip ./$env:CONFIGURATION/*
+  - ps: 7z a -tzip NES-Emulator_$env:VCPKG_TRIPLET.zip ./build/$env:CONFIGURATION/*
 
 artifacts:
   - path: "build/NES-Emulator_$(VCPKG_TRIPLET).zip"

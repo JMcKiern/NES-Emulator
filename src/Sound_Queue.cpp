@@ -5,6 +5,7 @@
 
 #include <assert.h>
 #include <string.h>
+#include <stdexcept>
 
 /* Copyright (C) 2005 by Shay Green. Permission is hereby granted, free of
 charge, to any person obtaining a copy of this software module and associated
@@ -62,6 +63,10 @@ int Sound_Queue::sample_count() const
 
 const char* Sound_Queue::init( long sample_rate, int chan_count )
 {
+	if (SDL_Init(SDL_INIT_AUDIO) < 0)
+		throw std::runtime_error("Failed to initialize SDL");
+	atexit(SDL_Quit);
+
 	assert( !bufs ); // can only be initialized once
 
 	bufs = new sample_t [(long) buf_size * buf_count];
@@ -70,7 +75,7 @@ const char* Sound_Queue::init( long sample_rate, int chan_count )
 
 	free_sem = SDL_CreateSemaphore( buf_count - 1 );
 	if ( !free_sem )
-		return sdl_error( "Couldn't create semaphore" );
+		throw std::runtime_error( "Couldn't create semaphore" );
 
 	SDL_AudioSpec as;
 	as.freq = sample_rate;
@@ -82,7 +87,7 @@ const char* Sound_Queue::init( long sample_rate, int chan_count )
 	as.callback = fill_buffer_;
 	as.userdata = this;
 	if ( SDL_OpenAudio( &as, NULL ) < 0 )
-		return sdl_error( "Couldn't open SDL audio" );
+		throw std::runtime_error( "Couldn't open SDL audio" );
 	SDL_PauseAudio( false );
 	sound_open = true;
 

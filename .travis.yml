@@ -1,17 +1,35 @@
 sudo: required
 dist: bionic
+
 language: cpp
+
 compiler:
 - gcc
+
 before_install:
 - sudo apt update
+
 install:
 - sudo apt install libglew-dev libglfw3-dev libsdl2-dev
+
 script:
+  # Build and run tests
+- cd tests
 - mkdir build
 - cd build
 - cmake ..
 - make
+- git clone https://github.com/jmckiern/nes-tests.git
+- ./NES-Emulator-Test
+- cd ../../
+
+  # Build main project
+- mkdir build
+- cd build
+- cmake ..
+- make
+- cd ..
+
 deploy:
   provider: releases
   skip_cleanup: true

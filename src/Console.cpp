@@ -1,112 +1,11 @@
 #include <chrono>
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
 #include <iostream>
-#include <memory>
 #include <string>
 #include <thread>
 #include "Console.h"
 #include "MapperFactory.h"
 #include "RegisterInterrupt.h"
 
-void Console::InitializeWindow() {
-	if (!glfwInit()) {
-		throw std::runtime_error("Error: GLFW failed to initialise");
-	}
-
-	window = glfwCreateWindow(w_width, w_height, windowTitle.c_str(), NULL,
-	                          NULL);
-	if (!window) {
-		throw std::runtime_error("Error: GLFW failed to create window");
-	}
-	glfwMakeContextCurrent(window);
-}
-void Console::SetCallbacks() {
-	glfwSetWindowUserPointer(window, this);
-
-	auto sizeCB = [](GLFWwindow* w, int a, int b) {
-		static_cast<Console*>(glfwGetWindowUserPointer(w))->
-			ResizeWinCB(w, a, b);
-	};
-	glfwSetWindowSizeCallback(window, sizeCB);
-
-	auto keyCB = [](GLFWwindow* w, int a, int b, int c, int d) {
-		static_cast<Console*>(glfwGetWindowUserPointer(w))->
-			KeyCB(w, a, b, c, d);
-	};
-	glfwSetKeyCallback(window, keyCB);
-}
-void Console::ResizeWinCB(GLFWwindow* _window, int w, int h) {
-	if (window != _window) {
-		throw std::runtime_error("Incorrect window");
-	}
-	w_width = w;
-	w_height = h;
-}
-void Console::KeyCB(GLFWwindow* _window, int key, int scancode, int action,
-                    int mods) {
-	if (window != _window) return;
-	if (controller0KeyMap.count(key) > 0)
-		controller0.SetKey(controller0KeyMap[key], action);
-	if (controller1KeyMap.count(key) > 0)
-		controller1.SetKey(controller1KeyMap[key], action);
-	if (key == GLFW_KEY_F11 && action == GLFW_PRESS) ToggleFullscreen();
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) glfwSetWindowShouldClose(window, 1);
-}
-void Console::UpdatePeripherals() {
-	for (std::vector<std::unique_ptr<Peripheral>>::iterator it
-	         = peripherals.begin();
-	     it != peripherals.end();
-	     it++) {
-		(*it)->UpdatePeripheral();
-	}
-}
-void Console::CheckJoystick() {
-	int count;
-	const unsigned char* buttons = glfwGetJoystickButtons(joynum, &count);
-	if (buttons != NULL) {
-		for (int i = 0; i < 8; i++) {
-			int action = buttons[gamePadKeyMap[i]];
-			controller0.SetJoyKey(i, action);
-		}
-	}
-}
-void Console::UpdateFPSCounter(int numFrames/*=1*/) {
-	static auto prevTime = std::chrono::system_clock::now();
-	auto dT = std::chrono::duration_cast<
-		std::chrono::milliseconds>(
-			std::chrono::system_clock::now() - prevTime
-		).count();
-	if (dT == 0) {
-		dT = 1;
-	}
-
-	// Truncates the value but that's fine
-	std::string title = "FPS: " + std::to_string(numFrames * 1000 / dT);
-	glfwSetWindowTitle(window, title.c_str());
-	prevTime = std::chrono::system_clock::now();
-}
-void Console::ToggleFullscreen() {
-	if (isFullscreen) {
-		// Return to windowed
-		glfwSetWindowMonitor(window, NULL, old_xpos, old_ypos, old_width,
-				old_height, 0);
-		isFullscreen = false;
-	}
-	else {
-		// Save window pos and size
-		glfwGetWindowPos(window, &old_xpos, &old_ypos);
-		old_width = w_width;
-		old_height = w_height;
-
-		// Set fullscreen
-		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-		glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height,
-				mode->refreshRate);
-		isFullscreen = true;
-	}
-}
 void Console::RunFrame() {
 	// A frame should take 16ms (and sleep for 16 - run_time = ~9)
 	//std::cout << "Sleeping for "
@@ -131,24 +30,19 @@ void Console::RunFrame() {
 }
 void Console::Run(std::string filename) {
 	LoadINES(filename);
-	UpdatePeripherals(); // Only needed for Register Interrupts
-	InitializeWindow();
-	SetCallbacks();
-	gls.InitGL();
 
-	int i = 0;
+#ifndef NES_DISABLE_IO
+	io.Initialize();
+#endif
+
 	nextFrame = std::chrono::system_clock::now() + cycles{0};
-	while (!glfwWindowShouldClose(window)) {
-		i++;
+	while (true) {
 		RunFrame();
-		if (i % FPS_WINDOW == 0) {
-			UpdateFPSCounter(FPS_WINDOW);
-			i = 0;
-		}
-		glfwPollEvents();
-		if (usingGamePad) CheckJoystick();
-		UpdatePeripherals(); // Only needed for Register Interrupts
-		gls.DrawGLScene(window, w_width, w_height);
+
+#ifndef NES_DISABLE_IO
+		io.Update();
+		if (io.ShouldClose()) break;
+#endif
 
 		if (desiredHash != "" && desiredHash == ppu.GetDispHash()) break;
 		if (numInstrsToRun != 0
@@ -189,10 +83,9 @@ void Console::LoadINES(std::string filename) {
 }
 
 Console::Console() :
-	cpu(&ppu, &apu, &mapperPtr, &controller0, &controller1),
-	ppu(&cpu, &mapperPtr, &gls),
-	apu(&cpu),
-	gls(RES_X, RES_Y)
+	cpu(&ppu, &apu, &mapperPtr, &io),
+	ppu(&cpu, &mapperPtr, &io.gls),
+	apu(&cpu)
 {}
 Console::~Console() {
 	glfwTerminate();

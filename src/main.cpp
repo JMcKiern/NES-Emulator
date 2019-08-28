@@ -24,7 +24,7 @@ void displayError(std::string err) {
 }
 #else
 void displayError(std::string err) {
-	std::cerr << err;
+	std::cerr << err << std::endl;
 }
 #endif
 

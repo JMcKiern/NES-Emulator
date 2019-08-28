@@ -33,9 +33,7 @@ private:
 	void end_time_frame(int length);
 
 	// For actual output
-	Sound_Queue* sound_queue;
-	void play_samples(const blip_sample_t* samples, long count);
-
+	Sound_Queue sound_queue;
 
 public:
 	uint8_t Read(uint16_t offset);

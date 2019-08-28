@@ -1,12 +1,13 @@
 #include <exception>
 #include <cstdint>
 #define HAVE_STDINT_H 1
-#include <SDL2/SDL.h>
 #include "Sound_Queue.h"
 #include "APU.h"
 
 void APU::output_samples(const blip_sample_t * smpl, size_t count) {
-	sound_queue->write(smpl, count);
+#ifndef NES_DISABLE_IO
+	sound_queue.write(smpl, count);
+#endif
 }
 
 int APU::elapsed() {
@@ -70,19 +71,13 @@ APU::APU(CPU_NES* _cpuPtr) {
 	apu.output(&buf);
 	//apu.dmc_reader(static_cast<APU*>(this)->dmc_read);
 	apu.dmc_reader(apu_dmc_read, cpuPtr);
-	if (SDL_Init(SDL_INIT_AUDIO) < 0)
-		exit(EXIT_FAILURE);
 
-	atexit(SDL_Quit);
-
-	sound_queue = new Sound_Queue;
-	if (!sound_queue)
-		exit(EXIT_FAILURE);
-
-	if (sound_queue->init(44100))
-		exit(EXIT_FAILURE);
+#ifndef NES_DISABLE_IO
+	if (sound_queue.init(44100))
+		throw std::runtime_error("Failed to initialize Sound_Queue");
+#endif
 }
 
 APU::~APU() {
-	delete sound_queue;
+	//delete sound_queue;
 }
