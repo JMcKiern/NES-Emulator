@@ -1,12 +1,12 @@
 #include <exception>
 #include <cstdint>
 #define HAVE_STDINT_H 1
-#include "Sound_Queue.h"
 #include "APU.h"
 
-void APU::output_samples(const blip_sample_t * smpl, size_t count) {
+void APU::output_samples(blip_sample_t * smpl, size_t count) {
 #ifndef NES_DISABLE_IO
-	sound_queue.write(smpl, count);
+	//sound_queue.write(smpl, count);
+	soundbuffer.Write(smpl, count);
 #endif
 }
 
@@ -73,8 +73,7 @@ APU::APU(CPU_NES* _cpuPtr) {
 	apu.dmc_reader(apu_dmc_read, cpuPtr);
 
 #ifndef NES_DISABLE_IO
-	if (sound_queue.init(44100))
-		throw std::runtime_error("Failed to initialize Sound_Queue");
+	soundbuffer.Initialize(44100);
 #endif
 }
 
