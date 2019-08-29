@@ -10,7 +10,7 @@ before_install:
 - sudo apt update
 
 install:
-- sudo apt install libglew-dev libglfw3-dev libsdl2-dev
+- sudo apt install libglew-dev libglfw3-dev portaudio19-dev
 
 script:
   # Build and run tests
