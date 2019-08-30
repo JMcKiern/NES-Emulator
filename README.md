@@ -13,7 +13,7 @@ NES emulator written in C++
 Before building this project the following must be installed :
 - [GLEW](http://glew.sourceforge.net/) - `libglew-dev` on Ubuntu
 - [GLFW](https://www.glfw.org/download.html) - `libglfw3-dev` on Ubuntu
-- [SDL2](https://www.libsdl.org/) - `libsdl2-dev` on Ubuntu
+- [PortAudio](http://www.portaudio.com/) - `portaudio19-dev` on Ubuntu
 
 ### CMake
 
@@ -25,12 +25,12 @@ The following definitions can be used to locate the dependencies if they are not
 
 ### Windows
 
-I use [vcpkg](https://github.com/microsoft/vcpkg) to install the dependencies on Windows
+I use [vcpkg](https://github.com/microsoft/vcpkg) to install the dependencies on Windows.
 
 ```
 vcpkg install glfw3:x64_windows
 vcpkg install glew:x64_windows
-vcpkg install sdl2:x64_windows
+vcpkg install portaudio:x64_windows
 git clone https://github.com/jmckiern/NES-Emulator
 cd NES-Emulator
 mkdir build
@@ -41,10 +41,8 @@ cmake --build . --target ALL_BUILD --config Release
 
 ### Linux
 
-The below packages supply the dependencies on Ubuntu
-
 ```
-sudo apt install libglew-dev libglfw3-dev libsdl2-dev
+sudo apt install libglew-dev libglfw3-dev portaudio19-dev
 git clone https://github.com/jmckiern/NES-Emulator
 cd NES-Emulator
 mkdir build
