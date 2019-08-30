@@ -58,8 +58,7 @@ int main(int argc, char* argv[]) {
 
 		{"nes-tests/PPU/blargg_ppu_tests_2005.09.15b/palette_ram.nes", 178166, "a028c0ca"},
 		{"nes-tests/PPU/blargg_ppu_tests_2005.09.15b/power_up_palette.nes", 178299, "a028c0ca"},
-		//{"nes-tests/PPU/blargg_ppu_tests_2005.09.15b/sprite_ram.nes", 169720, "a028c0ca"},
-		//PrintHash("nes-tests/PPU/blargg_ppu_tests_2005.09.15b/sprite_ram.nes"},
+		{"nes-tests/PPU/blargg_ppu_tests_2005.09.15b/sprite_ram.nes", 169288, "a028c0ca"},
 		//PrintHash("nes-tests/PPU/blargg_ppu_tests_2005.09.15b/vbl_clear_time.nes"},
 		{"nes-tests/PPU/blargg_ppu_tests_2005.09.15b/vram_access.nes", 186572, "a028c0ca"},
 

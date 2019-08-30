@@ -120,19 +120,22 @@ uint8_t PPU::PPUSTATUS() { // Potential Error: 5 LSB should not be zero
 	if (cycle < 3 && scanline == 241) {
 		//shouldSuppressNMI = true;
 	}
+	openBus = status;
 	return status;
 }
 void PPU::OAMADDR(uint8_t data) {
 	oamAddr = data;
 }
 void PPU::OAMDATA(uint8_t data) {
-	OAM[oamAddr] = data;
+	if (oamAddr % 4 == 2)
+		OAM[oamAddr] = (data & ~0x1c);
+	else
+		OAM[oamAddr] = data;
 	oamAddr++;
 }
 uint8_t PPU::OAMDATA() {
-	uint8_t returnValue = (OAM[oamAddr] & ~(0x1c));
-	openBus = returnValue;
-	return returnValue;
+	openBus = OAM[oamAddr];
+	return OAM[oamAddr];// returnValue;
 }
 void PPU::PPUSCROLL(uint8_t data) {
 	if (w == 0) { // isNextScrollX = true
@@ -237,6 +240,7 @@ void PPU::SpriteEvaluation() {
 			spriteEvalTemp = 0xFF;
 		}
 		else {
+			// TODO: This should probably set byte 2 to 0xE3
 			OAMSL[oamSLAddr] = spriteEvalTemp;
 			oamSLAddr = (oamSLAddr + 1) % 0x20;
 		}
@@ -834,10 +838,16 @@ PPU::PPU(CPU_NES* _CPUPtr, Mapper** _mapperPtrPtr, GLScene2D* _gls) :
 	gls = _gls;
 
 	for (int i = 0; i < 0x100; i++) {
-		OAM[i] = 0xFF;
+		if (i % 4 == 2)
+			OAM[i] = 0xE3;
+		else
+			OAM[i] = 0xFF;
 	}
 	for (int i = 0; i < 0x20; i++) {
-		OAMSL[i] = 0xFF;
+		if (i % 4 == 2)
+			OAMSL[i] = 0xE3;
+		else
+			OAMSL[i] = 0xFF;
 	}
 	for (int i = 0; i < 8; i++) {
 		bsrSpr[i][0] = 0;
