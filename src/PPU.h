@@ -2,7 +2,6 @@
 
 #include <cstdint>
 #include <memory>
-#include <chrono>
 #include "CPU_NES.h"
 #include "Mapper.h"
 #include "PeripheralConnection.h"
@@ -20,7 +19,7 @@ private:
 	void Write(uint16_t offset, uint8_t data);
 	uint8_t Read(uint16_t offset);
 
-	// PPUCTRL Variables	
+	// PPUCTRL Variables
 	uint16_t nameTableAddr;
 	uint16_t patternTableAddrSprite;
 	uint16_t patternTableAddrBackground;
@@ -34,7 +33,7 @@ private:
 	bool shouldClipSprites = false;
 	bool shouldShowBackground = false;
 	bool shouldShowSprites = false;
-	uint8_t colourEmphasis; // Background Colour in Monochrome Mode or 
+	uint8_t colourEmphasis; // Background Colour in Monochrome Mode or
 							// Colour Intensity in Colour Mode
 
 	// PPUSTATUS Variables
@@ -56,7 +55,8 @@ private:
 
 	// PPU Registers - Used to communicate with CPU
 	uint8_t openBus = 0;
-	std::chrono::time_point<std::chrono::system_clock> openBusLastRefresh;
+	long frameCount = 0;
+	long openBusLastRefresh = 0;
 	void PPUCTRL(uint8_t data);
 	void PPUMASK(uint8_t data);
 	uint8_t PPUSTATUS();
@@ -121,13 +121,13 @@ private:
 	void ShiftSprShifters();
 
 	void UpdateA12(uint16_t addr);
-	
+
 	GLScene2D* gls;
 
 	Palette palette;
 
 	Mapper** mapperPtrPtr;
-	
+
 public:
 	// Frame Check
 	bool IsOddFrame();

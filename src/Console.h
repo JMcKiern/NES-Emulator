@@ -36,6 +36,7 @@ class Console {
 	std::string desiredHash = "";
 	bool shouldPrintHash = false;
 	std::string prevHash;
+	bool shouldRunAt60fps = true;
 
 public:
 	void RunFrame();
@@ -47,6 +48,6 @@ public:
 	std::string GetFrameHash();
 	void LoadINES(std::string filename);
 
-	Console();
+	Console(bool _shouldRunAt60fps = true);
 	~Console();
 };

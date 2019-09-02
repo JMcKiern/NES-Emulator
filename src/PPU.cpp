@@ -109,9 +109,9 @@ uint8_t PPU::PPUSTATUS() { // Potential Error: 5 LSB should not be zero
 	status |= ((isSprite0Hit & 0x1) << 6);
 	status |= ((isInVBlank & 0x1) << 7);
 	isInVBlank = false;
-	// Reading 1 PPU clock before VBL should suppress setting 
-	if (cycle == 0 && scanline == 241) { 
-	//if (cycle == 340 && scanline == 240) { 
+	// Reading 1 PPU clock before VBL should suppress setting
+	if (cycle == 0 && scanline == 241) {
+	//if (cycle == 340 && scanline == 240) {
 		// This must be cycle == 0(1) since cycle corresponds to the cycle on
 		// prev(next) PPU tick
 		shouldSuppressSettingVBL = true;
@@ -384,7 +384,7 @@ void PPU::ChoosePixel() {
 						sprPxl = ((bsrSpr[i][1] & 0x80) >> 6)
 						         | ((bsrSpr[i][0] & 0x80) >> 7);
 						sprAttr = lchSpr[i];
-						
+
 						// if pixel not transparent
 						// if not (color = 0 on palette = 0)
 						if (spritePixelsLeft[i] > 0
@@ -624,7 +624,7 @@ void PPU::LoadSpritesForScanline() {
 }
 
 // http://wiki.nesdev.com/w/index.php/PPU_rendering#Line-by-line_timing
-// Each 
+// Each
 void PPU::RenderTick() {
 	if (scanline == -1) {
 		// Pre-render scanline
@@ -632,7 +632,7 @@ void PPU::RenderTick() {
 			isInVBlank = false;
 			// Bit 7, 6 and 5 of PPUSTATUS ($2002) is cleared at dot 1 of the
 			// pre-render line.
-			isSprite0Hit = false; 
+			isSprite0Hit = false;
 			isSpriteOverflow = false;
 		}
 		else if (321 <= cycle && cycle <= 336) {
@@ -685,18 +685,18 @@ void PPU::RenderTick() {
 		}
 		if (cycle == 257) { // dot 257
 			// v: ....... ...EDCBA = t : ....... ...EDCBA
-			v = (v & ~(0x1F)) | ((t & 0x1F));    
+			v = (v & ~(0x1F)) | ((t & 0x1F));
 
 			// v: ....F.. ........ = t : ....F.. ........
-			v = (v & ~(0x1 << 10)) | (t & (0x1 << 10)); 
+			v = (v & ~(0x1 << 10)) | (t & (0x1 << 10));
 		}
 		if (scanline == -1) {
 			if (280 <= cycle && cycle <= 304) { // dot 280-304
 				// v: IHGF... ........ = t: IHGF... ........
-				v = (v & ~(0xF << 11)) | ((t & (0xF << 11))); 
+				v = (v & ~(0xF << 11)) | ((t & (0xF << 11)));
 
 				// v: .....ED CBA..... = t: .....ED CBA.....
-				v = (v & ~(0x1F << 5)) | ((t & (0x1F << 5))); 
+				v = (v & ~(0x1F << 5)) | ((t & (0x1F << 5)));
 			}
 		}
 		if (cycle <= 256 || cycle >= 328) {
@@ -784,8 +784,9 @@ void PPU::Tick() {
 		// Start of new frame
 		isOddFrame = !isOddFrame;
 		shouldSuppressNMI = false;
+		frameCount++;
 	}
-	
+
 	// TODO: Check order of these functions
 	RenderTick();
 	ShiftBGShifters();
@@ -807,7 +808,6 @@ void PPU::Tick() {
 	else {
 		cpuNMIConnection.SetState(HIGH);
 	}
-	
 }
 
 void PPU::PowerUp() {
@@ -866,7 +866,7 @@ bool PPU::IsOddFrame() {
 // PPU Registers Access Functions for the CPU
 void PPU::WriteReg(uint16_t offset, uint8_t data) {
 	openBus = data;
-	openBusLastRefresh = std::chrono::system_clock::now();
+	openBusLastRefresh = frameCount;
 	switch (offset) {
 		case 0x2000: PPUCTRL(data); break;
 		case 0x2001: PPUMASK(data); break;
@@ -880,11 +880,9 @@ void PPU::WriteReg(uint16_t offset, uint8_t data) {
 	}
 }
 uint8_t PPU::ReadReg(uint16_t offset) {
-	auto msSinceLastRefresh
-		= std::chrono::duration_cast<std::chrono::milliseconds>(
-		          std::chrono::system_clock::now() - openBusLastRefresh
-		      ).count();
-	if (msSinceLastRefresh > 600) 
+	long framesSinceLastRefresh = frameCount - openBusLastRefresh;
+	// Open bus goes to 0 after 600 ms
+	if (framesSinceLastRefresh > 0.600 * 60)
 		openBus = 0;
 	switch (offset) {
 		case 0x2002: return PPUSTATUS();

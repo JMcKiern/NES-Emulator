@@ -14,7 +14,8 @@ void Console::RunFrame() {
 	//	           nextFrame - std::chrono::system_clock::now()
 	//	       ).count()
 	//	<< " ms\n";
-	std::this_thread::sleep_until(nextFrame);
+	if (shouldRunAt60fps)
+		std::this_thread::sleep_until(nextFrame);
 
 	bool isOddFrame = ppu.IsOddFrame();
 	while (isOddFrame == ppu.IsOddFrame()) {
@@ -82,10 +83,11 @@ void Console::LoadINES(std::string filename) {
 	cpu.PowerUp();
 }
 
-Console::Console() :
+Console::Console(bool _shouldRunAt60fps/*= true*/) :
 	cpu(&ppu, &apu, &mapperPtr, &io),
 	ppu(&cpu, &mapperPtr, &io.gls),
-	apu(&cpu)
+	apu(&cpu),
+	shouldRunAt60fps(_shouldRunAt60fps)
 {}
 Console::~Console() {
 	glfwTerminate();

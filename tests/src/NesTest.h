@@ -8,11 +8,11 @@ struct NesTestRun {
 };
 
 bool Test(std::string filename, int numInstrs, std::string desiredHash) {
-	Console console;
+	Console console(false);
 	return console.Test(filename, numInstrs, desiredHash);
 }
 void PrintHash(std::string filename) {
 	std::cout << "Printing hashes for " << filename << '\n';
-	Console console;
+	Console console(false);
 	console.PrintHash(filename);
 }
