@@ -62,6 +62,9 @@ int main(int argc, char* argv[]) {
 		//PrintHash("nes-tests/PPU/blargg_ppu_tests_2005.09.15b/vbl_clear_time.nes"},
 		{"nes-tests/PPU/blargg_ppu_tests_2005.09.15b/vram_access.nes", 186572, "a028c0ca"},
 
+		{"nes-tests/PPU/oam_read/oam_read.nes", 233935, "bf43241e"},
+		{"nes-tests/PPU/oam_stress/oam_stress.nes", 16389317, "17bf66b3"},
+
 		//PrintHash("nes-tests/PPU/nmi_sync/demo_ntsc.nes"},
 
 		{"nes-tests/PPU/ppu_sprite_hit/rom_singles/01-basics.nes", 402814, "9841a902"},
@@ -96,6 +99,11 @@ int main(int argc, char* argv[]) {
 	//PrintHash("nes-tests/holydiverbatman-bin-0.01/testroms/M1_P128K_C32K.nes");
 	//PrintHash("nes-tests/holydiverbatman-bin-0.01/testroms/M1_P128K_C32K_S8K.nes");
 	//PrintHash("nes-tests/holydiverbatman-bin-0.01/testroms/M1_P128K_C32K_W8K.nes");
+
+	//PrintHash("nes-tests/PPU/scanline/scanline.nes");
+	//PrintHash("nes-tests/PPU/ppu_sprite_overflow/ppu_sprite_overflow.nes");
+	//PrintHash("nes-tests/PPU/sprdma_and_dmc_dma/sprdma_and_dmc_dma.nes");
+	//PrintHash("nes-tests/PPU/sprdma_and_dmc_dma/sprdma_and_dmc_dma_512.nes");
 
 	std::vector<std::string> failedFilenames;
 	for (auto it = ftrs.begin(); it != ftrs.end(); ++it) {
