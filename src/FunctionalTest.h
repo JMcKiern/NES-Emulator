@@ -5,6 +5,7 @@
 #include <vector>
 #include <memory>
 #include <chrono>
+#include <iostream>
 #include "CPU_6502.h"
 #include "Peripheral.h"
 #include "RegisterInterrupt.h"

@@ -3,7 +3,7 @@
 #include "Windows.h"
 #endif
 #include "Console.h"
-#include "Test.cpp"
+#include "Test.h"
 #include "Logger.h"
 
 //Logger logger("log.txt");

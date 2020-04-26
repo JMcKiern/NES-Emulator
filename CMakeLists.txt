@@ -24,6 +24,10 @@ endif()
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
+option(NES_DISABLE_IO "Disable the NES's IO" OFF)
+if (NES_DISABLE_IO)
+	target_compile_definitions(NES-Emulator PRIVATE NES_DISABLE_IO)
+endif()
 
 # If using vcpkg
 if(CMAKE_TOOLCHAIN_FILE)

@@ -1,4 +1,8 @@
+#pragma once
+
 #include <fstream>
+#include <sstream>
+#include <cctype>
 #include "FunctionalTest.h"
 #include "NesTest.h"
 
@@ -32,9 +36,7 @@ int RunTests(std::string csvTestFile) {
 		std::string token;
 		while (std::getline(ss, token, DELIMITER)) {
 			vec.push_back(token);
-			std::cout << token << " ";
 		}
-		std::cout << "\n";
 
 		if (vec.size() == 0) {
 			continue; // Empty line
