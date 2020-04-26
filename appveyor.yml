@@ -18,14 +18,13 @@ install:
 
 build_script:
   # Build and run tests
-  - ps: mkdir build
-  - ps: cd build
+  - ps: mkdir testbuild
+  - ps: cd testbuild
   - ps: cmake -G"$env:CMAKE_GENERATOR" -DCMAKE_TOOLCHAIN_FILE=C:/Tools/vcpkg/scripts/buildsystems/vcpkg.cmake -DNES_DISABLE_IO=ON ..
   - ps: cmake --build . --target ALL_BUILD --config $env:CONFIGURATION
   - ps: git clone -q https://github.com/jmckiern/nes-tests.git
   - ps: iex "./$env:CONFIGURATION/NES-Emulator.exe --test ../tests/testlist.csv"
   - ps: cd ..
-  - ps: rm -rf build
 
   # Build main project
   - ps: mkdir build
