@@ -1,5 +1,5 @@
 #pragma once
-#include "../../src/Console.h"
+#include "Console.h"
 
 struct NesTestRun {
 	std::string filename;

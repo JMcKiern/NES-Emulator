@@ -5,9 +5,9 @@
 #include <vector>
 #include <memory>
 #include <chrono>
-#include "../../src/CPU_6502.h"
-#include "../../src/Peripheral.h"
-#include "../../src/RegisterInterrupt.h"
+#include "CPU_6502.h"
+#include "Peripheral.h"
+#include "RegisterInterrupt.h"
 
 struct FunctionalTestRun {
 	std::string filename;
@@ -65,7 +65,7 @@ bool FunctionalTest(std::string filename, uint16_t memOffset, uint16_t startPC, 
 		std::cout << "Final PC: " << currPC << "\n";
 		std::cout << "Success!\n\n";
 	}
-	else if (currPC != successPC) { // 
+	else if (currPC != successPC) { //
 		std::cout << "Ran " << filename << '\n';
 		std::cout << "Finished with: " << cpu.GetTotalCycles() << " cycles\n";
 		std::cout << "               " << elapsed_seconds.count() << " second\n";

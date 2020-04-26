@@ -3,6 +3,7 @@
 #include "Windows.h"
 #endif
 #include "Console.h"
+#include "Test.cpp"
 #include "Logger.h"
 
 //Logger logger("log.txt");
@@ -28,17 +29,23 @@ void displayError(std::string err) {
 }
 #endif
 
+
 int main(int argc, char* argv[]) {
 	try {
 		if (argc == 2) {
 			Console console;
 			console.Run(argv[1]);
 		}
+		else if (argc == 3 && (std::string(argv[1]) == "--test" ||
+		         std::string(argv[1]) == "-t")) {
+			std::string csvTestFile = argv[2];
+			return RunTests(csvTestFile);
+		}
 		else if (argc < 2) {
 			throw std::runtime_error("You must supply a file to run!\n");
 		}
 		else {
-			throw std::runtime_error("You cannot supply more than one file!\n");
+			throw std::runtime_error("Did not understand the arguments!\n");
 		}
 		return 0;
 	}
