@@ -14,14 +14,14 @@ install:
 
 script:
   # Build and run tests
-- cd tests
 - mkdir build
 - cd build
-- cmake ..
+- cmake -DNES_DISABLE_IO=ON ..
 - make
 - git clone https://github.com/jmckiern/nes-tests.git
-- ./NES-Emulator-Test
-- cd ../../
+- ./NES-Emulator --test ../tests/testlist.csv
+- cd ..
+- rm -rf build
 
   # Build main project
 - mkdir build
