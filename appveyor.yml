@@ -23,7 +23,10 @@ build_script:
   - ps: cmake -G"$env:CMAKE_GENERATOR" -DCMAKE_TOOLCHAIN_FILE=C:/Tools/vcpkg/scripts/buildsystems/vcpkg.cmake -DNES_DISABLE_IO=ON ..
   - ps: cmake --build . --target ALL_BUILD --config $env:CONFIGURATION
   - ps: git clone -q https://github.com/jmckiern/nes-tests.git
-  - ps: iex "./$env:CONFIGURATION/NES-Emulator.exe --test ../tests/testlist.csv"
+  - ps: $process = Start-Process "./$env:CONFIGURATION/NES-Emulator.exe" -ArgumentList "--test ../tests/testlist.csv" -Wait -PassThru -RedirectStandardOutput "out.txt" -RedirectStandardError "err.txt"
+  - ps: cat out.txt
+  - ps: cat err.txt
+  - ps: cmd /c exit $process.ExitCode
   - ps: cd ..
 
   # Build main project
