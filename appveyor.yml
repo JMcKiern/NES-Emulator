@@ -25,7 +25,7 @@ build_script:
   - ps: git clone -q https://github.com/jmckiern/nes-tests.git
   - ps: $process = Start-Process "./$env:CONFIGURATION/NES-Emulator.exe" -ArgumentList "--test ../tests/testlist.csv" -Wait -PassThru -RedirectStandardOutput "out.txt"
   - ps: cat out.txt
-  - ps: return $process.ExitCode
+  - ps: $LASTEXITCODE = $process.ExitCode
   - ps: cd ..
 
   # Build main project
