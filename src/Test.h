@@ -114,6 +114,6 @@ int RunTests(std::string csvTestFile) {
 	}
 	else {
 		std::cout << "Passed all tests!\n";
-		return 1;
+		return 0;
 	}
 }
