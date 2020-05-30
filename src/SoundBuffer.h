@@ -2,8 +2,8 @@
 
 #include <cstdint>
 #include <queue>
-#include "portaudio.h"
-#include "readerwriterqueue.h"
+#include <portaudio.h>
+#include "../3rdparty/readerwriterqueue/readerwriterqueue.h"
 
 using namespace moodycamel;
 

@@ -5,7 +5,7 @@
 #include "CPU_NES.h"
 
 // I'm going to be lazy and just use blargg's library
-#include "nes_apu/Nes_Apu.h"
+#include "../3rdparty/nes_apu/Nes_Apu.h"
 #include "SoundBuffer.h"
 
 class CPU_NES;
