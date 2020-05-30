@@ -1,4 +1,5 @@
 #include <chrono>
+#include <stdexcept>
 #include "IO.h"
 
 void IO::InitializeWindow() {
