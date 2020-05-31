@@ -5,6 +5,7 @@
 #include "Console.h"
 #include "MapperFactory.h"
 #include "RegisterInterrupt.h"
+#include "INILoader.h"
 
 void Console::RunFrame() {
 	// A frame should take 16ms (and sleep for 16 - run_time = ~9)
@@ -29,10 +30,14 @@ void Console::RunFrame() {
 	apu.RunFrame();
 	nextFrame += cycles{cyclesRun};
 }
-void Console::Run(std::string filename) {
+void Console::Run(std::string filename, std::string inifilename/*= ""*/) {
 	LoadINES(filename);
 
 #ifndef NES_DISABLE_IO
+	if (inifilename != "") {
+		INILoader iniLoader;
+		iniLoader.ParseINIFile(inifilename, &io);
+	}
 	io.Initialize();
 #endif
 

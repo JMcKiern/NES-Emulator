@@ -74,6 +74,7 @@ public:
 	GLScene2D gls = GLScene2D(RES_X, RES_Y);
 
 	void Initialize();
+	void SetContollerKeyMap(uint8_t ctrlNum, std::map<int, int> keymap);
 	void Update(int framesRun = 1);
 	bool ShouldClose();
 };

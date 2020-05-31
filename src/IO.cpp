@@ -109,6 +109,18 @@ void IO::Initialize() {
 	isInitialized = true;
 }
 
+void IO::SetContollerKeyMap(uint8_t ctrlNum, std::map<int, int> keymap) {
+	switch(ctrlNum) {
+		default:
+		case 0:
+			controller0KeyMap = keymap;
+			break;
+		case 1:
+			controller1KeyMap = keymap;
+			break;
+	}
+}
+
 void IO::Update(int framesRun/*= 1*/) {
 	if (!isInitialized)
 		throw std::logic_error("IO must be initialized before use");

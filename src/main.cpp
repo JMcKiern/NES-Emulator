@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
 	try {
 		if (argc == 2) {
 			Console console;
-			console.Run(argv[1]);
+			console.Run(argv[1], "settings.ini");
 		}
 		else if (argc == 3 && (std::string(argv[1]) == "--test" ||
 		         std::string(argv[1]) == "-t")) {

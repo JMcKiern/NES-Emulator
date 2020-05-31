@@ -40,7 +40,7 @@ class Console {
 
 public:
 	void RunFrame();
-	void Run(std::string filename);
+	void Run(std::string filename, std::string inifilename = "");
 	void RunInstrs(std::string filename, int _numInstrs);
 	bool Test(std::string filename, int _numInstrsToRun,
 	          std::string _desiredHash);

@@ -4,6 +4,7 @@ project(NES-Emulator)
 
 file(GLOB_RECURSE SOURCES
 	"${PROJECT_SOURCE_DIR}/src/*.cpp"
+	"${PROJECT_SOURCE_DIR}/3rdparty/*.c"
 	"${PROJECT_SOURCE_DIR}/3rdparty/*.cpp")
 file(GLOB_RECURSE HEADERS
 	"${PROJECT_SOURCE_DIR}/src/*.h"
