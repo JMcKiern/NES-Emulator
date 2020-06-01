@@ -5,6 +5,7 @@
 [![Coverity Scan](https://scan.coverity.com/projects/19074/badge.svg)](https://scan.coverity.com/projects/jmckiern-nes-emulator)
 
 NES emulator written in C++
+
 <div align="center">
 <img src="demo.gif">
 </div>
