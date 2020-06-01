@@ -5,6 +5,9 @@
 [![Coverity Scan](https://scan.coverity.com/projects/19074/badge.svg)](https://scan.coverity.com/projects/jmckiern-nes-emulator)
 
 NES emulator written in C++
+<div align="center">
+<img src="demo.gif">
+</div>
 
 ## How to Build
 
@@ -20,8 +23,8 @@ Before building this project the following must be installed :
 To keep this project platform independent CMake is used to generate the build files.
 
 The following definitions can be used to locate the dependencies if they are not found automatically:
-- CMAKE_INCLUDE_PATH
-- CMAKE_LIBRARY_PATH
+- CMAKE\_INCLUDE\_PATH
+- CMAKE\_LIBRARY\_PATH
 
 ### Windows
 
@@ -59,7 +62,9 @@ This emulator opens the file passed through the command line arguments. A game c
 
 ### Controls
 
-The controls are currently hardcoded.
+The controls can be set in a `settings.ini` file.
+
+The default controls are
 
 Player 1:
 ```
